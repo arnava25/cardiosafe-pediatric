@@ -1,0 +1,17 @@
+drug_name,standard_type,assay_quality,n,median_nM,min_nM,max_nM,median_pchembl
+Aripiprazole,IC50,electrophysiology,2,2378.0,896.0,3860.0,5.73
+Aripiprazole,IC50,other,4,948.25,630.96,3860.0,6.05
+Aripiprazole,Ki,binding_assay,2,809.0,598.0,1020.0,6.105
+Aripiprazole,Ki,electrophysiology,1,1020.0,1020.0,1020.0,5.99
+Fluoxetine,IC50,binding_assay,3,10000.0,3100.0,12286.4,5.21
+Fluoxetine,IC50,electrophysiology,1,1513.56,1513.56,1513.56,5.82
+Fluoxetine,IC50,other,4,985.3249999999999,10.0,1513.56,6.08
+Fluoxetine,Ki,binding_assay,1,10066.0,10066.0,10066.0,5.0
+Guanfacine,IC50,binding_assay,0,,,,
+Guanfacine,Ki,binding_assay,0,,,,
+Imipramine,IC50,electrophysiology,1,3388.44,3388.44,3388.44,5.47
+Imipramine,IC50,other,7,3388.44,3388.44,3400.0,5.47
+Nortriptyline,IC50,binding_assay,0,,,,
+Nortriptyline,Ki,binding_assay,0,,,,
+Sertraline,IC50,binding_assay,0,,,,
+Sertraline,Ki,binding_assay,0,,,,

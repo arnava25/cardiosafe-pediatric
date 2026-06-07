@@ -1,0 +1,33 @@
+drug_name,chembl_id,standard_type,standard_value,standard_units,pchembl_value,assay_id,assay_description,assay_format,activity_comment,assay_quality
+Aripiprazole,CHEMBL1112,Ki,1020.0,nM,5.99,CHEMBL954169,Binding affinity to human ERG expressed in HEK293 cells by whole cell patch clamp method,cell-based format,,electrophysiology
+Aripiprazole,CHEMBL1112,Ki,1020.0,nM,5.99,CHEMBL1176236,Binding affinity to human ERG expressed in HEK293 cells,cell-based format,,binding_assay
+Aripiprazole,CHEMBL1112,Ki,598.0,nM,6.22,CHEMBL1260557,Displacement of [3H]dofetilide from human ERG,single protein format,,binding_assay
+Aripiprazole,CHEMBL1112,IC50,1000.0,nM,,CHEMBL1292027,Inhibition of human ERG,single protein format,,other
+Aripiprazole,CHEMBL1112,IC50,630.96,nM,6.2,CHEMBL1676103,Inhibition of human ERG,single protein format,,other
+Aripiprazole,CHEMBL1112,IC50,3860.0,nM,5.41,CHEMBL3806884,Inhibition of human ERG after 10 mins,single protein format,,other
+Aripiprazole,CHEMBL1112,IC50,3860.0,nM,5.41,CHEMBL4254808,Inhibition of human ERG by auomated patch clamp assay,assay format,,electrophysiology
+Aripiprazole,CHEMBL1112,IC50,896.0,nM,6.05,CHEMBL4709848,Inhibition of human ERG expressed in HEK293 cells by whole-cell patch clamp method,cell-based format,,electrophysiology
+Aripiprazole,CHEMBL1112,IC50,896.5,nM,6.05,CHEMBL4821061,Inhibition of human ERG by automated patch method relative to control,single protein format,,other
+Fluoxetine,CHEMBL41,IC50,1513.56,nM,5.82,CHEMBL766814,Inhibition of human Potassium channel HERG expressed in mammalian cells,cell-based format,,other
+Fluoxetine,CHEMBL41,IC50,1513.56,nM,5.82,CHEMBL829152,Inhibitory concentration against potassium channel HERG,single protein format,,other
+Fluoxetine,CHEMBL41,IC50,1513.56,nM,5.82,CHEMBL954102,Inhibition of human ERG expressed in CHO cells by whole cell patch clamp technique,cell-based format,,electrophysiology
+Fluoxetine,CHEMBL41,IC50,3100.0,nM,5.51,CHEMBL1217370,Displacement of [3H] astemizole from human recombinant ERG channel expressed in HEK293 cells,cell-based format,,binding_assay
+Fluoxetine,CHEMBL41,IC50,457.09,nM,6.34,CHEMBL1676103,Inhibition of human ERG,single protein format,,other
+Fluoxetine,CHEMBL41,IC50,12286.4,nM,4.91,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,,binding_assay
+Fluoxetine,CHEMBL41,Ki,10066.0,nM,5.0,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,,binding_assay
+Fluoxetine,CHEMBL41,IC50,10.0,nM,8.0,CHEMBL3090833,Inhibition of human ERG,single protein format,,other
+Fluoxetine,CHEMBL41,IC50,10000.0,nM,,CHEMBL4611417,Displacement of [3H]astemizole from human ERG,single protein format,,binding_assay
+Sertraline,CHEMBL1046,IC50,,,,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,Inhibition < 50% @ 10 uM and thus dose-reponse curve not measured,binding_assay
+Sertraline,CHEMBL1046,Ki,,,,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,Inhibition < 50% @ 10 uM and thus dose-reponse curve not measured,binding_assay
+Guanfacine,CHEMBL1057,IC50,,,,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,Inhibition < 50% @ 10 uM and thus dose-reponse curve not measured,binding_assay
+Guanfacine,CHEMBL1057,Ki,,,,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,Inhibition < 50% @ 10 uM and thus dose-reponse curve not measured,binding_assay
+Imipramine,CHEMBL11,IC50,3400.0,nM,5.47,CHEMBL662305,K+ channel blocking activity in Chinese hamster ovary cells expressing HERG Kv11.1,cell-based format,,other
+Imipramine,CHEMBL11,IC50,3388.44,nM,5.47,CHEMBL766814,Inhibition of human Potassium channel HERG expressed in mammalian cells,cell-based format,,other
+Imipramine,CHEMBL11,IC50,3388.44,nM,5.47,CHEMBL832278,Inhibition of partially open human voltage-gated potassium channel subunit Kv11.1 (ERG K+ channel),assay format,,other
+Imipramine,CHEMBL11,IC50,3388.44,nM,5.47,CHEMBL829152,Inhibitory concentration against potassium channel HERG,single protein format,,other
+Imipramine,CHEMBL11,IC50,3388.44,nM,5.47,CHEMBL954102,Inhibition of human ERG expressed in CHO cells by whole cell patch clamp technique,cell-based format,,electrophysiology
+Imipramine,CHEMBL11,IC50,3388.44,nM,5.47,CHEMBL1023674,Inhibition of human ERG in MCF7 cells,cell-based format,,other
+Imipramine,CHEMBL11,IC50,3388.44,nM,5.47,CHEMBL1676103,Inhibition of human ERG,single protein format,,other
+Imipramine,CHEMBL11,IC50,3400.0,nM,5.47,CHEMBL3430640,Inhibition of hERG K channel,assay format,,other
+Nortriptyline,CHEMBL407,IC50,,,,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,Inhibition < 50% @ 10 uM and thus dose-reponse curve not measured,binding_assay
+Nortriptyline,CHEMBL407,Ki,,,,CHEMBL1909190,DRUGMATRIX: Potassium Channel HERG radioligand binding (ligand: [3H] Astemizole),cell membrane format,Inhibition < 50% @ 10 uM and thus dose-reponse curve not measured,binding_assay

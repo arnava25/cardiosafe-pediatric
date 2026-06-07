@@ -1,0 +1,11 @@
+combination,n_drugs,APD90_ms,QTc_ms,ΔAPD90_ms,ΔQTc_ms,IKr_block_pct
+Methylphenidate + Aripiprazole + Fluoxetine,3,283.2,298.5,3.1,18.4,4.53
+Methylphenidate + Aripiprazole,2,282.7,298.0,2.6,17.9,4.22
+Imipramine + Methylphenidate,2,277.3,292.3,-2.8,12.2,0.73
+Methylphenidate + Risperidone + Sertraline,3,276.9,291.9,-3.3,11.7,0.55
+Methylphenidate + Sertraline,2,276.4,291.4,-3.7,11.3,0.19
+Methylphenidate + Risperidone + Clonidine,3,285.3,286.7,5.1,6.6,0.36
+Methylphenidate + Clonidine,2,284.8,286.2,4.6,6.1,0.0
+Nortriptyline + Risperidone,2,284.6,284.6,4.5,4.5,3.0
+Risperidone + Sertraline,2,281.1,281.1,1.0,1.0,0.55
+Risperidone + Fluoxetine,2,281.1,281.1,1.0,1.0,0.68

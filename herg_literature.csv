@@ -1,0 +1,23 @@
+drug_name,ic50_nM,assay_type,species,source,notes,cmax_free_nM,safety_index,risk_flag
+Imipramine,3388,electrophysiology,human,[3] Witchel 2002,"Manual patch clamp, HEK293",25.0,135.52,LOW
+Imipramine,3000,electrophysiology,human,[1] Redfern 2003,Consistent with Witchel,25.0,120.0,LOW
+Nortriptyline,1100,electrophysiology,human,[3] Witchel 2002,More potent hERG block than imipramine,30.0,36.666666666666664,LOW
+Nortriptyline,1540,binding_assay,human,[8] Perrin 2008,Radioligand binding,30.0,51.333333333333336,LOW
+Quetiapine,1070,electrophysiology,human,[6] Kongsamut 2002,Patch clamp; moderate hERG block,10.0,107.0,LOW
+Quetiapine,2300,binding_assay,human,[4] Vieweg 2004,Radioligand; higher than patch clamp,10.0,230.0,LOW
+Risperidone,560,electrophysiology,human,[6] Kongsamut 2002,Stronger hERG block than quetiapine,2.0,280.0,LOW
+Risperidone,700,binding_assay,human,[2] Kramer 2013,Consistent across labs,2.0,350.0,LOW
+Aripiprazole,1350,electrophysiology,human,[2] Kramer 2013,Lower risk than risperidone,50.0,27.0,MODERATE
+Aripiprazole,896,electrophysiology,human,[8] Perrin 2008,Patch clamp confirmation,50.0,17.92,MODERATE
+Fluoxetine,1513,electrophysiology,human,[9] Polak 2009,Patch clamp; active metabolite norfluoxetine also hERG active,5.0,302.6,LOW
+Fluoxetine,3162,binding_assay,human,[5] Tarantino 2011,Radioligand,5.0,632.4,LOW
+Sertraline,446,electrophysiology,human,[9] Polak 2009,Most potent hERG block among common SSRIs,1.0,446.0,LOW
+Sertraline,590,electrophysiology,human,[2] Kramer 2013,Consistent; flag for adolescent use,1.0,590.0,LOW
+Escitalopram,9500,electrophysiology,human,[9] Polak 2009,Weaker hERG than sertraline but known QTc prolongation at OD,3.0,3166.6666666666665,LOW
+Escitalopram,14800,binding_assay,human,[5] Tarantino 2011,Radioligand; higher than electrophys,3.0,4933.333333333333,LOW
+Citalopram,3800,electrophysiology,human,[9] Polak 2009,Parent racemic; escitalopram is S-enantiomer,10.0,380.0,LOW
+Methylphenidate,100000,electrophysiology,human,[7] Darpö 2001,Very weak hERG block; cardiac risk via catecholamine not ion channel,5.0,20000.0,LOW
+Amphetamine,110000,electrophysiology,human,[7] Darpö 2001,Minimal direct hERG; sympathomimetic mechanism dominates,20.0,5500.0,LOW
+Dextroamphetamine,110000,electrophysiology,human,[7] Darpö 2001,Same as amphetamine; extrapolated,20.0,5500.0,LOW
+Clonidine,28000,electrophysiology,human,[1] Redfern 2003,Weak hERG; cardiac risk via bradycardia/conduction slowing not QTc,0.5,56000.0,LOW
+Guanfacine,50000,binding_assay,human,[8] Perrin 2008,Sparse data; estimate; cardiac risk via BP/HR not hERG,0.3,166666.6666666667,LOW

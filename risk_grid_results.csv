@@ -1,0 +1,85 @@
+drug_A,drug_B,combination,n_drugs,APD90_ms,QTc_ms,ΔAPD90_ms,ΔQTc_ms,IKr_block_pct,risk_flag,CL_eff_ms,drugs
+Methylphenidate,Amphetamine,MPH+AMP,2,273.5,303.9,-6.6,23.8,0.0,HIGH,810.0,
+,,NOR+MPH+ARI,3,286.3,301.8,6.2,21.7,6.76,HIGH,900.0,Nortriptyline + Methylphenidate + Aripiprazole
+,,MPH+ARI+FLU,3,283.2,298.5,3.1,18.4,4.53,MODERATE,900.0,Methylphenidate + Aripiprazole + Fluoxetine
+Methylphenidate,Aripiprazole,MPH+ARI,2,282.7,298.0,2.6,17.9,4.22,MODERATE,900.0,
+Amphetamine,Aripiprazole,AMP+ARI,2,282.7,298.0,2.6,17.9,4.22,MODERATE,900.0,
+,,AMP+ARI+SER,3,282.7,298.0,2.6,17.9,4.4,MODERATE,900.0,Amphetamine + Aripiprazole + Sertraline
+,,MPH+ARI+ESC,3,282.7,298.0,2.6,17.9,4.25,MODERATE,900.0,Methylphenidate + Aripiprazole + Escitalopram
+,,MPH+ARI+SER,3,282.7,298.0,2.6,17.9,4.4,MODERATE,900.0,Methylphenidate + Aripiprazole + Sertraline
+Methylphenidate,Nortriptyline,MPH+NOR,2,280.0,295.2,-0.1,15.0,2.65,MODERATE,900.0,
+Amphetamine,Nortriptyline,AMP+NOR,2,280.0,295.2,-0.1,15.0,2.65,MODERATE,900.0,
+,,MPH+GUA+ARI,3,291.7,293.2,11.6,13.0,4.22,MODERATE,990.0,Methylphenidate + Guanfacine + Aripiprazole
+,,MPH+CLO+ARI,3,291.7,293.2,11.6,13.0,4.22,MODERATE,990.0,Methylphenidate + Clonidine + Aripiprazole
+,,IMI+MPH+RIS,3,277.8,292.8,-2.4,12.7,1.09,MODERATE,900.0,Imipramine + Methylphenidate + Risperidone
+,,IMI+MPH+SER,3,277.8,292.8,-2.4,12.7,0.92,MODERATE,900.0,Imipramine + Methylphenidate + Sertraline
+,,MPH+QUE+SER,3,277.8,292.8,-2.4,12.7,1.12,MODERATE,900.0,Methylphenidate + Quetiapine + Sertraline
+Methylphenidate,Quetiapine,MPH+QUE,2,277.8,292.8,-2.4,12.7,0.93,MODERATE,900.0,
+Amphetamine,Quetiapine,AMP+QUE,2,277.8,292.8,-2.4,12.7,0.93,MODERATE,900.0,
+,,MPH+RIS+FLU,3,277.3,292.3,-2.8,12.2,0.68,MODERATE,900.0,Methylphenidate + Risperidone + Fluoxetine
+Amphetamine,Imipramine,AMP+IMI,2,277.3,292.3,-2.8,12.2,0.73,MODERATE,900.0,
+Methylphenidate,Imipramine,MPH+IMI,2,277.3,292.3,-2.8,12.2,0.73,MODERATE,900.0,
+Amphetamine,Risperidone,AMP+RIS,2,276.9,291.9,-3.3,11.7,0.36,MODERATE,900.0,
+,,MPH+RIS+SER,3,276.9,291.9,-3.3,11.7,0.55,MODERATE,900.0,Methylphenidate + Risperidone + Sertraline
+Methylphenidate,Risperidone,MPH+RIS,2,276.9,291.9,-3.3,11.7,0.36,MODERATE,900.0,
+,,AMP+RIS+SER,3,276.9,291.9,-3.3,11.7,0.55,MODERATE,900.0,Amphetamine + Risperidone + Sertraline
+Amphetamine,Fluoxetine,AMP+FLU,2,276.9,291.9,-3.3,11.7,0.33,MODERATE,900.0,
+Methylphenidate,Fluoxetine,MPH+FLU,2,276.9,291.9,-3.3,11.7,0.33,MODERATE,900.0,
+Methylphenidate,Escitalopram,MPH+ESC,2,276.4,291.4,-3.7,11.3,0.03,MODERATE,900.0,
+Amphetamine,Sertraline,AMP+SER,2,276.4,291.4,-3.7,11.3,0.19,MODERATE,900.0,
+Amphetamine,Escitalopram,AMP+ESC,2,276.4,291.4,-3.7,11.3,0.03,MODERATE,900.0,
+Methylphenidate,Sertraline,MPH+SER,2,276.4,291.4,-3.7,11.3,0.19,MODERATE,900.0,
+Aripiprazole,Nortriptyline,ARI+NOR,2,291.1,291.1,11.0,11.0,6.76,MODERATE,1000.0,
+Aripiprazole,Imipramine,ARI+IMI,2,288.1,288.1,8.0,8.0,4.92,LOW-MOD,1000.0,
+Quetiapine,Aripiprazole,QUE+ARI,2,288.1,288.1,8.0,8.0,5.11,LOW-MOD,1000.0,
+Aripiprazole,Sertraline,ARI+SER,2,287.1,287.1,7.0,7.0,4.4,LOW-MOD,1000.0,
+Aripiprazole,Fluoxetine,ARI+FLU,2,287.1,287.1,7.0,7.0,4.53,LOW-MOD,1000.0,
+Risperidone,Aripiprazole,RIS+ARI,2,287.1,287.1,7.0,7.0,4.56,LOW-MOD,1000.0,
+,,MPH+GUA+SER,3,285.3,286.7,5.1,6.6,0.19,LOW-MOD,990.0,Methylphenidate + Guanfacine + Sertraline
+,,MPH+CLO+RIS,3,285.3,286.7,5.1,6.6,0.36,LOW-MOD,990.0,Methylphenidate + Clonidine + Risperidone
+Aripiprazole,Escitalopram,ARI+ESC,2,286.6,286.6,6.5,6.5,4.25,LOW-MOD,1000.0,
+Methylphenidate,Guanfacine,MPH+GUA,2,284.8,286.2,4.6,6.1,0.0,LOW-MOD,990.0,
+Amphetamine,Guanfacine,AMP+GUA,2,284.8,286.2,4.6,6.1,0.0,LOW-MOD,990.0,
+Amphetamine,Clonidine,AMP+CLO,2,284.8,286.2,4.6,6.1,0.0,LOW-MOD,990.0,
+Methylphenidate,Clonidine,MPH+CLO,2,284.8,286.2,4.6,6.1,0.0,LOW-MOD,990.0,
+Imipramine,Nortriptyline,IMI+NOR,2,285.6,285.6,5.5,5.5,3.37,LOW-MOD,1000.0,
+Quetiapine,Nortriptyline,QUE+NOR,2,285.6,285.6,5.5,5.5,3.56,LOW-MOD,1000.0,
+Sertraline,Nortriptyline,SER+NOR,2,284.6,284.6,4.5,4.5,2.84,LOW,1000.0,
+Fluoxetine,Nortriptyline,FLU+NOR,2,284.6,284.6,4.5,4.5,2.98,LOW,1000.0,
+Risperidone,Nortriptyline,RIS+NOR,2,284.6,284.6,4.5,4.5,3.0,LOW,1000.0,
+Escitalopram,Nortriptyline,ESC+NOR,2,284.1,284.1,4.0,4.0,2.69,LOW,1000.0,
+,,ARI+FLU+CLO,3,297.1,283.3,17.0,3.2,4.53,LOW,1100.0,Aripiprazole + Fluoxetine + Clonidine
+Aripiprazole,Clonidine,ARI+CLO,2,296.6,282.8,16.5,2.7,4.22,LOW,1100.0,
+Aripiprazole,Guanfacine,ARI+GUA,2,296.6,282.8,16.5,2.7,4.22,LOW,1100.0,
+Quetiapine,Imipramine,QUE+IMI,2,282.6,282.6,2.5,2.5,1.65,LOW,1000.0,
+Risperidone,Quetiapine,RIS+QUE,2,282.1,282.1,2.0,2.0,1.28,LOW,1000.0,
+Quetiapine,Sertraline,QUE+SER,2,282.1,282.1,2.0,2.0,1.12,LOW,1000.0,
+Quetiapine,Fluoxetine,QUE+FLU,2,282.1,282.1,2.0,2.0,1.25,LOW,1000.0,
+Quetiapine,Escitalopram,QUE+ESC,2,281.6,281.6,1.5,1.5,0.96,LOW,1000.0,
+Fluoxetine,Imipramine,FLU+IMI,2,281.6,281.6,1.5,1.5,1.06,LOW,1000.0,
+Sertraline,Imipramine,SER+IMI,2,281.6,281.6,1.5,1.5,0.92,LOW,1000.0,
+Risperidone,Imipramine,RIS+IMI,2,281.6,281.6,1.5,1.5,1.09,LOW,1000.0,
+Risperidone,Sertraline,RIS+SER,2,281.1,281.1,1.0,1.0,0.55,LOW,1000.0,
+Risperidone,Fluoxetine,RIS+FLU,2,281.1,281.1,1.0,1.0,0.68,LOW,1000.0,
+Sertraline,Fluoxetine,SER+FLU,2,281.1,281.1,1.0,1.0,0.52,LOW,1000.0,
+Escitalopram,Imipramine,ESC+IMI,2,281.1,281.1,1.0,1.0,0.76,LOW,1000.0,
+Fluoxetine,Escitalopram,FLU+ESC,2,280.6,280.6,0.5,0.5,0.36,LOW,1000.0,
+Sertraline,Escitalopram,SER+ESC,2,280.6,280.6,0.5,0.5,0.22,LOW,1000.0,
+Risperidone,Escitalopram,RIS+ESC,2,280.6,280.6,0.5,0.5,0.39,LOW,1000.0,
+Clonidine,Nortriptyline,CLO+NOR,2,293.8,280.2,13.7,0.0,2.65,LOW,1100.0,
+Guanfacine,Nortriptyline,GUA+NOR,2,293.8,280.2,13.7,0.0,2.65,LOW,1100.0,
+,,QUE+SER+CLO,3,291.1,277.5,11.0,-2.6,1.12,LOW,1100.0,Quetiapine + Sertraline + Clonidine
+Quetiapine,Guanfacine,QUE+GUA,2,291.1,277.5,11.0,-2.6,0.93,LOW,1100.0,
+Quetiapine,Clonidine,QUE+CLO,2,291.1,277.5,11.0,-2.6,0.93,LOW,1100.0,
+,,RIS+SER+CLO,3,290.5,277.0,10.4,-3.1,0.55,LOW,1100.0,Risperidone + Sertraline + Clonidine
+Clonidine,Imipramine,CLO+IMI,2,290.5,277.0,10.4,-3.1,0.73,LOW,1100.0,
+Guanfacine,Imipramine,GUA+IMI,2,290.5,277.0,10.4,-3.1,0.73,LOW,1100.0,
+Fluoxetine,Clonidine,FLU+CLO,2,290.0,276.5,9.9,-3.6,0.33,LOW,1100.0,
+Sertraline,Guanfacine,SER+GUA,2,290.0,276.5,9.9,-3.6,0.19,LOW,1100.0,
+Sertraline,Clonidine,SER+CLO,2,290.0,276.5,9.9,-3.6,0.19,LOW,1100.0,
+Risperidone,Clonidine,RIS+CLO,2,290.0,276.5,9.9,-3.6,0.36,LOW,1100.0,
+Risperidone,Guanfacine,RIS+GUA,2,290.0,276.5,9.9,-3.6,0.36,LOW,1100.0,
+Fluoxetine,Guanfacine,FLU+GUA,2,290.0,276.5,9.9,-3.6,0.33,LOW,1100.0,
+Escitalopram,Guanfacine,ESC+GUA,2,289.4,276.0,9.3,-4.2,0.03,LOW,1100.0,
+Escitalopram,Clonidine,ESC+CLO,2,289.4,276.0,9.3,-4.2,0.03,LOW,1100.0,
+Clonidine,Guanfacine,CLO+GUA,2,301.4,274.0,21.3,-6.1,0.0,LOW,1210.0,
