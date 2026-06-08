@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+
+# FAERS raw data — too large for git (2GB+)
+data/faers_cache/*.zip
+data/faers_cache/*.parquet
