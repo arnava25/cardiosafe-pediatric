@@ -10,7 +10,14 @@ import numpy as np
 import pandas as pd
 from scipy.integrate import odeint
 import warnings
+from pathlib import Path
 warnings.filterwarnings("ignore")
+
+# Resolve paths relative to this file so the module works from any cwd
+_SRC_DIR  = Path(__file__).resolve().parent        # …/src/
+_ROOT_DIR = _SRC_DIR.parent                        # …/cardiosafe-pediatric/
+_DATA_DIR = _ROOT_DIR / "data"
+_DEFAULT_PARAMS = str(_DATA_DIR / "herg_master_params.csv")
 
 # ── CONSTANTS ────────────────────────────────────────────────────────────────
 R = 8314.0; T = 310.0; F = 96485.0
@@ -33,7 +40,9 @@ def ghk(V, ci, co, z, regularize=True):
     return z * V * F / (R * T) * (ci * ev - co) / (ev - 1.0)
 
 # ── DRUG BLOCK MODULE ─────────────────────────────────────────────────────────
-def load_drug_params(csv_path="herg_master_params.csv"):
+def load_drug_params(csv_path=None):
+    if csv_path is None:
+        csv_path = _DEFAULT_PARAMS
     try:
         df = pd.read_csv(csv_path)
         return df.set_index("drug_name").to_dict("index")
@@ -310,9 +319,11 @@ Y0 = np.array([
 ], dtype=float)
 
 # ── SIMULATION RUNNER ─────────────────────────────────────────────────────────
-def run_simulation(drug_combination=None, drug_params_path="herg_master_params.csv",
+def run_simulation(drug_combination=None, drug_params_path=None,
                    n_beats=100, CL=1000.0, stim_amp=-80.0, stim_dur=0.5, verbose=True):
 
+    if drug_params_path is None:
+        drug_params_path = _DEFAULT_PARAMS
     drug_params = load_drug_params(drug_params_path)
 
     if drug_combination:
@@ -386,8 +397,10 @@ def run_simulation(drug_combination=None, drug_params_path="herg_master_params.c
             "t_trace": t_trace, "V_trace": V_trace}
 
 
-def run_polypharmacy_sweep(combinations, drug_params_path="herg_master_params.csv",
+def run_polypharmacy_sweep(combinations, drug_params_path=None,
                            n_beats=100, CL=1000.0):
+    if drug_params_path is None:
+        drug_params_path = _DEFAULT_PARAMS
     baseline = run_simulation(None, drug_params_path, n_beats, CL, verbose=False)
     bAPD = baseline["APD90"]; bQTc = baseline["QTc"]
     print(f"Baseline  APD90={bAPD:.1f} ms  QTc={bQTc:.1f} ms\n")
@@ -419,7 +432,7 @@ if __name__ == "__main__":
     print("CardioSafe Pediatric — O'Hara-Rudy Simulator")
     print("="*60)
 
-    PARAMS = "herg_master_params.csv"
+    PARAMS = _DEFAULT_PARAMS
     N = 50  # beats (increase to 200+ for true steady state)
 
     t0 = time.time()

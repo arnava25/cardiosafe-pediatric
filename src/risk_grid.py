@@ -12,9 +12,16 @@ import numpy as np
 import pandas as pd
 import itertools
 import time
+from pathlib import Path
 from ord_model import run_simulation, run_polypharmacy_sweep, load_drug_params
 
-PARAMS_PATH = "herg_master_params.csv"
+_SRC_DIR     = Path(__file__).resolve().parent
+_ROOT_DIR    = _SRC_DIR.parent
+_DATA_DIR    = _ROOT_DIR / "data"
+_RESULTS_DIR = _ROOT_DIR / "results"
+_RESULTS_DIR.mkdir(exist_ok=True)
+
+PARAMS_PATH = str(_DATA_DIR / "herg_master_params.csv")
 N_BEATS     = 50    # increase to 200 for manuscript figures
 CL          = 1000.0
 
@@ -224,15 +231,15 @@ print(f"   - Adolescent baseline QTc differs from adult (shorter by ~10-15ms)")
 print(f"   - Pubertal hormonal effects on IKs not modeled (flag for future work)")
 
 # ── SAVE ──────────────────────────────────────────────────────────────────────
-all_results.to_csv("risk_grid_results.csv", index=False)
-matrix_df.to_csv("risk_matrix.csv")
-pair_df.to_csv("pairwise_results.csv", index=False)
-triple_df.to_csv("triple_results.csv", index=False)
+all_results.to_csv(_RESULTS_DIR / "risk_grid_results.csv", index=False)
+matrix_df.to_csv(_RESULTS_DIR / "risk_matrix.csv")
+pair_df.to_csv(_RESULTS_DIR / "pairwise_results.csv", index=False)
+triple_df.to_csv(_RESULTS_DIR / "triple_results.csv", index=False)
 
 print(f"\nSaved:")
-print(f"  risk_grid_results.csv  — all combinations ranked by ΔQTc")
-print(f"  risk_matrix.csv        — pairwise ΔQTc heatmap data")
-print(f"  pairwise_results.csv   — pairs only")
-print(f"  triple_results.csv     — triples only")
+print(f"  {_RESULTS_DIR}/risk_grid_results.csv  — all combinations ranked by ΔQTc")
+print(f"  {_RESULTS_DIR}/risk_matrix.csv        — pairwise ΔQTc heatmap data")
+print(f"  {_RESULTS_DIR}/pairwise_results.csv   — pairs only")
+print(f"  {_RESULTS_DIR}/triple_results.csv     — triples only")
 print(f"\nTotal runtime: {total_time/60:.1f} min")
 print(f"Next: run visualize_risk.py to generate manuscript figures")
