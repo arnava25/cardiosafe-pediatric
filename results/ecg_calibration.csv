@@ -1,0 +1,6 @@
+heart_rate_bpm,cycle_length_ms,model_APD90_ms,model_QTc_ms,ref_QTc_mean_ms,ref_QTc_sd_ms,ref_QTc_ULN_ms,offset_ms,ref_source,n_beats
+50,1200.0,363.2,331.5,408,22,452,76.5,Rijnbeek et al. 2014 (adolescents 12-16y),500
+60,1000.0,331.7,331.7,405,21,447,73.3,Rijnbeek et al. 2014 (adolescents 12-16y),500
+70,857.1428571428571,309.2,333.9,402,20,442,68.1,Rijnbeek et al. 2014 (adolescents 12-16y),500
+80,750.0,291.1,336.2,400,20,440,63.8,Rijnbeek et al. 2014 (adolescents 12-16y),500
+100,600.0,265.6,342.9,396,22,440,53.1,Rijnbeek et al. 2014 (adolescents 12-16y),500
