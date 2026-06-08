@@ -1,0 +1,4 @@
+stratum,n,n_faers_signal,n_model_pos,TP,FP,FN,TN,sensitivity,specificity,PPV,F1,kappa,fisher_p,permutation_p
+ALL pairs,63,17,17,4,13,13,33,0.235,0.717,0.235,0.235,-0.047,0.7519,0.5108
+Stimulant-containing,20,5,16,4,12,1,3,0.8,0.2,0.25,0.381,-0.0,0.7513,0.2791
+Non-stimulant only,43,12,1,0,1,12,30,0.0,0.968,0.0,0.0,-0.045,1.0,1.0

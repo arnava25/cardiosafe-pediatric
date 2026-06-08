@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioSafe Pediatric — Clinical Risk Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #F7F5F0;
+  --bg2:     #EDEAE2;
+  --bg3:     #E2DED5;
+  --ink:     #1A1814;
+  --ink2:    #3D3A34;
+  --ink3:    #7A7468;
+  --rule:    #CCC9BF;
+  --navy:    #1B3A6B;
+  --teal:    #0D5C6B;
+  --amber:   #8B4A0A;
+  --red:     #8B1A1A;
+  --green:   #1A5C2A;
+  --red-bg:  #FDF0EF;
+  --amb-bg:  #FDF5EC;
+  --tel-bg:  #EFF7F8;
+  --grn-bg:  #EFF8F1;
+  --accent:  #C0392B;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  grid-template-rows: auto 1fr;
+}
+
+/* ── HEADER ── */
+header {
+  grid-column: 1 / -1;
+  background: var(--navy);
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #C0392B;
+}
+.header-left h1 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.4rem;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.header-left h1 em { color: #F4A261; font-style: italic; }
+.header-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 2px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.header-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 4px 10px;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--rule);
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar-section h2 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* patient fields */
+.field { margin-bottom: 0.75rem; }
+.field label {
+  display: block;
+  font-size: 11px;
+  color: var(--ink3);
+  font-weight: 500;
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+}
+.field input, .field select {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  border-radius: 2px;
+  transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus { border-color: var(--navy); }
+.field input[type="number"] { font-family: 'IBM Plex Mono', monospace; }
+
+/* drug selector */
+.drug-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.drug-btn {
+  padding: 7px 6px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink3);
+  text-align: center;
+  border-radius: 2px;
+  transition: all 0.1s;
+  user-select: none;
+}
+.drug-btn:hover { border-color: var(--navy); color: var(--navy); }
+.drug-btn.selected {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+.drug-btn.selected .drug-class {
+  color: rgba(255,255,255,0.6);
+}
+.drug-name { font-size: 11px; font-weight: 500; display: block; }
+.drug-class { font-size: 9px; color: var(--ink3); font-family: 'IBM Plex Sans', sans-serif; font-weight: 400; display: block; margin-top: 1px; }
+
+.btn-run {
+  width: 100%;
+  padding: 11px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+.btn-run:hover { background: #9B2D22; }
+.btn-run:disabled { background: var(--rule); color: var(--ink3); cursor: default; }
+
+.btn-clear {
+  width: 100%;
+  padding: 7px;
+  background: transparent;
+  color: var(--ink3);
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12px;
+  border-radius: 2px;
+  margin-top: 4px;
+  transition: all 0.1s;
+}
+.btn-clear:hover { border-color: var(--ink3); color: var(--ink2); }
+
+.selected-list {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--navy);
+  min-height: 20px;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+.selected-list.empty { color: var(--ink3); font-family: 'IBM Plex Sans', sans-serif; font-style: italic; font-size: 11px; }
+
+/* ── MAIN ── */
+.main {
+  padding: 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── RESULT CARD ── */
+.result-card {
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.result-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.patient-name {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+.patient-meta {
+  font-size: 12px;
+  color: var(--ink3);
+  margin-top: 2px;
+}
+.risk-badge-large {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.risk-HIGH    { background: var(--red-bg); color: var(--red); border: 1px solid #E8B4B4; }
+.risk-MODERATE{ background: var(--amb-bg); color: var(--amber); border: 1px solid #E8D0B4; }
+.risk-LOW-MOD { background: var(--tel-bg); color: var(--teal); border: 1px solid #B4D4DA; }
+.risk-LOW     { background: var(--grn-bg); color: var(--green); border: 1px solid #B4D8BF; }
+.risk-PROTECTIVE { background: var(--grn-bg); color: var(--green); border: 1px solid #B4D8BF; }
+
+.result-body { padding: 1.25rem; }
+
+/* combo rows */
+.combo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
+.combo-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border-radius: 2px;
+  border-left: 3px solid transparent;
+}
+.combo-row.HIGH     { border-left-color: var(--red); }
+.combo-row.MODERATE { border-left-color: #E07000; }
+.combo-row.LOW-MOD  { border-left-color: var(--teal); }
+.combo-row.LOW, .combo-row.PROTECTIVE { border-left-color: var(--green); }
+
+.combo-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.combo-dqtc {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 70px;
+  text-align: right;
+}
+.combo-ikr {
+  font-size: 11px;
+  color: var(--ink3);
+  min-width: 70px;
+  text-align: right;
+}
+.combo-mech {
+  font-size: 10px;
+  color: var(--ink3);
+  min-width: 120px;
+  text-align: right;
+  font-style: italic;
+}
+.dqtc-HIGH    { color: var(--red); }
+.dqtc-MODERATE{ color: var(--amber); }
+.dqtc-LOW-MOD { color: var(--teal); }
+.dqtc-LOW, .dqtc-PROTECTIVE { color: var(--green); }
+
+/* bar */
+.dqtc-bar-wrap {
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.dqtc-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+
+/* clinical note */
+.clinical-note {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--rule);
+  background: var(--bg2);
+  border-radius: 2px;
+  border-left: 3px solid var(--navy);
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.6;
+}
+.clinical-note strong { color: var(--navy); font-weight: 500; }
+
+/* FAERS signal badge */
+.faers-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+.faers-badge {
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--rule);
+  color: var(--ink3);
+}
+.faers-badge.signal { background: #FDF5EC; color: var(--amber); border-color: #E8D0B4; }
+
+/* disclaimer */
+.disclaimer {
+  font-size: 11px;
+  color: var(--ink3);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  line-height: 1.5;
+}
+
+/* empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 0.75rem;
+}
+.empty-icon {
+  font-size: 3rem;
+  opacity: 0.15;
+}
+.empty-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.1rem;
+  color: var(--ink3);
+}
+.empty-sub { font-size: 12px; color: var(--ink3); max-width: 280px; line-height: 1.5; }
+
+/* history */
+.history-section h2 {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--rule);
+}
+.history-list { display: flex; flex-direction: column; gap: 4px; }
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ink2);
+  transition: border-color 0.1s;
+}
+.history-item:hover { border-color: var(--navy); }
+.history-name { font-weight: 500; flex: 1; }
+.history-drugs { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink3); }
+.history-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; }
+
+@media (max-width: 900px) {
+  body { grid-template-columns: 1fr; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--rule); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>CardioSafe <em>Pediatric</em> — Clinical Simulator</h1>
+    <div class="header-sub">Mechanistic cardiac risk · Adolescent psychiatric polypharmacy</div>
+  </div>
+  <div class="header-badge">ORd 2011 · Research use only</div>
+</header>
+
+<aside class="sidebar">
+
+  <div class="sidebar-section">
+    <h2>Patient</h2>
+    <div class="field">
+      <label>Patient name / ID</label>
+      <input type="text" id="patientName" placeholder="e.g. Patient A or MRN-001">
+    </div>
+    <div class="field">
+      <label>Age (years)</label>
+      <input type="number" id="patientAge" min="6" max="18" placeholder="12" value="">
+    </div>
+    <div class="field">
+      <label>Sex</label>
+      <select id="patientSex">
+        <option value="">Not specified</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Diagnosis / indication</label>
+      <input type="text" id="patientDx" placeholder="e.g. ADHD + anxiety">
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h2>Medications</h2>
+    <div class="selected-list empty" id="selectedList">No medications selected</div>
+    <div class="drug-grid" id="drugGrid"></div>
+    <button class="btn-clear" onclick="clearDrugs()">Clear all</button>
+  </div>
+
+  <div class="sidebar-section">
+    <button class="btn-run" id="runBtn" onclick="runAnalysis()" disabled>
+      Assess Cardiac Risk
+    </button>
+  </div>
+
+  <div class="sidebar-section">
+    <h2>About</h2>
+    <p style="font-size:11px;color:var(--ink3);line-height:1.5;">
+      Mechanistic cardiac risk assessment using O'Hara-Rudy 2011 action potential modeling and FDA FAERS pharmacovigilance data.<br><br>
+      <strong style="color:var(--red);">Research use only.</strong> Not validated for clinical decision-making. All ΔQTc estimates use adult Cmax values.
+    </p>
+  </div>
+
+</aside>
+
+<main class="main" id="main">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">♥</div>
+    <div class="empty-title">No patient loaded</div>
+    <div class="empty-sub">Select medications from the sidebar and click Assess Cardiac Risk to generate a patient-specific report.</div>
+  </div>
+</main>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const DRUGS = [
+  { code:"MPH", name:"Methylphenidate", cls:"Stimulant" },
+  { code:"AMP", name:"Amphetamine",     cls:"Stimulant" },
+  { code:"RIS", name:"Risperidone",     cls:"Antipsychotic" },
+  { code:"QUE", name:"Quetiapine",      cls:"Antipsychotic" },
+  { code:"ARI", name:"Aripiprazole",    cls:"Antipsychotic" },
+  { code:"SER", name:"Sertraline",      cls:"SSRI" },
+  { code:"FLU", name:"Fluoxetine",      cls:"SSRI" },
+  { code:"ESC", name:"Escitalopram",    cls:"SSRI" },
+  { code:"CLO", name:"Clonidine",       cls:"Alpha-2" },
+  { code:"GUA", name:"Guanfacine",      cls:"Alpha-2" },
+  { code:"IMI", name:"Imipramine",      cls:"TCA" },
+  { code:"NOR", name:"Nortriptyline",   cls:"TCA" },
+];
+
+// ΔQTc matrix (500-beat values where available, 50-beat otherwise)
+// [drug_a][drug_b] = dQTc
+const DQTC = {
+  "MPH+AMP":19.1,"MPH+RIS":10.0,"MPH+QUE":11.0,"MPH+ARI":18.1,
+  "MPH+SER":9.6, "MPH+FLU":10.0,"MPH+ESC":9.1, "MPH+CLO":6.8,
+  "MPH+GUA":6.8, "MPH+IMI":10.5,"MPH+NOR":14.8,
+  "AMP+RIS":10.0,"AMP+QUE":11.0,"AMP+ARI":18.1,"AMP+SER":9.6,
+  "AMP+FLU":10.0,"AMP+ESC":9.1, "AMP+CLO":6.8, "AMP+GUA":6.8,
+  "AMP+IMI":10.5,"AMP+NOR":14.8,
+  "RIS+QUE":3.0, "RIS+ARI":10.0,"RIS+SER":1.5, "RIS+FLU":1.5,
+  "RIS+ESC":1.0, "RIS+CLO":-1.1,"RIS+GUA":-1.1,"RIS+IMI":2.5,
+  "RIS+NOR":6.5,
+  "QUE+ARI":11.5,"QUE+SER":2.5, "QUE+FLU":3.0, "QUE+ESC":2.0,
+  "QUE+CLO":-0.1,"QUE+GUA":-0.1,"QUE+IMI":2.5, "QUE+NOR":5.5,
+  "ARI+SER":7.0, "ARI+FLU":7.0, "ARI+ESC":6.5, "ARI+CLO":2.7,
+  "ARI+GUA":2.7, "ARI+IMI":8.0, "ARI+NOR":11.0,
+  "SER+FLU":1.0, "SER+ESC":0.5, "SER+CLO":-3.6,"SER+GUA":-3.6,
+  "SER+IMI":1.5, "SER+NOR":4.5,
+  "FLU+ESC":0.5, "FLU+CLO":-3.6,"FLU+GUA":-3.6,"FLU+IMI":1.5,
+  "FLU+NOR":4.5,
+  "ESC+CLO":-4.2,"ESC+GUA":-4.2,"ESC+IMI":1.0, "ESC+NOR":4.0,
+  "CLO+GUA":-1.1,"CLO+IMI":-3.1,"CLO+NOR":0.0,
+  "GUA+IMI":-3.1,"GUA+NOR":0.0,
+  "IMI+NOR":5.5,
+};
+
+const IKR = {
+  "MPH+AMP":0,"MPH+RIS":0.36,"MPH+QUE":0.93,"MPH+ARI":4.22,
+  "MPH+SER":0.19,"MPH+FLU":0.33,"MPH+ESC":0.03,"MPH+CLO":0,
+  "MPH+GUA":0,"MPH+IMI":0.73,"MPH+NOR":2.65,
+  "AMP+RIS":0.36,"AMP+QUE":0.93,"AMP+ARI":4.22,"AMP+SER":0.19,
+  "AMP+FLU":0.33,"AMP+ESC":0.03,"AMP+CLO":0,"AMP+GUA":0,
+  "AMP+IMI":0.73,"AMP+NOR":2.65,
+  "RIS+QUE":1.28,"RIS+ARI":4.56,"RIS+SER":0.55,"RIS+FLU":0.68,
+  "RIS+ESC":0.39,"RIS+CLO":0.36,"RIS+GUA":0.36,"RIS+IMI":1.09,
+  "RIS+NOR":3.0,"QUE+ARI":5.11,"QUE+SER":1.12,"QUE+FLU":1.25,
+  "QUE+ESC":0.96,"QUE+CLO":0.93,"QUE+GUA":0.93,"QUE+IMI":1.65,
+  "QUE+NOR":3.56,"ARI+SER":4.40,"ARI+FLU":4.53,"ARI+ESC":4.25,
+  "ARI+CLO":4.22,"ARI+GUA":4.22,"ARI+IMI":4.92,"ARI+NOR":6.76,
+  "SER+FLU":0.52,"SER+ESC":0.22,"SER+CLO":0.19,"SER+GUA":0.19,
+  "SER+IMI":0.92,"SER+NOR":2.84,"FLU+ESC":0.36,"FLU+CLO":0.33,
+  "FLU+GUA":0.33,"FLU+IMI":1.06,"FLU+NOR":2.98,"ESC+CLO":0.03,
+  "ESC+GUA":0.03,"ESC+IMI":0.76,"ESC+NOR":2.69,"CLO+GUA":0,
+  "CLO+IMI":0.73,"CLO+NOR":2.65,"GUA+IMI":0.73,"GUA+NOR":2.65,
+  "IMI+NOR":3.37,
+};
+
+// FAERS signals
+const FAERS_SIGNAL = new Set([
+  "MPH+SER","MPH+ARI","MPH+QUE","AMP+SER","ARI+GUA","QUE+GUA",
+  "QUE+FLU","QUE+SER","ARI+SER","SER+IMI","ESC+IMI","ARI+IMI",
+  "RIS+ARI","ARI+ESC","MPH+GUA","RIS+FLU","SER+GUA",
+]);
+
+const FAERS_ROR = {
+  "MPH+SER":12.79,"MPH+ARI":8.15,"MPH+QUE":5.25,"AMP+SER":2.81,
+  "ARI+GUA":10.25,"QUE+GUA":13.15,"QUE+FLU":9.18,"QUE+SER":5.84,
+  "ARI+SER":6.78,"SER+IMI":16.22,"ESC+IMI":28.01,"ARI+IMI":14.67,
+};
+
+function getDQTc(a, b) {
+  const k1 = `${a}+${b}`, k2 = `${b}+${a}`;
+  return DQTC[k1] ?? DQTC[k2] ?? null;
+}
+function getIKR(a, b) {
+  const k1 = `${a}+${b}`, k2 = `${b}+${a}`;
+  return IKR[k1] ?? IKR[k2] ?? 0;
+}
+function isFaers(a, b) {
+  return FAERS_SIGNAL.has(`${a}+${b}`) || FAERS_SIGNAL.has(`${b}+${a}`);
+}
+function getFaersROR(a, b) {
+  return FAERS_ROR[`${a}+${b}`] ?? FAERS_ROR[`${b}+${a}`] ?? null;
+}
+
+function riskTier(dq) {
+  if (dq === null) return null;
+  if (dq >= 20)  return "HIGH";
+  if (dq >= 10)  return "MODERATE";
+  if (dq >= 5)   return "LOW-MOD";
+  if (dq >= 0)   return "LOW";
+  return "PROTECTIVE";
+}
+
+function mechLabel(ikr, dq) {
+  if (dq === null) return "—";
+  if (Math.abs(dq) < 2) return "minimal";
+  if (ikr < 1 && dq > 7) return "sympathomimetic";
+  if (ikr < 3 && dq > 7) return "sympathomimetic + mild IKr";
+  if (ikr >= 5) return "hERG-driven";
+  if (dq < 0) return "autonomic (bradycardic)";
+  return "mixed";
+}
+
+function tierColor(tier) {
+  return {
+    HIGH:"var(--red)", MODERATE:"var(--amber)",
+    "LOW-MOD":"var(--teal)", LOW:"var(--green)", PROTECTIVE:"var(--green)"
+  }[tier] || "var(--ink3)";
+}
+function tierBarColor(tier) {
+  return {
+    HIGH:"#C0392B", MODERATE:"#E07000",
+    "LOW-MOD":"#0D5C6B", LOW:"#1A5C2A", PROTECTIVE:"#1A5C2A"
+  }[tier] || "#ccc";
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let selected = new Set();
+let history  = [];
+
+// ── BUILD DRUG GRID ───────────────────────────────────────────────────────────
+function buildDrugGrid() {
+  const grid = document.getElementById('drugGrid');
+  grid.innerHTML = '';
+  DRUGS.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'drug-btn';
+    btn.id = `drug-${d.code}`;
+    btn.innerHTML = `<span class="drug-name">${d.code}</span><span class="drug-class">${d.cls}</span>`;
+    btn.onclick = () => toggleDrug(d.code);
+    grid.appendChild(btn);
+  });
+}
+
+function toggleDrug(code) {
+  if (selected.has(code)) {
+    selected.delete(code);
+    document.getElementById(`drug-${code}`).classList.remove('selected');
+  } else {
+    selected.add(code);
+    document.getElementById(`drug-${code}`).classList.add('selected');
+  }
+  updateSelectedList();
+  document.getElementById('runBtn').disabled = selected.size < 2;
+}
+
+function clearDrugs() {
+  selected.forEach(c => document.getElementById(`drug-${c}`)?.classList.remove('selected'));
+  selected.clear();
+  updateSelectedList();
+  document.getElementById('runBtn').disabled = true;
+}
+
+function updateSelectedList() {
+  const el = document.getElementById('selectedList');
+  if (selected.size === 0) {
+    el.textContent = 'No medications selected';
+    el.className = 'selected-list empty';
+  } else {
+    const drugs = DRUGS.filter(d => selected.has(d.code));
+    el.innerHTML = drugs.map(d => `<span style="color:var(--navy);font-weight:500">${d.code}</span> ${d.name}`).join('<br>');
+    el.className = 'selected-list';
+  }
+}
+
+// ── ANALYSIS ──────────────────────────────────────────────────────────────────
+function runAnalysis() {
+  const name  = document.getElementById('patientName').value.trim() || 'Patient';
+  const age   = document.getElementById('patientAge').value || '—';
+  const sex   = document.getElementById('patientSex').value;
+  const dx    = document.getElementById('patientDx').value.trim();
+
+  const codes = Array.from(selected);
+  const combos = [];
+
+  // All pairwise combos
+  for (let i = 0; i < codes.length; i++) {
+    for (let j = i+1; j < codes.length; j++) {
+      const a = codes[i], b = codes[j];
+      const dq = getDQTc(a, b);
+      const ikr = getIKR(a, b);
+      const tier = riskTier(dq);
+      const faers = isFaers(a, b);
+      const ror = getFaersROR(a, b);
+      combos.push({ a, b, dq, ikr, tier, faers, ror });
+    }
+  }
+
+  combos.sort((x, y) => (y.dq ?? -99) - (x.dq ?? -99));
+
+  // Overall tier = worst
+  const tierOrder = ["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
+  let worstTier = "LOW";
+  combos.forEach(c => {
+    if (c.tier && tierOrder.indexOf(c.tier) < tierOrder.indexOf(worstTier)) {
+      worstTier = c.tier;
+    }
+  });
+
+  // Sex warning
+  const sexWarning = sex === 'F'
+    ? 'Female sex is associated with longer baseline QTc (mean 410 ± 20 ms vs. 400 ± 20 ms in males) due to hormonal IKs modulation. This model does not account for sex differences — risk may be underestimated.'
+    : sex === 'M'
+    ? 'Male sex is associated with slightly shorter baseline QTc. Sex-specific IKs modulation is not modeled.'
+    : null;
+
+  // CYP2D6 flag
+  const hasFluoxetine = codes.includes('FLU');
+  const cyp2d6Substrates = ['RIS','ARI','QUE'].filter(c => codes.includes(c));
+  const cypWarning = (hasFluoxetine && cyp2d6Substrates.length > 0)
+    ? `Fluoxetine is a potent CYP2D6 inhibitor. ${cyp2d6Substrates.join(', ')} are CYP2D6 substrates — true plasma concentrations may be 2–4× higher than assumed, increasing actual cardiac risk.`
+    : null;
+
+  // Guanfacine conduction warning
+  const hasGua = codes.includes('GUA');
+  const antipsychoticsPresent = ['RIS','QUE','ARI'].filter(c => codes.includes(c));
+  const guaWarning = (hasGua && antipsychoticsPresent.length > 0)
+    ? `Guanfacine + antipsychotic combinations show elevated FAERS cardiac signal (ROR 10–13) despite low model ΔQTc. This likely reflects PR interval prolongation and AV conduction slowing — a mechanism not captured by QTc-based modeling.`
+    : null;
+
+  // Clinical recommendation
+  let recText = '';
+  if (worstTier === 'HIGH') {
+    recText = 'HIGH cardiac risk. Consider alternative combinations. If proceeding, baseline ECG required; repeat at each dose change. Cardiology consultation recommended.';
+  } else if (worstTier === 'MODERATE') {
+    recText = 'MODERATE cardiac risk. Baseline ECG recommended. Monitor heart rate and QTc at initiation and dose changes. Consider lower starting doses.';
+  } else if (worstTier === 'LOW-MOD') {
+    recText = 'LOW-MODERATE cardiac risk. Baseline ECG reasonable. Clinical monitoring for palpitations, presyncope, or HR elevation at follow-up.';
+  } else {
+    recText = 'LOW cardiac risk based on available modeling data. Standard clinical monitoring applies.';
+  }
+
+  // Render
+  const main = document.getElementById('main');
+  document.getElementById('emptyState')?.remove();
+
+  const metaParts = [`Age ${age}`];
+  if (sex) metaParts.push({ M:'Male', F:'Female' }[sex] || sex);
+  if (dx)  metaParts.push(dx);
+
+  const drugNames = DRUGS.filter(d => codes.includes(d.code)).map(d => d.name).join(', ');
+
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <div class="result-header">
+      <div>
+        <div class="patient-name">${escHtml(name)}</div>
+        <div class="patient-meta">${metaParts.join(' · ')} &nbsp;|&nbsp; ${escHtml(drugNames)}</div>
+      </div>
+      <div class="risk-badge-large risk-${worstTier}">${worstTier.replace('-',' ')}</div>
+    </div>
+    <div class="result-body">
+      ${renderCombos(combos)}
+      <div class="clinical-note" style="margin-top:1rem">
+        <strong>Clinical note:</strong> ${recText}
+      </div>
+      ${cypWarning ? `<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--amber)"><strong>CYP2D6 interaction flag:</strong> ${cypWarning}</div>` : ''}
+      ${guaWarning ? `<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--amber)"><strong>Conduction note:</strong> ${guaWarning}</div>` : ''}
+      ${sexWarning ? `<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--teal)"><strong>Sex note:</strong> ${sexWarning}</div>` : ''}
+      <div class="disclaimer" style="margin-top:1rem">
+        ΔQTc values from O'Hara-Rudy 2011 mechanistic simulation at 500-beat steady state, 60 bpm. All Cmax values adult-derived. FAERS pharmacovigilance signals from 552,832 pediatric cases (2015–2024).
+        <strong style="color:var(--red)"> Research use only — not validated for clinical decision-making.</strong>
+      </div>
+    </div>
+  `;
+
+  main.insertBefore(card, main.firstChild);
+
+  // Add to history
+  history.unshift({ name, drugs: codes, tier: worstTier, timestamp: new Date() });
+  renderHistory();
+}
+
+function renderCombos(combos) {
+  const maxDQ = 22;
+  return `
+    <div class="combo-list">
+      ${combos.map(c => {
+        const sign  = c.dq >= 0 ? '+' : '';
+        const bw    = Math.min(100, Math.abs(c.dq ?? 0) / maxDQ * 100);
+        const mech  = mechLabel(c.ikr, c.dq);
+        const rorStr = c.ror ? ` · FAERS ROR ${c.ror.toFixed(2)}` : '';
+        const fTag  = c.faers
+          ? `<span class="faers-badge signal">⚠ FAERS signal${rorStr}</span>`
+          : `<span class="faers-badge">no FAERS signal</span>`;
+        return `
+          <div class="combo-row ${c.tier}">
+            <div>
+              <div class="combo-name">${c.a} + ${c.b}</div>
+              <div class="dqtc-bar-wrap"><div class="dqtc-bar" style="width:${bw}%;background:${tierBarColor(c.tier)}"></div></div>
+              <div style="margin-top:4px">${fTag}</div>
+            </div>
+            <div class="combo-dqtc dqtc-${c.tier}">${sign}${c.dq?.toFixed(1) ?? 'n/a'} ms</div>
+            <div class="combo-ikr">IKr ${c.ikr.toFixed(2)}%</div>
+            <div class="combo-mech">${mech}</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderHistory() {
+  const existing = document.getElementById('historySection');
+  if (existing) existing.remove();
+  if (history.length === 0) return;
+
+  const main = document.getElementById('main');
+  const section = document.createElement('div');
+  section.id = 'historySection';
+  section.className = 'history-section';
+  section.innerHTML = `
+    <h2>Previous assessments</h2>
+    <div class="history-list">
+      ${history.slice(0,8).map((h,i) => `
+        <div class="history-item">
+          <span class="history-name">${escHtml(h.name)}</span>
+          <span class="history-drugs">${h.drugs.join(' + ')}</span>
+          <span class="history-badge" style="color:${tierColor(h.tier)}">${h.tier}</span>
+        </div>`).join('')}
+    </div>`;
+  main.appendChild(section);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildDrugGrid();
+</script>
+</body>
+</html>
