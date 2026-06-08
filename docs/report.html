@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioSafe Pediatric — Polypharmacy Cardiac Risk Report</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0f0e;
+  --ink2: #3a3a38;
+  --ink3: #76756f;
+  --paper: #faf9f6;
+  --paper2: #f2f0eb;
+  --paper3: #e8e5de;
+  --rule: #d4d0c8;
+  --high: #c0392b;
+  --high-bg: #fdf0ef;
+  --mod: #b8600a;
+  --mod-bg: #fef6ec;
+  --lowmod: #1a5fa8;
+  --lowmod-bg: #eff5fd;
+  --low: #27682e;
+  --low-bg: #f0f8f1;
+  --prot: #0f6b5c;
+  --prot-bg: #edf7f5;
+  --accent: #c0392b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.65;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2.5rem 5rem;
+}
+
+/* ── HEADER ── */
+header { border-top: 3px solid var(--ink); padding-top: 1.5rem; margin-bottom: 3rem; }
+.pre-title { font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink3); margin-bottom: 0.75rem; }
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.6rem;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+h1 em { font-style: italic; color: var(--accent); }
+.subtitle { font-size: 1rem; color: var(--ink2); font-weight: 300; max-width: 560px; margin-bottom: 1.5rem; }
+.meta-row { display: flex; gap: 2rem; flex-wrap: wrap; padding-top: 1rem; border-top: 0.5px solid var(--rule); }
+.meta-item { font-size: 11px; color: var(--ink3); }
+.meta-item strong { display: block; font-size: 12px; color: var(--ink2); font-weight: 500; margin-bottom: 1px; }
+
+/* ── SECTION ── */
+section { margin-bottom: 3rem; }
+.section-head {
+  display: flex; align-items: baseline; gap: 1rem;
+  border-bottom: 0.5px solid var(--rule);
+  padding-bottom: 0.5rem; margin-bottom: 1.5rem;
+}
+.section-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); }
+h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--ink); }
+h3 { font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink3); margin-bottom: 0.75rem; }
+p { color: var(--ink2); margin-bottom: 0.75rem; font-size: 0.95rem; }
+p:last-child { margin-bottom: 0; }
+
+/* ── SUMMARY STATS ── */
+.stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--rule); border: 0.5px solid var(--rule); margin-bottom: 2rem; }
+.stat-cell { background: var(--paper); padding: 1.25rem 1rem; text-align: center; }
+.stat-n { font-family: 'DM Serif Display', serif; font-size: 2.2rem; line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+.stat-sub { font-size: 10px; color: var(--ink3); font-style: italic; }
+
+/* ── HEATMAP ── */
+.hm-container { overflow-x: auto; margin-bottom: 1rem; }
+table.hm { border-collapse: collapse; font-size: 11px; min-width: 100%; }
+table.hm th {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  color: var(--ink3); padding: 6px 4px;
+  text-align: center; white-space: nowrap;
+}
+table.hm th.row-corner { text-align: right; padding-right: 8px; }
+table.hm td.row-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  color: var(--ink2); padding: 3px 8px 3px 0;
+  white-space: nowrap; text-align: right;
+}
+table.hm td.cell {
+  width: 52px; height: 34px;
+  text-align: center; font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  border: 1px solid var(--paper);
+  cursor: pointer; transition: filter 0.12s;
+}
+table.hm td.cell:hover { filter: brightness(0.9); }
+.hm-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+.hm-leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink3); }
+.hm-leg-swatch { width: 14px; height: 14px; border-radius: 2px; }
+
+/* ── TOOLTIP ── */
+.detail-box {
+  background: var(--paper2); border: 0.5px solid var(--rule);
+  padding: 0.875rem 1rem; margin-bottom: 1rem;
+  font-size: 13px; color: var(--ink2);
+  min-height: 48px; display: flex; align-items: center; gap: 10px;
+}
+.detail-box .combo-name { font-weight: 500; color: var(--ink); }
+.detail-box .dqtc { font-family: 'DM Mono', monospace; font-weight: 500; }
+
+/* ── BADGE ── */
+.badge {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.04em;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 2px;
+  white-space: nowrap;
+}
+.badge-high   { background: var(--high-bg);   color: var(--high); }
+.badge-mod    { background: var(--mod-bg);    color: var(--mod); }
+.badge-lowmod { background: var(--lowmod-bg); color: var(--lowmod); }
+.badge-low    { background: var(--low-bg);    color: var(--low); }
+.badge-prot   { background: var(--prot-bg);   color: var(--prot); }
+
+/* ── RANKED LIST ── */
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+.fbtn {
+  font-size: 11px; padding: 4px 12px; border-radius: 2px;
+  border: 0.5px solid var(--rule); background: var(--paper2);
+  color: var(--ink3); cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.1s;
+}
+.fbtn:hover { border-color: var(--ink3); color: var(--ink2); }
+.fbtn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.rank-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rank-table thead th {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--ink3);
+  padding: 6px 8px; border-bottom: 0.5px solid var(--rule);
+  text-align: left;
+}
+.rank-table thead th.r { text-align: right; }
+.rank-table tbody tr { border-bottom: 0.5px solid var(--paper3); }
+.rank-table tbody tr:hover { background: var(--paper2); }
+.rank-table tbody td { padding: 7px 8px; vertical-align: middle; }
+.rank-table tbody td.mono { font-family: 'DM Mono', monospace; font-size: 11px; }
+.rank-table tbody td.r { text-align: right; }
+.bar-wrap { width: 80px; height: 6px; background: var(--paper3); border-radius: 1px; display: inline-block; vertical-align: middle; }
+.bar-fill { height: 100%; border-radius: 1px; }
+
+/* ── FINDINGS ── */
+.finding-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 0.5px solid var(--rule); }
+.finding-cell { background: var(--paper); padding: 1.25rem; }
+.finding-cell h4 { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink3); margin-bottom: 0.5rem; }
+.finding-cell .finding-val { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--ink); margin-bottom: 0.25rem; }
+.finding-cell p { font-size: 0.85rem; color: var(--ink2); }
+
+/* ── METHODS ── */
+.method-row { display: grid; grid-template-columns: 140px 1fr; gap: 0; margin-bottom: 0; }
+.method-row + .method-row { border-top: 0.5px solid var(--paper3); }
+.method-key { font-size: 11px; font-weight: 500; color: var(--ink3); padding: 0.75rem 1rem 0.75rem 0; }
+.method-val { font-size: 12px; color: var(--ink2); padding: 0.75rem 0; }
+
+/* ── LIMITATIONS ── */
+.lim-list { list-style: none; }
+.lim-list li {
+  padding: 0.6rem 0; border-bottom: 0.5px solid var(--paper3);
+  font-size: 0.88rem; color: var(--ink2);
+  display: flex; gap: 0.75rem;
+}
+.lim-list li::before { content: "—"; color: var(--ink3); flex-shrink: 0; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 0.5px solid var(--rule); padding-top: 1.5rem;
+  margin-top: 4rem; display: flex; justify-content: space-between;
+  align-items: flex-start; flex-wrap: wrap; gap: 1rem;
+}
+footer p { font-size: 11px; color: var(--ink3); max-width: 420px; }
+.footer-badge { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink3); border: 0.5px solid var(--rule); padding: 4px 10px; }
+
+@media print {
+  body { padding: 1.5rem; max-width: 100%; }
+  .filter-row, .fbtn { display: none; }
+  .detail-box { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="pre-title">Computational Cardiology &mdash; Adolescent Psychopharmacology</div>
+  <h1>CardioSafe <em>Pediatric</em></h1>
+  <p class="subtitle">A mechanistic cardiac risk stratification framework for psychiatric polypharmacy in children and adolescents, derived from O'Hara-Rudy action potential modeling and hERG pharmacology.</p>
+  <div class="meta-row">
+    <div class="meta-item"><strong>Model</strong>O'Hara-Rudy 2011 (ORd)</div>
+    <div class="meta-item"><strong>Pacing</strong>60 bpm &middot; 50 beats</div>
+    <div class="meta-item"><strong>Metric</strong>&Delta;QTc (Bazett) vs. drug-free baseline</div>
+    <div class="meta-item"><strong>Population</strong>Adolescent (adult Cmax; see limitations)</div>
+    <div class="meta-item"><strong>Data sources</strong>ChEMBL &middot; Literature hERG IC50</div>
+    <div class="meta-item"><strong>Version</strong>1.1 &middot; June 2026</div>
+  </div>
+</header>
+
+<!-- ── 1. SUMMARY ── -->
+<section>
+  <div class="section-head"><span class="section-num">01</span><h2>Summary statistics</h2></div>
+  <div class="stat-grid">
+    <div class="stat-cell">
+      <div class="stat-n" style="color:var(--high);">2</div>
+      <div class="stat-lbl">HIGH risk</div>
+      <div class="stat-sub">&Delta;QTc &ge; 20 ms</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n" style="color:var(--mod);">29</div>
+      <div class="stat-lbl">MODERATE risk</div>
+      <div class="stat-sub">&Delta;QTc 10&ndash;19 ms</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n" style="color:var(--lowmod);">14</div>
+      <div class="stat-lbl">LOW-MOD risk</div>
+      <div class="stat-sub">&Delta;QTc 5&ndash;9 ms</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n" style="color:var(--low);">39</div>
+      <div class="stat-lbl">LOW / protective</div>
+      <div class="stat-sub">&Delta;QTc &lt; 5 ms</div>
+    </div>
+  </div>
+  <div class="finding-grid">
+    <div class="finding-cell">
+      <h4>Central finding</h4>
+      <div class="finding-val">28 / 31 HIGH/MOD</div>
+      <p>combinations with &Delta;QTc &ge; 10 ms have IKr block &lt; 5%, indicating sympathomimetic or autonomic mechanisms dominate over hERG block at therapeutic concentrations.</p>
+    </div>
+    <div class="finding-cell">
+      <h4>Alpha-2 agonists</h4>
+      <div class="finding-val">Protective effect</div>
+      <p>Clonidine and guanfacine produce negative &Delta;QTc (&minus;2.6 to &minus;6.1 ms) in combination with SSRIs and antipsychotics via bradycardic HR reduction offsetting Bazett correction.</p>
+    </div>
+    <div class="finding-cell">
+      <h4>Highest risk pair</h4>
+      <div class="finding-val">MPH + AMP &nbsp;<span class="badge badge-high">HIGH</span></div>
+      <p>&Delta;QTc +23.8 ms with 0% IKr block. Dual stimulant regimens produce additive sympathomimetic QTc prolongation through a mechanism entirely absent from hERG-based screening.</p>
+    </div>
+    <div class="finding-cell">
+      <h4>Highest risk triple</h4>
+      <div class="finding-val">NOR + MPH + ARI &nbsp;<span class="badge badge-high">HIGH</span></div>
+      <p>&Delta;QTc +21.7 ms. Convergence of sympathomimetic (MPH), hERG block (NOR+ARI combined 6.76%), and elevated heart rate. A clinically encountered combination.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 2. HEATMAP ── -->
+<section>
+  <div class="section-head"><span class="section-num">02</span><h2>Pairwise &Delta;QTc heatmap</h2></div>
+  <div id="detail" class="detail-box" style="color:var(--ink3);">Click any cell to view combination detail.</div>
+  <div class="hm-container">
+    <table class="hm" id="hmtable" aria-label="Pairwise drug combination QTc change heatmap"></table>
+  </div>
+  <div class="hm-legend">
+    <div class="hm-leg-item"><div class="hm-leg-swatch" style="background:#f7c1c1;"></div> HIGH (&ge;20 ms)</div>
+    <div class="hm-leg-item"><div class="hm-leg-swatch" style="background:#fac775;"></div> MODERATE (10&ndash;19 ms)</div>
+    <div class="hm-leg-item"><div class="hm-leg-swatch" style="background:#b5d4f4;"></div> LOW-MOD (5&ndash;9 ms)</div>
+    <div class="hm-leg-item"><div class="hm-leg-swatch" style="background:#c0dd97;"></div> LOW (0&ndash;4 ms)</div>
+    <div class="hm-leg-item"><div class="hm-leg-swatch" style="background:#9fe1cb;"></div> Protective (&lt;0 ms)</div>
+    <div class="hm-leg-item"><div class="hm-leg-swatch" style="background:#e8e5de;"></div> Same drug</div>
+  </div>
+</section>
+
+<!-- ── 3. RANKED TABLE ── -->
+<section>
+  <div class="section-head"><span class="section-num">03</span><h2>All combinations ranked</h2></div>
+  <div class="filter-row">
+    <button class="fbtn active" onclick="filt('ALL',this)">All (84)</button>
+    <button class="fbtn" onclick="filt('HIGH',this)">High</button>
+    <button class="fbtn" onclick="filt('MODERATE',this)">Moderate</button>
+    <button class="fbtn" onclick="filt('LOW-MOD',this)">Low-mod</button>
+    <button class="fbtn" onclick="filt('LOW',this)">Low / protective</button>
+    <button class="fbtn" onclick="filt('STIM',this)">Stimulant</button>
+    <button class="fbtn" onclick="filt('NOSTIM',this)">No stimulant</button>
+    <button class="fbtn" onclick="filt('TRIPLE',this)">Triples only</button>
+  </div>
+  <table class="rank-table" id="ranktbl">
+    <thead>
+      <tr>
+        <th>Risk</th>
+        <th>Combination</th>
+        <th>n</th>
+        <th class="r">&Delta;QTc (ms)</th>
+        <th class="r">IKr block</th>
+        <th>Mechanism</th>
+        <th>&Delta;QTc bar</th>
+      </tr>
+    </thead>
+    <tbody id="rankbody"></tbody>
+  </table>
+</section>
+
+<!-- ── 4. METHODS ── -->
+<section>
+  <div class="section-head"><span class="section-num">04</span><h2>Methods</h2></div>
+  <div class="method-row"><div class="method-key">AP model</div><div class="method-val">O'Hara-Rudy 2011 undiseased human ventricular model (41-variable ODE system). Integrated with LSODA via scipy.integrate.odeint, 50 paced beats at 1000 ms CL, dt = 0.5 ms.</div></div>
+  <div class="method-row"><div class="method-key">hERG block</div><div class="method-val">Competitive binding: block<sub>i</sub> = C<sub>free</sub> / (C<sub>free</sub> + IC50). Combined block: 1 &minus; &prod;(1 &minus; block<sub>i</sub>). Applied as GKr scaling: GKr<sub>eff</sub> = GKr<sub>max</sub> &times; (1 &minus; total block).</div></div>
+  <div class="method-row"><div class="method-key">Sympathomimetic</div><div class="method-val">Stimulants (MPH, AMP) modeled as 10% CL reduction (HR increase proxy) + 15% GCaL upregulation. Applied to each stimulant in combination independently.</div></div>
+  <div class="method-row"><div class="method-key">Autonomic</div><div class="method-val">Alpha-2 agonists (CLO, GUA) modeled as 10% CL increase (bradycardia) + 5% GNa reduction (conduction slowing). Produces negative &Delta;QTc via Bazett correction.</div></div>
+  <div class="method-row"><div class="method-key">QTc</div><div class="method-val">APD90 extracted from last beat V-trace as time from upstroke to 90% repolarization. QTc = APD90 / &radic;(RR<sub>s</sub>) (Bazett). &Delta;QTc = QTc<sub>drug</sub> &minus; QTc<sub>baseline</sub>.</div></div>
+  <div class="method-row"><div class="method-key">IC50 sources</div><div class="method-val">Electrophysiology (patch clamp) values preferred. Sources: ChEMBL v37, Witchel 2002, Redfern 2003, Kongsamut 2002, Polak 2009, Kramer 2013, Perrin 2008. Quality A (patch clamp): IMI, NOR, RIS, QUE, ARI, SER, FLU. Quality B/C: ESC, CLO, GUA, MPH, AMP.</div></div>
+  <div class="method-row"><div class="method-key">Free Cmax</div><div class="method-val">Therapeutic free plasma Cmax derived from published adult pharmacokinetic data and protein binding fractions. All values adult-derived; see limitations.</div></div>
+</section>
+
+<!-- ── 5. LIMITATIONS ── -->
+<section>
+  <div class="section-head"><span class="section-num">05</span><h2>Limitations &amp; assumptions</h2></div>
+  <ul class="lim-list">
+    <li>All free Cmax values are adult-derived. Adolescent pharmacokinetics differ substantially due to developmental CYP2D6 expression variability, which metabolizes risperidone, aripiprazole, fluoxetine, nortriptyline, and imipramine. Cmax may shift 1.5&ndash;3&times; in pediatric populations.</li>
+    <li>The ORd model represents the undiseased adult human ventricular action potential. Adolescent baseline QTc is shorter by approximately 10&ndash;15 ms, and autonomic tone differs developmentally. Model has not been validated against pediatric ECG data.</li>
+    <li>Sympathomimetic and autonomic modifiers (10% CL shift) are phenomenological approximations. Dose-dependent beta-adrenergic signaling cascades (PKA-mediated ICaL/IKs upregulation) are not fully mechanistically modeled.</li>
+    <li>Active metabolite contributions not included except where noted. Norfluoxetine (fluoxetine metabolite, IC50 ~3000 nM) and 9-OH-risperidone may contribute additional hERG block in vivo.</li>
+    <li>Independent binding site assumption for combined IKr block. If drugs compete for the same hERG binding site, combined block will be overestimated.</li>
+    <li>Guanfacine, methylphenidate, and amphetamine IC50 values are estimates (data quality C). Stimulant cardiac risk characterization through sympathomimetic pathway is mechanistically appropriate but quantitatively uncertain.</li>
+    <li>Pubertal hormonal modulation of IKs (estrogen increases IKs, testosterone decreases it) is not modeled. Sex differences in adolescent QTc are clinically significant and represent a key limitation for individual-level risk prediction.</li>
+    <li>50-beat simulations may not represent true electrophysiological steady state. Full convergence typically requires 200+ beats; &Delta;QTc estimates carry approximately &pm;3&ndash;5 ms uncertainty from this source.</li>
+  </ul>
+</section>
+
+<!-- ── 6. FAERS VALIDATION ── -->
+<section>
+  <div class="section-head"><span class="section-num">06</span><h2>Pharmacovigilance validation &mdash; FDA FAERS</h2></div>
+  <p>Model predictions were externally validated against FDA FAERS adverse event reports (2015Q1&ndash;2024Q4). Pediatric cases (age&nbsp;&lt;&nbsp;18) were filtered from 16.1&nbsp;million total reports, yielding 552,832 pediatric cases. Reporting odds ratios (ROR) were computed for primary cardiac preferred terms (QT prolonged, Torsade de pointes, ventricular arrhythmia, cardiac arrest, sudden cardiac death) in pediatric cases co-reported with each drug and drug combination.</p>
+
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-top:1.5rem;">
+    <div class="stat-cell">
+      <div class="stat-n">16.1M</div>
+      <div class="stat-lbl">FAERS cases</div>
+      <div class="stat-sub">2015Q1&ndash;2024Q4</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n">552k</div>
+      <div class="stat-lbl">Pediatric cases</div>
+      <div class="stat-sub">age &lt; 18</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n" style="color:var(--mod);">39/63</div>
+      <div class="stat-lbl">Concordant pairs</div>
+      <div class="stat-sub">model vs. FAERS signal (62%)</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-n" style="color:var(--high);">11/12</div>
+      <div class="stat-lbl">Drugs with signal</div>
+      <div class="stat-sub">ROR CI lower bound &gt; 1</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem;">Per-drug reporting odds ratios (pediatric)</h3>
+  <table class="rank-table" style="margin-bottom:1.5rem;">
+    <thead>
+      <tr>
+        <th>Drug</th><th>Class</th><th class="r">n reports</th>
+        <th class="r">Cardiac AEs</th><th class="r">ROR</th>
+        <th>95% CI</th><th>Signal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Nortriptyline</td><td style="color:var(--ink3);font-size:11px;">TCA</td><td class="r mono">200</td><td class="r mono">18</td><td class="r mono" style="font-weight:500;">10.44</td><td class="mono" style="font-size:11px;">6.47&ndash;16.86</td><td><span class="badge badge-high">SIGNAL</span></td></tr>
+      <tr><td>Imipramine</td><td style="color:var(--ink3);font-size:11px;">TCA</td><td class="r mono">172</td><td class="r mono">7</td><td class="r mono" style="font-weight:500;">4.66</td><td class="mono" style="font-size:11px;">2.24&ndash;9.69</td><td><span class="badge badge-high">SIGNAL</span></td></tr>
+      <tr><td>Guanfacine</td><td style="color:var(--ink3);font-size:11px;">Alpha-2</td><td class="r mono">2,936</td><td class="r mono">124</td><td class="r mono" style="font-weight:500;">4.63</td><td class="mono" style="font-size:11px;">3.86&ndash;5.55</td><td><span class="badge badge-high">SIGNAL</span></td></tr>
+      <tr><td>Quetiapine</td><td style="color:var(--ink3);font-size:11px;">Antipsychotic</td><td class="r mono">4,936</td><td class="r mono">189</td><td class="r mono" style="font-weight:500;">4.21</td><td class="mono" style="font-size:11px;">3.63&ndash;4.88</td><td><span class="badge badge-high">SIGNAL</span></td></tr>
+      <tr><td>Fluoxetine</td><td style="color:var(--ink3);font-size:11px;">SSRI</td><td class="r mono">5,894</td><td class="r mono">218</td><td class="r mono" style="font-weight:500;">4.08</td><td class="mono" style="font-size:11px;">3.55&ndash;4.68</td><td><span class="badge badge-high">SIGNAL</span></td></tr>
+      <tr><td>Sertraline</td><td style="color:var(--ink3);font-size:11px;">SSRI</td><td class="r mono">7,451</td><td class="r mono">215</td><td class="r mono" style="font-weight:500;">3.15</td><td class="mono" style="font-size:11px;">2.74&ndash;3.61</td><td><span class="badge badge-high">SIGNAL</span></td></tr>
+      <tr><td>Aripiprazole</td><td style="color:var(--ink3);font-size:11px;">Antipsychotic</td><td class="r mono">6,701</td><td class="r mono">170</td><td class="r mono" style="font-weight:500;">2.74</td><td class="mono" style="font-size:11px;">2.34&ndash;3.19</td><td><span class="badge badge-mod">SIGNAL</span></td></tr>
+      <tr><td>Escitalopram</td><td style="color:var(--ink3);font-size:11px;">SSRI</td><td class="r mono">2,658</td><td class="r mono">60</td><td class="r mono" style="font-weight:500;">2.41</td><td class="mono" style="font-size:11px;">1.86&ndash;3.11</td><td><span class="badge badge-mod">SIGNAL</span></td></tr>
+      <tr><td>Methylphenidate</td><td style="color:var(--ink3);font-size:11px;">Stimulant</td><td class="r mono">10,523</td><td class="r mono">169</td><td class="r mono" style="font-weight:500;">1.70</td><td class="mono" style="font-size:11px;">1.46&ndash;1.99</td><td><span class="badge badge-lowmod">SIGNAL</span></td></tr>
+      <tr><td>Amphetamine</td><td style="color:var(--ink3);font-size:11px;">Stimulant</td><td class="r mono">5,537</td><td class="r mono">70</td><td class="r mono" style="font-weight:500;">1.33</td><td class="mono" style="font-size:11px;">1.05&ndash;1.68</td><td><span class="badge badge-lowmod">SIGNAL</span></td></tr>
+      <tr><td>Risperidone</td><td style="color:var(--ink3);font-size:11px;">Antipsychotic</td><td class="r mono">14,000</td><td class="r mono">159</td><td class="r mono" style="font-weight:500;">1.19</td><td class="mono" style="font-size:11px;">1.01&ndash;1.39</td><td><span class="badge badge-lowmod">SIGNAL</span></td></tr>
+      <tr><td>Clonidine</td><td style="color:var(--ink3);font-size:11px;">Alpha-2</td><td class="r mono">4,306</td><td class="r mono">50</td><td class="r mono" style="font-weight:500;">1.22</td><td class="mono" style="font-size:11px;">0.92&ndash;1.61</td><td><span class="badge badge-low" style="background:var(--paper3);color:var(--ink3);">no signal</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Key combination signals</h3>
+  <table class="rank-table" style="margin-bottom:1.5rem;">
+    <thead>
+      <tr>
+        <th>Combination</th><th class="r">n co-reports</th>
+        <th class="r">ROR</th><th>95% CI</th>
+        <th class="r">Model &Delta;QTc</th><th>Model tier</th><th>Concordant</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mono">MPH + SER</td><td class="r mono">578</td><td class="r mono" style="font-weight:500;">12.79</td><td class="mono" style="font-size:11px;">9.84&ndash;16.62</td><td class="r mono">+11.3 ms</td><td><span class="badge badge-mod">MODERATE</span></td><td style="color:var(--low);font-weight:500;">✓</td></tr>
+      <tr><td class="mono">MPH + ARI</td><td class="r mono">&mdash;</td><td class="r mono" style="font-weight:500;">8.15</td><td class="mono" style="font-size:11px;">6.10&ndash;10.90</td><td class="r mono">+17.9 ms</td><td><span class="badge badge-mod">MODERATE</span></td><td style="color:var(--low);font-weight:500;">✓</td></tr>
+      <tr><td class="mono">MPH + QUE</td><td class="r mono">&mdash;</td><td class="r mono" style="font-weight:500;">5.25</td><td class="mono" style="font-size:11px;">3.04&ndash;9.08</td><td class="r mono">+12.7 ms</td><td><span class="badge badge-mod">MODERATE</span></td><td style="color:var(--low);font-weight:500;">✓</td></tr>
+      <tr><td class="mono">AMP + SER</td><td class="r mono">&mdash;</td><td class="r mono" style="font-weight:500;">2.81</td><td class="mono" style="font-size:11px;">1.56&ndash;5.05</td><td class="r mono">+11.3 ms</td><td><span class="badge badge-mod">MODERATE</span></td><td style="color:var(--low);font-weight:500;">✓</td></tr>
+      <tr style="background:var(--high-bg);"><td class="mono">ARI + GUA</td><td class="r mono">359</td><td class="r mono" style="font-weight:500;">10.25</td><td class="mono" style="font-size:11px;">7.14&ndash;14.71</td><td class="r mono">+2.7 ms</td><td><span class="badge badge-low">LOW</span></td><td style="color:var(--high);font-weight:500;">✗ discordant</td></tr>
+      <tr style="background:var(--high-bg);"><td class="mono">QUE + GUA</td><td class="r mono">127</td><td class="r mono" style="font-weight:500;">13.15</td><td class="mono" style="font-size:11px;">7.61&ndash;22.73</td><td class="r mono">&minus;2.6 ms</td><td><span class="badge badge-low">LOW</span></td><td style="color:var(--high);font-weight:500;">✗ discordant</td></tr>
+      <tr style="background:var(--high-bg);"><td class="mono">QUE + FLU</td><td class="r mono">&mdash;</td><td class="r mono" style="font-weight:500;">9.18</td><td class="mono" style="font-size:11px;">6.75&ndash;12.49</td><td class="r mono">+2.0 ms</td><td><span class="badge badge-low">LOW</span></td><td style="color:var(--high);font-weight:500;">✗ discordant</td></tr>
+    </tbody>
+  </table>
+
+  <div class="finding-grid">
+    <div class="finding-cell">
+      <h4>Primary validation</h4>
+      <div class="finding-val">MPH+SER ROR&nbsp;12.8</div>
+      <p>n=578 pediatric co-reports with tight CI. One of the most common adolescent polypharmacy combinations (ADHD + depression/anxiety) correctly flagged as MODERATE risk by the model via sympathomimetic mechanism.</p>
+    </div>
+    <div class="finding-cell">
+      <h4>Guanfacine discordance</h4>
+      <div class="finding-val">Model vs. FAERS gap</div>
+      <p>ARI+GUA (ROR 10.25) and QUE+GUA (ROR 13.15) show strong FAERS signal despite low model &Delta;QTc. Model lacks a PR/AV conduction pathway. Guanfacine risk in polypharmacy is likely conduction-mediated, not QTc-mediated.</p>
+    </div>
+    <div class="finding-cell">
+      <h4>CYP2D6 interaction gap</h4>
+      <div class="finding-val">PK not modeled</div>
+      <p>QUE+FLU (ROR 9.18) and ARI+SER (ROR 6.78) show FAERS signal despite low model risk. Fluoxetine inhibits CYP2D6, raising quetiapine and aripiprazole plasma levels 2&ndash;4&times;. Model uses fixed adult Cmax with no PK interaction term.</p>
+    </div>
+    <div class="finding-cell">
+      <h4>Sympathomimetic signal</h4>
+      <div class="finding-val">Heart rate increased: 230</div>
+      <p>Second most common cardiac PT in high-risk drug reports after ECG QT prolonged (297). Directly validates the model's sympathomimetic pathway as a real cardiac risk mechanism, not captured by hERG screening alone.</p>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <p>CardioSafe Pediatric v1.0 &middot; Computational modeling output for research purposes. Not validated for clinical decision-making. All Cmax values adult-derived; adolescent applicability requires validation. See limitations section.</p>
+  <div class="footer-badge">ORd 2011 &middot; ChEMBL v37 &middot; FAERS 2015–2024 &middot; n=84 combinations</div>
+</footer>
+
+<script>
+const drugs=['MPH','AMP','RIS','QUE','ARI','SER','FLU','ESC','CLO','GUA','IMI','NOR'];
+const fullNames={MPH:'Methylphenidate',AMP:'Amphetamine',RIS:'Risperidone',QUE:'Quetiapine',ARI:'Aripiprazole',SER:'Sertraline',FLU:'Fluoxetine',ESC:'Escitalopram',CLO:'Clonidine',GUA:'Guanfacine',IMI:'Imipramine',NOR:'Nortriptyline'};
+const drugClass={MPH:'Stimulant',AMP:'Stimulant',RIS:'Antipsychotic',QUE:'Antipsychotic',ARI:'Antipsychotic',SER:'SSRI',FLU:'SSRI',ESC:'SSRI',CLO:'Alpha-2',GUA:'Alpha-2',IMI:'TCA',NOR:'TCA'};
+const mx={MPH:[0,23.8,11.7,12.7,17.9,11.3,11.7,11.3,6.1,6.1,12.2,15.0],AMP:[23.8,0,11.7,12.7,17.9,11.3,11.7,11.3,6.1,6.1,12.2,15.0],RIS:[11.7,11.7,0,2.0,7.0,1.0,1.0,0.5,-3.6,-3.6,1.5,4.5],QUE:[12.7,12.7,2.0,0,8.0,2.0,2.0,1.5,-2.6,-2.6,2.5,5.5],ARI:[17.9,17.9,7.0,8.0,0,7.0,7.0,6.5,2.7,2.7,8.0,11.0],SER:[11.3,11.3,1.0,2.0,7.0,0,1.0,0.5,-3.6,-3.6,1.5,4.5],FLU:[11.7,11.7,1.0,2.0,7.0,1.0,0,0.5,-3.6,-3.6,1.5,4.5],ESC:[11.3,11.3,0.5,1.5,6.5,0.5,0.5,0,-4.2,-4.2,1.0,4.0],CLO:[6.1,6.1,-3.6,-2.6,2.7,-3.6,-3.6,-4.2,0,-6.1,-3.1,0.0],GUA:[6.1,6.1,-3.6,-2.6,2.7,-3.6,-3.6,-4.2,-6.1,0,-3.1,0.0],IMI:[12.2,12.2,1.5,2.5,8.0,1.5,1.5,1.0,-3.1,-3.1,0,5.5],NOR:[15.0,15.0,4.5,5.5,11.0,4.5,4.5,4.0,0.0,0.0,5.5,0]};
+const ikrMap={'MPH+AMP':0,'MPH+RIS':0.36,'MPH+QUE':0.93,'MPH+ARI':4.22,'MPH+SER':0.19,'MPH+FLU':0.33,'MPH+ESC':0.03,'MPH+CLO':0,'MPH+GUA':0,'MPH+IMI':0.73,'MPH+NOR':2.65,'AMP+RIS':0.36,'AMP+QUE':0.93,'AMP+ARI':4.22,'AMP+SER':0.19,'AMP+FLU':0.33,'AMP+ESC':0.03,'AMP+CLO':0,'AMP+GUA':0,'AMP+IMI':0.73,'AMP+NOR':2.65,'RIS+QUE':1.28,'RIS+ARI':4.56,'RIS+SER':0.55,'RIS+FLU':0.68,'RIS+ESC':0.39,'RIS+CLO':0.36,'RIS+GUA':0.36,'RIS+IMI':1.09,'RIS+NOR':3.0,'QUE+ARI':5.11,'QUE+SER':1.12,'QUE+FLU':1.25,'QUE+ESC':0.96,'QUE+CLO':0.93,'QUE+GUA':0.93,'QUE+IMI':1.65,'QUE+NOR':3.56,'ARI+SER':4.40,'ARI+FLU':4.53,'ARI+ESC':4.25,'ARI+CLO':4.22,'ARI+GUA':4.22,'ARI+IMI':4.92,'ARI+NOR':6.76,'SER+FLU':0.52,'SER+ESC':0.22,'SER+CLO':0.19,'SER+GUA':0.19,'SER+IMI':0.92,'SER+NOR':2.84,'FLU+ESC':0.36,'FLU+CLO':0.33,'FLU+GUA':0.33,'FLU+IMI':1.06,'FLU+NOR':2.98,'ESC+CLO':0.03,'ESC+GUA':0.03,'ESC+IMI':0.76,'ESC+NOR':2.69,'CLO+GUA':0,'CLO+IMI':0.73,'CLO+NOR':2.65,'GUA+IMI':0.73,'GUA+NOR':2.65,'IMI+NOR':3.37};
+
+function cellColor(v){
+  if(v===0) return['#e8e5de','#76756f'];
+  if(v>=20) return['#f7c1c1','#791f1f'];
+  if(v>=10) return['#fac775','#633806'];
+  if(v>=5)  return['#b5d4f4','#0c447c'];
+  if(v>0)   return['#c0dd97','#27500a'];
+  return['#9fe1cb','#085041'];
+}
+function riskInfo(v){
+  if(v>=20) return{flag:'HIGH',cls:'badge-high'};
+  if(v>=10) return{flag:'MODERATE',cls:'badge-mod'};
+  if(v>=5)  return{flag:'LOW-MOD',cls:'badge-lowmod'};
+  if(v>=0)  return{flag:'LOW',cls:'badge-low'};
+  return{flag:'PROTECTIVE',cls:'badge-prot'};
+}
+function mechLabel(ikr,v){
+  if(Math.abs(v)<2) return'minimal';
+  if(ikr<1&&v>8) return'sympathomimetic';
+  if(ikr<3&&v>8) return'sympathomimetic + mild IKr';
+  if(ikr>=5) return'hERG-driven';
+  if(v<0) return'autonomic (bradycardic)';
+  return'mixed';
+}
+
+const tbl=document.getElementById('hmtable');
+let hdr='<tr><th class="row-corner"></th>';
+drugs.forEach(d=>{hdr+=`<th>${d}</th>`;});
+hdr+='</tr>';
+tbl.innerHTML=hdr;
+drugs.forEach((r,ri)=>{
+  let row=`<tr><td class="row-lbl">${r}</td>`;
+  drugs.forEach((c,ci)=>{
+    const v=mx[r][ci];
+    const[bg,fg]=cellColor(v);
+    const diag=ri===ci;
+    const txt=diag?'—':(v>0?'+':'')+v.toFixed(1);
+    row+=`<td class="cell" style="background:${bg};color:${fg};" onclick="showDetail('${r}','${c}',${v})">${txt}</td>`;
+  });
+  row+='</tr>';
+  tbl.innerHTML+=row;
+});
+
+function showDetail(a,b,v){
+  if(a===b){document.getElementById('detail').innerHTML='<span style="color:var(--ink3)">Click any cell to view combination detail.</span>';return;}
+  const k1=a+'+'+b,k2=b+'+'+a;
+  const ikr=ikrMap[k1]??ikrMap[k2]??0;
+  const{flag,cls}=riskInfo(v);
+  const mech=mechLabel(ikr,v);
+  document.getElementById('detail').innerHTML=
+    `<span class="badge ${cls}">${flag}</span>
+     <span class="combo-name">${fullNames[a]} + ${fullNames[b]}</span>
+     &nbsp;&middot;&nbsp;
+     <span class="dqtc">&Delta;QTc ${v>0?'+':''}${v.toFixed(1)} ms</span>
+     &nbsp;&middot;&nbsp;
+     <span style="color:var(--ink3);font-size:12px;">IKr block ${ikr.toFixed(2)}% &middot; mechanism: ${mech} &middot; ${drugClass[a]} + ${drugClass[b]}</span>`;
+}
+
+const pairs=[];
+drugs.forEach((a,ai)=>{drugs.forEach((b,bi)=>{
+  if(bi<=ai)return;
+  const v=mx[a][bi];
+  const k1=a+'+'+b,k2=b+'+'+a;
+  const ikr=ikrMap[k1]??ikrMap[k2]??0;
+  pairs.push({combo:a+'+'+b,full:fullNames[a]+' + '+fullNames[b],n:2,v,ikr,flag:riskInfo(v).flag,isStim:['MPH','AMP'].includes(a)||['MPH','AMP'].includes(b)});
+})});
+const triples=[
+  {combo:'NOR+MPH+ARI',full:'Nortriptyline + Methylphenidate + Aripiprazole',n:3,v:21.7,ikr:6.76,flag:'HIGH',isStim:true},
+  {combo:'MPH+ARI+FLU',full:'Methylphenidate + Aripiprazole + Fluoxetine',n:3,v:18.4,ikr:4.53,flag:'MODERATE',isStim:true},
+  {combo:'MPH+ARI+SER',full:'Methylphenidate + Aripiprazole + Sertraline',n:3,v:17.9,ikr:4.40,flag:'MODERATE',isStim:true},
+  {combo:'MPH+ARI+ESC',full:'Methylphenidate + Aripiprazole + Escitalopram',n:3,v:17.9,ikr:4.25,flag:'MODERATE',isStim:true},
+  {combo:'MPH+CLO+ARI',full:'Methylphenidate + Clonidine + Aripiprazole',n:3,v:13.0,ikr:4.22,flag:'MODERATE',isStim:true},
+  {combo:'MPH+GUA+ARI',full:'Methylphenidate + Guanfacine + Aripiprazole',n:3,v:13.0,ikr:4.22,flag:'MODERATE',isStim:true},
+  {combo:'IMI+MPH+RIS',full:'Imipramine + Methylphenidate + Risperidone',n:3,v:12.7,ikr:1.09,flag:'MODERATE',isStim:true},
+  {combo:'IMI+MPH+SER',full:'Imipramine + Methylphenidate + Sertraline',n:3,v:12.7,ikr:0.92,flag:'MODERATE',isStim:true},
+  {combo:'MPH+QUE+SER',full:'Methylphenidate + Quetiapine + Sertraline',n:3,v:12.7,ikr:1.12,flag:'MODERATE',isStim:true},
+  {combo:'MPH+RIS+FLU',full:'Methylphenidate + Risperidone + Fluoxetine',n:3,v:12.2,ikr:0.68,flag:'MODERATE',isStim:true},
+  {combo:'MPH+RIS+SER',full:'Methylphenidate + Risperidone + Sertraline',n:3,v:11.7,ikr:0.55,flag:'MODERATE',isStim:true},
+  {combo:'AMP+ARI+SER',full:'Amphetamine + Aripiprazole + Sertraline',n:3,v:17.9,ikr:4.40,flag:'MODERATE',isStim:true},
+  {combo:'AMP+RIS+SER',full:'Amphetamine + Risperidone + Sertraline',n:3,v:11.7,ikr:0.55,flag:'MODERATE',isStim:true},
+  {combo:'MPH+CLO+RIS',full:'Methylphenidate + Clonidine + Risperidone',n:3,v:6.6,ikr:0.36,flag:'LOW-MOD',isStim:true},
+  {combo:'MPH+GUA+SER',full:'Methylphenidate + Guanfacine + Sertraline',n:3,v:6.6,ikr:0.19,flag:'LOW-MOD',isStim:true},
+  {combo:'ARI+FLU+CLO',full:'Aripiprazole + Fluoxetine + Clonidine',n:3,v:3.2,ikr:4.53,flag:'LOW',isStim:false},
+  {combo:'RIS+SER+CLO',full:'Risperidone + Sertraline + Clonidine',n:3,v:-3.1,ikr:0.55,flag:'PROTECTIVE',isStim:false},
+  {combo:'QUE+SER+CLO',full:'Quetiapine + Sertraline + Clonidine',n:3,v:-2.6,ikr:1.12,flag:'PROTECTIVE',isStim:false},
+];
+const allData=[...pairs,...triples].sort((x,y)=>y.v-x.v);
+const maxV=24;
+const barColors={'HIGH':'#c0392b','MODERATE':'#b8600a','LOW-MOD':'#1a5fa8','LOW':'#27682e','PROTECTIVE':'#0f6b5c'};
+
+function filt(f,btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRank(f);
+}
+
+function renderRank(f){
+  let data=allData;
+  if(f==='HIGH') data=data.filter(d=>d.flag==='HIGH');
+  else if(f==='MODERATE') data=data.filter(d=>d.flag==='MODERATE');
+  else if(f==='LOW-MOD') data=data.filter(d=>d.flag==='LOW-MOD');
+  else if(f==='LOW') data=data.filter(d=>['LOW','PROTECTIVE'].includes(d.flag));
+  else if(f==='STIM') data=data.filter(d=>d.isStim);
+  else if(f==='NOSTIM') data=data.filter(d=>!d.isStim);
+  else if(f==='TRIPLE') data=data.filter(d=>d.n===3);
+
+  const ri=riskInfo;
+  document.getElementById('rankbody').innerHTML=data.map(d=>{
+    const{cls}=riskInfo(d.v);
+    const bw=Math.max(0,Math.min(100,(Math.abs(d.v)/maxV)*100));
+    const bc=d.v<0?'#0f6b5c':(barColors[d.flag]||'#76756f');
+    const mech=mechLabel(d.ikr,d.v);
+    return`<tr>
+      <td><span class="badge ${cls}">${d.flag}</span></td>
+      <td class="mono">${d.combo}</td>
+      <td style="color:var(--ink3);font-size:11px;">${d.n}</td>
+      <td class="r mono" style="font-weight:500;">${d.v>0?'+':''}${d.v.toFixed(1)}</td>
+      <td class="r" style="font-size:11px;color:var(--ink3);">${d.ikr.toFixed(2)}%</td>
+      <td style="font-size:11px;color:var(--ink3);">${mech}</td>
+      <td><div class="bar-wrap"><div class="bar-fill" style="width:${bw}%;background:${bc};"></div></div></td>
+    </tr>`;
+  }).join('');
+}
+renderRank('ALL');
+</script>
+</body>
+</html>
