@@ -1,0 +1,40 @@
+combination,drug_a,drug_b,substrate_scaled,cmax_multiplier,dQTc_ms,dQTc_delta_from_1x,IKr_block_pct,risk_tier,tier_at_1x,tier_changed,rationale
+QUE+FLU,QUE,FLU,FLU,1.0,2.5,0.0,,LOW,LOW,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+QUE+FLU,QUE,FLU,FLU,1.5,3.0,0.5,1.41,LOW,LOW,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+QUE+FLU,QUE,FLU,FLU,3.0,4.0,1.5,1.9,LOW,LOW,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+ARI+SER,ARI,SER,ARI,1.0,9.0,0.0,,LOW-MOD,LOW-MOD,False,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+SER,ARI,SER,ARI,1.5,13.0,4.0,6.38,MODERATE,LOW-MOD,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+SER,ARI,SER,ARI,3.0,25.0,16.0,11.84,HIGH,LOW-MOD,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+FLU,ARI,FLU,ARI,1.0,9.0,0.0,,LOW-MOD,LOW-MOD,False,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+FLU,ARI,FLU,ARI,1.5,13.0,4.0,6.51,MODERATE,LOW-MOD,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+FLU,ARI,FLU,ARI,3.0,25.5,16.5,11.96,HIGH,LOW-MOD,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+FLU,ARI,FLU,FLU,1.0,9.0,0.0,,LOW-MOD,LOW-MOD,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+ARI+FLU,ARI,FLU,FLU,1.5,9.5,0.5,4.69,LOW-MOD,LOW-MOD,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+ARI+FLU,ARI,FLU,FLU,3.0,10.5,1.5,5.16,MODERATE,LOW-MOD,True,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+RIS+FLU,RIS,FLU,RIS,1.0,1.5,0.0,,LOW,LOW,False,CYP2D6 primary metabolizer; children may have 1.5–2x adult Cmax
+RIS+FLU,RIS,FLU,RIS,1.5,2.0,0.5,0.86,LOW,LOW,False,CYP2D6 primary metabolizer; children may have 1.5–2x adult Cmax
+RIS+FLU,RIS,FLU,RIS,3.0,3.0,1.5,1.39,LOW,LOW,False,CYP2D6 primary metabolizer; children may have 1.5–2x adult Cmax
+RIS+FLU,RIS,FLU,FLU,1.0,1.5,0.0,,LOW,LOW,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+RIS+FLU,RIS,FLU,FLU,1.5,1.5,0.0,0.85,LOW,LOW,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+RIS+FLU,RIS,FLU,FLU,3.0,2.5,1.0,1.33,LOW,LOW,False,CYP2D6 substrate AND inhibitor; active metabolite norfluoxetine adds to exposure
+SER+IMI,SER,IMI,IMI,1.0,2.0,0.0,,LOW,LOW,False,CYP2D6/CYP2C19 substrate; variable pediatric exposure
+SER+IMI,SER,IMI,IMI,1.5,2.5,0.5,1.29,LOW,LOW,False,CYP2D6/CYP2C19 substrate; variable pediatric exposure
+SER+IMI,SER,IMI,IMI,3.0,4.5,2.5,2.35,LOW,LOW,False,CYP2D6/CYP2C19 substrate; variable pediatric exposure
+ESC+IMI,ESC,IMI,IMI,1.0,1.5,0.0,,LOW,LOW,False,CYP2D6/CYP2C19 substrate; variable pediatric exposure
+ESC+IMI,ESC,IMI,IMI,1.5,2.5,1.0,1.13,LOW,LOW,False,CYP2D6/CYP2C19 substrate; variable pediatric exposure
+ESC+IMI,ESC,IMI,IMI,3.0,4.5,3.0,2.2,LOW,LOW,False,CYP2D6/CYP2C19 substrate; variable pediatric exposure
+ARI+NOR,ARI,NOR,ARI,1.0,14.0,0.0,,MODERATE,MODERATE,False,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+NOR,ARI,NOR,ARI,1.5,18.0,4.0,8.69,MODERATE,MODERATE,False,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+NOR,ARI,NOR,ARI,3.0,30.0,16.0,14.02,HIGH,MODERATE,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+ARI+NOR,ARI,NOR,NOR,1.0,14.0,0.0,,MODERATE,MODERATE,False,CYP2D6 substrate; narrow therapeutic index; poor metabolizers at 3–10x Cmax
+ARI+NOR,ARI,NOR,NOR,1.5,16.5,2.5,7.98,MODERATE,MODERATE,False,CYP2D6 substrate; narrow therapeutic index; poor metabolizers at 3–10x Cmax
+ARI+NOR,ARI,NOR,NOR,3.0,24.0,10.0,11.46,HIGH,MODERATE,True,CYP2D6 substrate; narrow therapeutic index; poor metabolizers at 3–10x Cmax
+MPH+ARI,MPH,ARI,ARI,1.0,17.2,0.0,,MODERATE,MODERATE,False,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+MPH+ARI,MPH,ARI,ARI,1.5,21.4,4.2,6.2,HIGH,MODERATE,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+MPH+ARI,MPH,ARI,ARI,3.0,33.3,16.1,11.67,HIGH,MODERATE,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+MPH+RIS,MPH,RIS,RIS,1.0,9.6,0.0,,LOW-MOD,LOW-MOD,False,CYP2D6 primary metabolizer; children may have 1.5–2x adult Cmax
+MPH+RIS,MPH,RIS,RIS,1.5,10.0,0.4,0.53,MODERATE,LOW-MOD,True,CYP2D6 primary metabolizer; children may have 1.5–2x adult Cmax
+MPH+RIS,MPH,RIS,RIS,3.0,11.0,1.4,1.06,MODERATE,LOW-MOD,True,CYP2D6 primary metabolizer; children may have 1.5–2x adult Cmax
+QUE+ARI,QUE,ARI,ARI,1.0,10.5,0.0,,MODERATE,MODERATE,False,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+QUE+ARI,QUE,ARI,ARI,1.5,14.5,4.0,7.07,MODERATE,MODERATE,False,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
+QUE+ARI,QUE,ARI,ARI,3.0,26.5,16.0,12.49,HIGH,MODERATE,True,CYP2D6 substrate; fluoxetine co-administration increases Cmax 2–4x
