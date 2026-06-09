@@ -22,7 +22,7 @@ _RESULTS_DIR = _ROOT_DIR / "results"
 _RESULTS_DIR.mkdir(exist_ok=True)
 
 PARAMS_PATH = str(_DATA_DIR / "herg_master_params.csv")
-N_BEATS     = 50    # increase to 200 for manuscript figures
+N_BEATS     = 500    # 500 = true steady state
 CL          = 1000.0
 
 # ── DRUG LIST ─────────────────────────────────────────────────────────────────
