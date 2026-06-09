@@ -10,7 +10,7 @@
 
 ## Overview
 
-Children and adolescents with psychiatric conditions are frequently prescribed multiple medications simultaneously — stimulants, antipsychotics, antidepressants, and alpha-2 agonists, often in combination. These drugs carry real cardiac risks, but existing safety frameworks focus almost exclusively on hERG channel block, missing the sympathomimetic and autonomic mechanisms that dominate risk in the most common pediatric polypharmacy patterns.
+Children and adolescents with psychiatric conditions are frequently prescribed multiple medications simultaneously: stimulants, antipsychotics, antidepressants, and alpha-2 agonists, often in combination. These drugs carry real cardiac risks, but existing safety frameworks focus almost exclusively on hERG channel block, missing the sympathomimetic and autonomic mechanisms that dominate risk in the most common pediatric polypharmacy patterns.
 
 CardioSafe Pediatric fills that gap. It couples **O'Hara-Rudy (ORd) 2011 ventricular action potential modeling** with a three-pathway drug effect architecture and validates predictions against **FDA FAERS pharmacovigilance data** across 552,832 pediatric cases.
 
