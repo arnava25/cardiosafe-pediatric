@@ -4,3 +4,13 @@ __pycache__/
 # FAERS raw data — too large for git (2GB+)
 data/faers_cache/*.zip
 data/faers_cache/*.parquet
+
+# macOS metadata
+.DS_Store
+docs/.DS_Store
+
+# Large log files
+results/risk_grid_500beat.log
+
+# Figures generated at root level by mistake
+figure5_sympathomimetic_sensitivity.png

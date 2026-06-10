@@ -16,9 +16,9 @@ negative predictive value was 0.72.
 Cohen's kappa was -0.047, indicating fair
 agreement beyond chance. A permutation test (10,000 permutations, shuffling
 model tier assignments while preserving FAERS signal labels) confirmed that
-this level of agreement was statistically significant (p=0.5108),
+this level of agreement was statistically significant (p=0.5076),
 with the observed kappa exceeding the 95th percentile of the null distribution
-(null mean=-0.000, null 95th percentile=0.194).
+(null mean=-0.001, null 95th percentile=0.194).
 Fisher's exact test on the 2x2 contingency table was also significant
 (OR=0.78, p=0.7519).
 
