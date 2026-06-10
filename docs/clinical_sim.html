@@ -189,6 +189,28 @@ header {
 .history-name { font-weight:500; flex:1; }
 .history-drugs { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink3); }
 .history-badge { font-size:10px; font-weight:600; letter-spacing:0.04em; }
+/* dose panel */
+.dose-panel {
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 2px;
+  padding: 0; max-height: 0; overflow: hidden;
+  transition: max-height 0.25s ease, padding 0.25s ease;
+  margin-top: 4px;
+}
+.dose-panel.open { max-height: 300px; padding: 10px; }
+.dose-panel h4 { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink3); margin-bottom: 8px; }
+.dose-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.dose-input-wrap { display: flex; flex-direction: column; gap: 3px; }
+.dose-input-wrap label { font-size: 10px; color: var(--ink3); }
+.dose-input-wrap input {
+  padding: 5px 8px; border: 1px solid var(--rule); background: var(--bg2);
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink);
+  border-radius: 2px; outline: none; width: 100%;
+}
+.dose-input-wrap input:focus { border-color: var(--navy); }
+.dose-note { font-size: 10px; color: var(--ink3); line-height: 1.4; font-style: italic; }
+.dose-result { font-size: 11px; color: var(--teal); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; min-height: 14px; }
+.cmax-scale-badge { font-size: 10px; padding: 2px 7px; border-radius: 2px; border: 1px solid #B4D4DA; background: var(--tel-bg); color: var(--teal); font-family: 'IBM Plex Mono', monospace; display: inline-block; }
+.drug-btn-wrap { position: relative; }
 @media (max-width:900px) {
   body { grid-template-columns:1fr; }
   .sidebar { border-right:none; border-bottom:1px solid var(--rule); }
@@ -231,6 +253,10 @@ header {
       <div class="dx-suggest" id="dxSuggest"></div>
     </div>
     <div class="field">
+      <label>Weight (kg)</label>
+      <input type="number" id="patientWeight" min="10" max="120" placeholder="e.g. 32" step="0.5">
+    </div>
+    <div class="field">
       <label>Additional notes</label>
       <input type="text" id="patientNotes" placeholder="e.g. prior ECG, cardiac history">
     </div>
@@ -257,9 +283,11 @@ header {
   </div>
 
   <div class="sidebar-section">
-    <h2>Medications</h2>
+    <h2>Medications &amp; Doses</h2>
+    <div style="font-size:10px;color:var(--ink3);margin-bottom:6px;font-style:italic;">Click a selected drug to enter patient-specific dose</div>
     <div class="selected-list empty" id="selectedList">No medications selected</div>
     <div class="drug-grid" id="drugGrid"></div>
+    <div id="dosePanel"></div>
     <button class="btn-clear" onclick="clearDrugs()">Clear all</button>
   </div>
 
@@ -365,6 +393,26 @@ const TRIPLES = [
 
 // CYP2D6 substrates that scale with poor metabolizer status
 const CYP2D6_SUBSTRATES = {ARI:2.0, RIS:1.75, NOR:2.0, IMI:1.5};
+
+// Adult reference PK data used for Cmax scaling
+// adult_dose_mg: typical adult therapeutic dose (mg/day or per dose as noted)
+// adult_weight_kg: reference adult body weight for dose normalization
+// free_cmax_nm: adult free plasma Cmax at reference dose (nM)
+// dose_unit: 'mg/kg/day' or 'mg/day' (affects how patient dose is entered)
+const ADULT_REF_PK = {
+  MPH: {adult_dose: 1.0,  adult_weight: 70, free_cmax_nm: 2.6,  dose_unit:'mg/kg/day', label:'Methylphenidate',  max_dose_per_kg:2.0,  note:'Typical pediatric dose 0.3–1.0 mg/kg/day (max 60 mg/day)'},
+  AMP: {adult_dose: 0.5,  adult_weight: 70, free_cmax_nm: 4.1,  dose_unit:'mg/kg/day', label:'Amphetamine',      max_dose_per_kg:1.5,  note:'Mixed amphetamine salts 0.1–0.5 mg/kg/dose BID'},
+  RIS: {adult_dose: 0.07, adult_weight: 70, free_cmax_nm: 0.9,  dose_unit:'mg/kg/day', label:'Risperidone',      max_dose_per_kg:0.15, note:'Pediatric 0.01–0.07 mg/kg/day (typical 0.5–3 mg/day)'},
+  QUE: {adult_dose: 4.0,  adult_weight: 70, free_cmax_nm: 2.1,  dose_unit:'mg/kg/day', label:'Quetiapine',       max_dose_per_kg:8.0,  note:'Pediatric 50–800 mg/day divided; weight-adjust by age'},
+  ARI: {adult_dose: 0.2,  adult_weight: 70, free_cmax_nm: 21.0, dose_unit:'mg/kg/day', label:'Aripiprazole',     max_dose_per_kg:0.5,  note:'Pediatric 2–30 mg/day; typical 0.1–0.3 mg/kg/day'},
+  SER: {adult_dose: 1.4,  adult_weight: 70, free_cmax_nm: 3.0,  dose_unit:'mg/kg/day', label:'Sertraline',       max_dose_per_kg:3.0,  note:'Pediatric 25–200 mg/day; start 25 mg in children'},
+  FLU: {adult_dose: 0.29, adult_weight: 70, free_cmax_nm: 3.5,  dose_unit:'mg/kg/day', label:'Fluoxetine',       max_dose_per_kg:0.6,  note:'Pediatric 10–60 mg/day; lower doses in children <40 kg'},
+  ESC: {adult_dose: 0.14, adult_weight: 70, free_cmax_nm: 2.5,  dose_unit:'mg/kg/day', label:'Escitalopram',     max_dose_per_kg:0.3,  note:'Pediatric 5–20 mg/day; start low in children'},
+  CLO: {adult_dose: 0.004,adult_weight: 70, free_cmax_nm: 0.5,  dose_unit:'mg/kg/day', label:'Clonidine',        max_dose_per_kg:0.01, note:'Pediatric 0.05–0.4 mg/day; 0.003–0.01 mg/kg/day'},
+  GUA: {adult_dose: 0.06, adult_weight: 70, free_cmax_nm: 1.8,  dose_unit:'mg/kg/day', label:'Guanfacine ER',    max_dose_per_kg:0.12, note:'Intuniv 1–7 mg/day; weight-based dosing in labeling'},
+  IMI: {adult_dose: 1.5,  adult_weight: 70, free_cmax_nm: 18.0, dose_unit:'mg/kg/day', label:'Imipramine',       max_dose_per_kg:2.5,  note:'Pediatric 1–5 mg/kg/day; narrow TI — monitor carefully'},
+  NOR: {adult_dose: 1.0,  adult_weight: 70, free_cmax_nm: 28.0, dose_unit:'mg/kg/day', label:'Nortriptyline',    max_dose_per_kg:2.0,  note:'Pediatric 0.5–2 mg/kg/day; narrow TI — check levels'},
+};
 
 // ── DIAGNOSIS SYSTEM ─────────────────────────────────────────────────────────
 const DIAGNOSES = [
@@ -514,6 +562,10 @@ function updateSuggestions(){
   }
 }
 
+// dose state: {code: {dose_mg_per_kg, weight_kg}} — per drug
+const doseState = {};
+let activeDosePanel = null;
+
 function buildDrugGrid(){
   const grid = document.getElementById('drugGrid');
   grid.innerHTML='';
@@ -522,9 +574,131 @@ function buildDrugGrid(){
     btn.className='drug-btn';
     btn.id=`drug-${d.code}`;
     btn.innerHTML=`<div class="suggest-dot"></div><span class="drug-name">${d.code}</span><span class="drug-class">${d.cls}</span>`;
-    btn.onclick=()=>toggleDrug(d.code);
+    btn.onclick=(e)=>{
+      if(selected.has(d.code)){
+        e.stopPropagation();
+        toggleDosePanel(d.code);
+      } else {
+        toggleDrug(d.code);
+      }
+    };
     grid.appendChild(btn);
   });
+}
+
+function toggleDosePanel(code){
+  const panel = document.getElementById('dosePanel');
+  if(activeDosePanel === code){
+    panel.innerHTML='';
+    activeDosePanel = null;
+    return;
+  }
+  activeDosePanel = code;
+  const ref = ADULT_REF_PK[code];
+  const existing = doseState[code] || {};
+  const patientWeight = parseFloat(document.getElementById('patientWeight')?.value) || '';
+  panel.innerHTML = `
+    <div class="dose-panel open" id="dp-${code}">
+      <h4>${ref.label} — Patient dose</h4>
+      <div class="dose-row">
+        <div class="dose-input-wrap">
+          <label>Dose (mg/kg/day)</label>
+          <input type="number" id="dp-dose-${code}" placeholder="${ref.adult_dose.toFixed(3)}" step="0.01" min="0" max="${ref.max_dose_per_kg}"
+            value="${existing.dose_mg_per_kg||''}" oninput="updateDosePreview('${code}')">
+        </div>
+        <div class="dose-input-wrap">
+          <label>Weight (kg)</label>
+          <input type="number" id="dp-weight-${code}" placeholder="${patientWeight||'e.g. 32'}" step="0.5" min="10" max="120"
+            value="${existing.weight_kg||patientWeight||''}" oninput="updateDosePreview('${code}')">
+        </div>
+      </div>
+      <div class="dose-note">${ref.note}</div>
+      <div class="dose-result" id="dp-result-${code}"></div>
+      <button style="margin-top:8px;font-size:11px;padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:2px;cursor:pointer" onclick="saveDose('${code}')">Apply</button>
+      <button style="margin-top:8px;margin-left:6px;font-size:11px;padding:5px 12px;background:transparent;color:var(--ink3);border:1px solid var(--rule);border-radius:2px;cursor:pointer" onclick="clearDose('${code}')">Use adult Cmax</button>
+    </div>`;
+  updateDosePreview(code);
+}
+
+function updateDosePreview(code){
+  const ref = ADULT_REF_PK[code];
+  const doseEl = document.getElementById(`dp-dose-${code}`);
+  const weightEl = document.getElementById(`dp-weight-${code}`);
+  const resEl = document.getElementById(`dp-result-${code}`);
+  if(!doseEl||!resEl) return;
+  const dose = parseFloat(doseEl.value);
+  const weight = parseFloat(weightEl.value);
+  if(!dose||!weight){ resEl.textContent='Enter dose and weight to see Cmax estimate'; return; }
+  const scale = getCmaxScale(code, dose, weight);
+  const scaledCmax = (ref.free_cmax_nm * scale).toFixed(1);
+  resEl.innerHTML = `Scaled Cmax ≈ <strong>${scaledCmax} nM</strong> (${scale.toFixed(2)}× adult reference ${ref.free_cmax_nm} nM)`;
+}
+
+function saveDose(code){
+  const doseEl = document.getElementById(`dp-dose-${code}`);
+  const weightEl = document.getElementById(`dp-weight-${code}`);
+  if(!doseEl) return;
+  const dose = parseFloat(doseEl.value);
+  const weight = parseFloat(weightEl.value);
+  if(dose && weight){
+    doseState[code] = {dose_mg_per_kg: dose, weight_kg: weight};
+    const btn = document.getElementById(`drug-${code}`);
+    if(btn){
+      const scale = getCmaxScale(code, dose, weight);
+      btn.innerHTML = `<div class="suggest-dot"></div><span class="drug-name">${code}</span><span class="drug-class" style="color:rgba(255,255,255,0.8)">${scale.toFixed(2)}× Cmax</span>`;
+    }
+  }
+  activeDosePanel = null;
+  document.getElementById('dosePanel').innerHTML = '';
+}
+
+function clearDose(code){
+  delete doseState[code];
+  const btn = document.getElementById(`drug-${code}`);
+  const drug = DRUGS.find(d=>d.code===code);
+  if(btn && drug) btn.innerHTML = `<div class="suggest-dot"></div><span class="drug-name">${code}</span><span class="drug-class">${drug.cls}</span>`;
+  activeDosePanel = null;
+  document.getElementById('dosePanel').innerHTML = '';
+}
+
+function getCmaxScale(code, dose_mg_per_kg, weight_kg){
+  const ref = ADULT_REF_PK[code];
+  // Patient total dose = dose_mg_per_kg * weight_kg
+  // Adult reference total dose = adult_dose (mg/kg/day) * adult_weight (70 kg)
+  const patientDoseMg = dose_mg_per_kg * weight_kg;
+  const adultDoseMg = ref.adult_dose * ref.adult_weight;
+  return patientDoseMg / adultDoseMg;
+}
+
+function getScaledDQTc(a, b, baseDQ){
+  // Get Cmax scales for both drugs
+  const scaleA = getDoseScale(a);
+  const scaleB = getDoseScale(b);
+  if(scaleA === 1.0 && scaleB === 1.0) return {dq: baseDQ, scaled: false, scaleA: 1.0, scaleB: 1.0};
+  const ikr = getIKR(a, b);
+  const stimulants = new Set(['MPH','AMP']);
+  let dqAdj = baseDQ || 0;
+  // For sympathomimetic component (stimulants): scale linearly with dose
+  if(stimulants.has(a) || stimulants.has(b)){
+    const stimScale = stimulants.has(a) ? scaleA : scaleB;
+    const nonStimScale = stimulants.has(a) ? scaleB : scaleA;
+    // Sympathomimetic delta is ~proportional to stimulant dose
+    // hERG component scales with non-stimulant Cmax
+    const sympFrac = ikr < 1 ? 1.0 : Math.max(0, 1 - ikr/20);
+    const hERGFrac = 1 - sympFrac;
+    dqAdj = dqAdj * (sympFrac * stimScale + hERGFrac * nonStimScale);
+  } else {
+    // Pure hERG: scale by whichever drug dominates IKr
+    // Use max scale as conservative estimate
+    dqAdj = dqAdj * Math.max(scaleA, scaleB);
+  }
+  return {dq: Math.round(dqAdj*10)/10, scaled: true, scaleA, scaleB};
+}
+
+function getDoseScale(code){
+  const state = doseState[code];
+  if(!state || !state.dose_mg_per_kg || !state.weight_kg) return 1.0;
+  return getCmaxScale(code, state.dose_mg_per_kg, state.weight_kg);
 }
 
 function toggleDrug(code){
@@ -571,19 +745,25 @@ function runAnalysis(){
 
   // Pairwise combos
   const combos=[];
+  const patientWeight = parseFloat(document.getElementById('patientWeight')?.value) || null;
   for(let i=0;i<codes.length;i++){
     for(let j=i+1;j<codes.length;j++){
       const a=codes[i],b=codes[j];
-      const baseDQ=getDQTc(a,b);
-      const {dq, adjusted}=adjustedDQTc(a,b,baseDQ??0);
+      const baseDQ=getDQTc(a,b)??0;
+      // Apply CYP2D6 poor metabolizer adjustment first
+      const {dq:cypDQ, adjusted:cypAdj}=adjustedDQTc(a,b,baseDQ);
+      // Then apply weight/dose scaling
+      const {dq:scaledDQ, scaled:doseScaled, scaleA, scaleB}=getScaledDQTc(a,b,cypDQ);
+      const dq = scaledDQ;
+      const adjusted = cypAdj || doseScaled;
       const ikr=getIKR(a,b);
       const tier=riskTier(dq);
       const faers=isFaers(a,b);
       const ror=getFaersROR(a,b);
-      const hasCyp=(codes.includes('FLU')&&['RIS','ARI','QUE'].includes(a||b));
+      const hasCyp=(codes.includes('FLU')&&['RIS','ARI','QUE'].includes(a)||['RIS','ARI','QUE'].includes(b)&&codes.includes('FLU'));
       const hasCond=codes.includes('GUA')&&['RIS','QUE','ARI'].some(c=>codes.includes(c));
       const score=compositeScore(dq,ikr,ror,faers,hasCyp,hasCond);
-      combos.push({a,b,dq,baseDQ,ikr,tier,faers,ror,adjusted,score,scoreLabel:scoreLabel(score)});
+      combos.push({a,b,dq,baseDQ,ikr,tier,faers,ror,adjusted,doseScaled,scaleA,scaleB,score,scoreLabel:scoreLabel(score)});
     }
   }
   combos.sort((x,y)=>y.score-x.score);
@@ -650,7 +830,8 @@ function runAnalysis(){
   const main=document.getElementById('main');
   document.getElementById('emptyState')?.remove();
 
-  const metaParts=[age?`Age ${age}`:''];
+  const weight = parseFloat(document.getElementById('patientWeight')?.value)||null;
+  const metaParts=[age?`Age ${age}`:'',weight?`${weight} kg`:''];
   if(sex) metaParts.push({M:'Male',F:'Female'}[sex]||sex);
   if(dxLabels.length) metaParts.push(dxLabels.join(', '));
   const drugNames=DRUGS.filter(d=>codes.includes(d.code)).map(d=>d.name).join(', ');
@@ -683,7 +864,7 @@ function runAnalysis(){
       ${sexWarning?`<div class="clinical-note note-teal" style="margin-top:0.5rem"><strong>Sex note:</strong> ${sexWarning}</div>`:''}
       ${notes?`<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--ink3)"><strong>Notes:</strong> ${escHtml(notes)}</div>`:''}
       <div class="disclaimer" style="margin-top:0.75rem">
-        Composite score integrates ΔQTc (0.50), IKr block (0.20), FAERS ROR (0.30), plus CYP2D6 and conduction flags. ORd 2011 simulation at 500-beat steady state. Adult Cmax values unless CYP2D6 poor metabolizer selected.
+        Composite score integrates ΔQTc (0.50), IKr block (0.20), FAERS ROR (0.30), plus CYP2D6 and conduction flags. ORd 2011 simulation at 500-beat steady state. Cmax scaled by patient dose/weight where entered; adult Cmax used otherwise.
         <strong style="color:var(--red)"> Research use only.</strong>
       </div>
     </div>`;
@@ -728,7 +909,15 @@ function renderCombos(combos){
     const fTag=c.faers
       ?`<span class="faers-badge signal">⚠ FAERS signal${rorStr}</span>`
       :`<span class="faers-badge">no FAERS signal</span>`;
-    const adjTag=c.adjusted?`<span class="adjusted-badge" style="margin-left:4px">CYP2D6 adj</span>`:'';
+    let adjTag='';
+    if(c.doseScaled && c.scaleA!==1.0 && c.scaleB!==1.0)
+      adjTag=`<span class="cmax-scale-badge" style="margin-left:4px">${c.a} ${c.scaleA.toFixed(2)}× · ${c.b} ${c.scaleB.toFixed(2)}× Cmax</span>`;
+    else if(c.doseScaled && c.scaleA!==1.0)
+      adjTag=`<span class="cmax-scale-badge" style="margin-left:4px">${c.a} ${c.scaleA.toFixed(2)}× Cmax</span>`;
+    else if(c.doseScaled && c.scaleB!==1.0)
+      adjTag=`<span class="cmax-scale-badge" style="margin-left:4px">${c.b} ${c.scaleB.toFixed(2)}× Cmax</span>`;
+    else if(c.adjusted)
+      adjTag=`<span class="adjusted-badge" style="margin-left:4px">CYP2D6 adj</span>`;
     return `
       <div class="combo-row ${c.tier}">
         <div class="combo-left">
