@@ -574,14 +574,14 @@ function buildDrugGrid(){
     btn.className='drug-btn';
     btn.id=`drug-${d.code}`;
     btn.innerHTML=`<div class="suggest-dot"></div><span class="drug-name">${d.code}</span><span class="drug-class">${d.cls}</span>`;
-    btn.onclick=(e)=>{
-      if(selected.has(d.code)){
-        e.stopPropagation();
-        toggleDosePanel(d.code);
-      } else {
-        toggleDrug(d.code);
-      }
-    };
+    // Dose adjust button — only visible when selected
+    const doseBtn = document.createElement('div');
+    doseBtn.id = `dosebtn-${d.code}`;
+    doseBtn.style.cssText = 'display:none;position:absolute;top:2px;right:2px;font-size:9px;background:rgba(255,255,255,0.2);padding:1px 4px;border-radius:2px;cursor:pointer;color:rgba(255,255,255,0.8);';
+    doseBtn.textContent = '⚖ dose';
+    doseBtn.onclick = (e) => { e.stopPropagation(); toggleDosePanel(d.code); };
+    btn.appendChild(doseBtn);
+    btn.onclick=()=>toggleDrug(d.code);
     grid.appendChild(btn);
   });
 }
@@ -702,20 +702,44 @@ function getDoseScale(code){
 }
 
 function toggleDrug(code){
+  const btn = document.getElementById(`drug-${code}`);
+  const doseBtn = document.getElementById(`dosebtn-${code}`);
   if(selected.has(code)){
     selected.delete(code);
-    document.getElementById(`drug-${code}`)?.classList.remove('selected');
+    btn?.classList.remove('selected');
+    if(doseBtn) doseBtn.style.display='none';
+    // Close dose panel if open for this drug
+    if(activeDosePanel===code){
+      activeDosePanel=null;
+      document.getElementById('dosePanel').innerHTML='';
+    }
+    // Clear dose state
+    clearDose(code);
   } else {
     selected.add(code);
-    document.getElementById(`drug-${code}`)?.classList.add('selected');
+    btn?.classList.add('selected');
+    if(doseBtn) doseBtn.style.display='block';
+    // Restore dose scale label if dose was previously set
+    if(doseState[code]){
+      const scale = getCmaxScale(code, doseState[code].dose_mg_per_kg, doseState[code].weight_kg);
+      const drug = DRUGS.find(d=>d.code===code);
+      if(btn && drug) btn.querySelector('.drug-class').textContent = scale.toFixed(2)+'× Cmax';
+    }
   }
   updateSelectedList();
   document.getElementById('runBtn').disabled = selected.size<2;
 }
 
 function clearDrugs(){
-  selected.forEach(c=>document.getElementById(`drug-${c}`)?.classList.remove('selected'));
+  selected.forEach(c=>{
+    document.getElementById(`drug-${c}`)?.classList.remove('selected');
+    const db = document.getElementById(`dosebtn-${c}`);
+    if(db) db.style.display='none';
+    delete doseState[c];
+  });
   selected.clear();
+  activeDosePanel=null;
+  document.getElementById('dosePanel').innerHTML='';
   updateSelectedList();
   document.getElementById('runBtn').disabled=true;
 }
