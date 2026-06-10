@@ -880,8 +880,13 @@ function buildCombos(codes){
         } else {
           pkDQ=baseDQ*Math.max(ratioA,ratioB);
         }
-        // Cap delta-QTc at physiologically plausible maximum (50ms)
-        pkDQ=Math.min(Math.round(pkDQ*10)/10, 50.0);
+        pkDQ=Math.round(pkDQ*10)/10;
+        // Cap delta-QTc at mechanism-appropriate maximum
+        // Sympathomimetic combinations: max ~30ms (upper bound from 500-beat sweep)
+        // hERG-driven combinations: max ~50ms (theoretical)
+        const stimulants_cap=new Set(['MPH','AMP']);
+        const isSympathomimetic=(stimulants_cap.has(a)||stimulants_cap.has(b))&&getIKR(a,b)<3;
+        pkDQ=Math.min(pkDQ, isSympathomimetic?28.0:45.0);
       }
       const{dq:cypDQ,adjusted:cypAdj}=adjustedDQTc(a,b,pkDQ);
       // Dose scaling overrides pediatric Cmax scaling when both are present
