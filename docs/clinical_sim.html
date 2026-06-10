@@ -280,6 +280,7 @@ header{grid-column:1/-1;background:var(--navy);padding:1.25rem 2rem;display:flex
     <h2>Proposed regimen</h2>
     <div class="selected-list empty" id="selectedListB">No medications selected</div>
     <div class="drug-grid" id="drugGridB"></div>
+    <div id="dosePanelB"></div>
     <button class="btn-clear" onclick="clearDrugsB()">Clear all</button>
   </div>
 
@@ -518,6 +519,8 @@ const doseState={};
 let appMode='single'; // 'single' | 'compare'
 let cmaxMode='adult'; // 'adult' | 'pediatric'
 let weightUnit='kg';
+const doseStateB={};
+let activeDosePanelB=null;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function canonicalKey(a,b){return [a,b].sort().join('+');}
@@ -576,12 +579,107 @@ function adjustedDQTc(a,b,baseDQ){
   return{dq:Math.round(dqAdj*10)/10,adjusted:true};
 }
 
+function toggleDosePanelB(code){
+  const panel=document.getElementById('dosePanelB');
+  if(activeDosePanelB===code){panel.innerHTML='';activeDosePanelB=null;return;}
+  activeDosePanelB=code;
+  const ref=ADULT_REF_PK[code];
+  const existing=doseStateB[code]||{};
+  const patientWeightKg=getWeightKg();
+  if(existing.weight_kg&&patientWeightKg&&existing.weight_kg!==patientWeightKg)existing.weight_kg=patientWeightKg;
+  panel.innerHTML=`
+    <div class="dose-panel open" id="dpB-${code}">
+      <h4>${code} — Proposed dose</h4>
+      <div class="dose-row">
+        <div class="dose-input-wrap"><label>Dose (mg/kg/day)</label>
+          <input type="number" id="dpB-dose-${code}" placeholder="${ref.adult_dose.toFixed(3)}" step="0.01" min="0" max="${ref.max_dose_per_kg}" value="${existing.dose_mg_per_kg||''}" oninput="updateDosePreviewB('${code}')">
+        </div>
+        <div class="dose-input-wrap"><label>Weight (kg)</label>
+          <input type="number" id="dpB-weight-${code}" placeholder="${patientWeightKg||'e.g. 32'}" step="0.5" min="10" max="120" value="${patientWeightKg||existing.weight_kg||''}" oninput="updateDosePreviewB('${code}')">
+        </div>
+      </div>
+      <div class="dose-note">${ref.note}</div>
+      <div class="dose-result" id="dpB-result-${code}"></div>
+      <button style="margin-top:8px;font-size:11px;padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:2px;cursor:pointer" onclick="saveDoseB('${code}')">Apply</button>
+      <button style="margin-top:8px;margin-left:6px;font-size:11px;padding:5px 12px;background:transparent;color:var(--ink3);border:1px solid var(--rule);border-radius:2px;cursor:pointer" onclick="clearDoseB('${code}')">Use reference Cmax</button>
+    </div>`;
+  updateDosePreviewB(code);
+}
+
+function updateDosePreviewB(code){
+  const ref=ADULT_REF_PK[code];
+  const doseEl=document.getElementById(`dpB-dose-${code}`);
+  const weightEl=document.getElementById(`dpB-weight-${code}`);
+  const resEl=document.getElementById(`dpB-result-${code}`);
+  if(!doseEl||!resEl)return;
+  const dose=parseFloat(doseEl.value),weight=parseFloat(weightEl.value);
+  if(!dose||!weight){resEl.textContent='Enter dose and weight to see Cmax estimate';return;}
+  const scale=(dose*weight)/(ref.adult_dose*ref.adult_weight);
+  const base=getBaseCmax(code);
+  resEl.innerHTML=`Scaled Cmax ≈ <strong>${(base*scale).toFixed(1)} nM</strong> (${scale.toFixed(2)}× reference ${base.toFixed(1)} nM)`;
+}
+
+function saveDoseB(code){
+  const doseEl=document.getElementById(`dpB-dose-${code}`);
+  const weightEl=document.getElementById(`dpB-weight-${code}`);
+  if(!doseEl)return;
+  const dose=parseFloat(doseEl.value);
+  const weight=parseFloat(weightEl.value)||getWeightKg()||null;
+  if(dose&&weight&&!isNaN(dose)&&!isNaN(weight)){
+    doseStateB[code]={dose_mg_per_kg:dose,weight_kg:weight};
+    const ref=ADULT_REF_PK[code];
+    const scale=(dose*weight)/(ref.adult_dose*ref.adult_weight);
+    const clsEl=document.querySelector(`#drugB-${code} .drug-class`);
+    if(clsEl){clsEl.textContent=scale.toFixed(2)+'× Cmax';clsEl.style.color='rgba(255,255,255,0.8)';}
+    const doseBtn=document.getElementById(`dosebtnB-${code}`);
+    if(doseBtn)doseBtn.style.display='block';
+  } else if(dose&&!weight){
+    const resEl=document.getElementById(`dpB-result-${code}`);
+    if(resEl)resEl.innerHTML='<span style="color:var(--red)">Enter patient weight to apply dose scaling</span>';
+    return;
+  }
+  activeDosePanelB=null;document.getElementById('dosePanelB').innerHTML='';
+}
+
+function clearDoseB(code){
+  delete doseStateB[code];
+  const drug=DRUGS.find(d=>d.code===code);
+  const clsEl=document.querySelector(`#drugB-${code} .drug-class`);
+  if(clsEl&&drug){clsEl.textContent=drug.cls;clsEl.style.color='';}
+  activeDosePanelB=null;document.getElementById('dosePanelB').innerHTML='';
+}
+
+function getDoseScaleB(code){
+  const state=doseStateB[code];
+  if(!state||!state.dose_mg_per_kg||!state.weight_kg)return 1.0;
+  const ref=ADULT_REF_PK[code];
+  const scale=(state.dose_mg_per_kg*state.weight_kg)/(ref.adult_dose*ref.adult_weight);
+  return isNaN(scale)||scale<=0?1.0:scale;
+}
+
 function getDoseScale(code){
   const state=doseState[code];
   if(!state||!state.dose_mg_per_kg||!state.weight_kg)return 1.0;
   const ref=ADULT_REF_PK[code];
   const scale=(state.dose_mg_per_kg*state.weight_kg)/(ref.adult_dose*ref.adult_weight);
   return isNaN(scale)||scale<=0?1.0:scale;
+}
+
+function getScaledDQTcWith(a,b,baseDQ,scaleFn){
+  const scaleA=scaleFn(a),scaleB=scaleFn(b);
+  if(scaleA===1.0&&scaleB===1.0)return{dq:baseDQ,scaled:false,scaleA:1.0,scaleB:1.0};
+  const ikr=getIKR(a,b);
+  const stimulants=new Set(['MPH','AMP']);
+  let dqAdj=baseDQ||0;
+  if(stimulants.has(a)||stimulants.has(b)){
+    const stimScale=stimulants.has(a)?scaleA:scaleB;
+    const nonStimScale=stimulants.has(a)?scaleB:scaleA;
+    const sympFrac=ikr<1?1.0:Math.max(0,1-ikr/20);
+    dqAdj=dqAdj*(sympFrac*stimScale+(1-sympFrac)*nonStimScale);
+  } else {
+    dqAdj=dqAdj*Math.max(scaleA,scaleB);
+  }
+  return{dq:isNaN(dqAdj)?baseDQ:Math.round(dqAdj*10)/10,scaled:true,scaleA,scaleB};
 }
 
 function getScaledDQTc(a,b,baseDQ){
@@ -723,6 +821,12 @@ function buildDrugGrid(gridId='drugGrid', selSet=selected){
       btn.appendChild(doseBtn);
       btn.onclick=()=>toggleDrug(d.code,selSet,'drugGrid','selectedList');
     } else {
+      const doseBtnB=document.createElement('div');
+      doseBtnB.id=`dosebtnB-${d.code}`;
+      doseBtnB.style.cssText='display:none;position:absolute;top:2px;right:2px;font-size:9px;background:rgba(255,255,255,0.2);padding:1px 4px;border-radius:2px;cursor:pointer;color:rgba(255,255,255,0.8);';
+      doseBtnB.textContent='⚖ dose';
+      doseBtnB.onclick=(e)=>{e.stopPropagation();toggleDosePanelB(d.code);};
+      btn.appendChild(doseBtnB);
       btn.onclick=()=>toggleDrug(d.code,selSet,'drugGridB','selectedListB');
     }
     grid.appendChild(btn);
@@ -742,8 +846,14 @@ function toggleDrug(code,selSet,gridId,listId){
   } else {
     selSet.add(code);btn?.classList.add('selected');
     if(doseBtn){doseBtn.style.display='block';}
+    const doseBtnB=!isA?document.getElementById(`dosebtnB-${code}`):null;
+    if(doseBtnB){doseBtnB.style.display='block';}
     if(isA&&doseState[code]){
       const scale=(doseState[code].dose_mg_per_kg*doseState[code].weight_kg)/(ADULT_REF_PK[code].adult_dose*ADULT_REF_PK[code].adult_weight);
+      const clsEl=btn?.querySelector('.drug-class');
+      if(clsEl){clsEl.textContent=scale.toFixed(2)+'× Cmax';clsEl.style.color='rgba(255,255,255,0.8)';}
+    } else if(!isA&&doseStateB[code]){
+      const scale=(doseStateB[code].dose_mg_per_kg*doseStateB[code].weight_kg)/(ADULT_REF_PK[code].adult_dose*ADULT_REF_PK[code].adult_weight);
       const clsEl=btn?.querySelector('.drug-class');
       if(clsEl){clsEl.textContent=scale.toFixed(2)+'× Cmax';clsEl.style.color='rgba(255,255,255,0.8)';}
     }
@@ -765,8 +875,14 @@ function clearDrugs(){
   document.getElementById('runBtn').disabled=true;
 }
 function clearDrugsB(){
-  selectedB.forEach(c=>document.getElementById(`drugB-${c}`)?.classList.remove('selected'));
+  selectedB.forEach(c=>{
+    document.getElementById(`drugB-${c}`)?.classList.remove('selected');
+    const db=document.getElementById(`dosebtnB-${c}`);if(db)db.style.display='none';
+    delete doseStateB[c];
+  });
   selectedB.clear();
+  activeDosePanelB=null;
+  const pb=document.getElementById('dosePanelB');if(pb)pb.innerHTML='';
   updateSelectedList(selectedB,'selectedListB');
   if(selected.size<2&&selectedB.size<2)document.getElementById('runBtn').disabled=true;
 }
@@ -853,7 +969,7 @@ function clearDose(code){
 }
 
 // ── ANALYSIS ──────────────────────────────────────────────────────────────────
-function buildCombos(codes){
+function buildCombos(codes, doseScaleFn=null){
   const combos=[];
   for(let i=0;i<codes.length;i++){
     for(let j=i+1;j<codes.length;j++){
@@ -891,10 +1007,11 @@ function buildCombos(codes){
       const{dq:cypDQ,adjusted:cypAdj}=adjustedDQTc(a,b,pkDQ);
       // Dose scaling overrides pediatric Cmax scaling when both are present
       // (user-entered dose data is more specific than population-level peds reference)
-      const hasDoseA=doseState[a]&&doseState[a].dose_mg_per_kg&&doseState[a].weight_kg;
-      const hasDoseB=doseState[b]&&doseState[b].dose_mg_per_kg&&doseState[b].weight_kg;
+      const dsObj=doseScaleFn===getDoseScaleB?doseStateB:doseState;
+      const hasDoseA=dsObj[a]&&dsObj[a].dose_mg_per_kg&&dsObj[a].weight_kg;
+      const hasDoseB=dsObj[b]&&dsObj[b].dose_mg_per_kg&&dsObj[b].weight_kg;
       const baseForDose=(hasDoseA||hasDoseB)?baseDQ:cypDQ;
-      const{dq:scaledDQ,scaled:doseScaled,scaleA,scaleB}=getScaledDQTc(a,b,hasDoseA||hasDoseB?adjustedDQTc(a,b,baseDQ).dq:cypDQ);
+      const{dq:scaledDQ,scaled:doseScaled,scaleA,scaleB}=getScaledDQTcWith(a,b,hasDoseA||hasDoseB?adjustedDQTc(a,b,baseDQ).dq:cypDQ, doseScaleFn||getDoseScale);
       const dq=scaledDQ;
       const ikr=getIKR(a,b);
       const tier=riskTier(dq);
@@ -947,7 +1064,7 @@ function runAnalysis(){
 function runComparison(name,age,sex,baselineQTc,dxLabels,cypStatus){
   const main=document.getElementById('main');
   const codesA=Array.from(selected),codesB=Array.from(selectedB);
-  const combosA=buildCombos(codesA),combosB=buildCombos(codesB);
+  const combosA=buildCombos(codesA,getDoseScale),combosB=buildCombos(codesB,getDoseScaleB);
   const tierOrder=["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
   const worstA=combosA.reduce((w,c)=>tierOrder.indexOf(c.tier)<tierOrder.indexOf(w)?c.tier:w,"LOW");
   const worstB=combosB.reduce((w,c)=>tierOrder.indexOf(c.tier)<tierOrder.indexOf(w)?c.tier:w,"LOW");
@@ -1219,6 +1336,9 @@ function resetForm(){
   DRUGS.forEach(d=>document.getElementById(`drug-${d.code}`)?.classList.remove('suggested'));
   clearDrugs();clearDrugsB();
   Object.keys(doseState).forEach(k=>delete doseState[k]);
+  Object.keys(doseStateB).forEach(k=>delete doseStateB[k]);
+  activeDosePanelB=null;
+  const pbr=document.getElementById('dosePanelB');if(pbr)pbr.innerHTML='';
   document.querySelector('input[name=cyp2d6][value=unknown]').checked=true;
   setWeightUnit('kg');setCmaxMode('adult');
   const advPanel=document.getElementById('advancedPanel');
