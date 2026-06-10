@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CardioSafe Pediatric — Clinical Risk Simulator</title>
+<title>CardioSafe Pediatric — Clinical Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -19,27 +19,25 @@
   --amber:   #8B4A0A;
   --red:     #8B1A1A;
   --green:   #1A5C2A;
+  --purple:  #5B2D8E;
   --red-bg:  #FDF0EF;
   --amb-bg:  #FDF5EC;
   --tel-bg:  #EFF7F8;
   --grn-bg:  #EFF8F1;
+  --pur-bg:  #F5F0FD;
   --accent:  #C0392B;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 15px; }
-
 body {
   font-family: 'IBM Plex Sans', sans-serif;
   background: var(--bg);
   color: var(--ink);
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 380px 1fr;
   grid-template-rows: auto 1fr;
 }
-
-/* ── HEADER ── */
 header {
   grid-column: 1 / -1;
   background: var(--navy);
@@ -49,358 +47,151 @@ header {
   justify-content: space-between;
   border-bottom: 3px solid #C0392B;
 }
-.header-left h1 {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.4rem;
-  color: #fff;
-  letter-spacing: -0.01em;
-}
-.header-left h1 em { color: #F4A261; font-style: italic; }
-.header-sub {
-  font-size: 11px;
-  color: rgba(255,255,255,0.55);
-  margin-top: 2px;
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.header-badge {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  color: rgba(255,255,255,0.4);
-  border: 1px solid rgba(255,255,255,0.15);
-  padding: 4px 10px;
-}
-
-/* ── SIDEBAR ── */
-.sidebar {
-  background: var(--bg2);
-  border-right: 1px solid var(--rule);
-  padding: 1.5rem;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.sidebar-section h2 {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink3);
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-/* patient fields */
-.field { margin-bottom: 0.75rem; }
-.field label {
-  display: block;
-  font-size: 11px;
-  color: var(--ink3);
-  font-weight: 500;
-  margin-bottom: 4px;
-  letter-spacing: 0.03em;
-}
+.header-left h1 { font-family:'Libre Baskerville',serif; font-size:1.4rem; color:#fff; }
+.header-left h1 em { color:#F4A261; font-style:italic; }
+.header-sub { font-size:11px; color:rgba(255,255,255,0.55); margin-top:2px; font-weight:300; letter-spacing:0.04em; text-transform:uppercase; }
+.header-badge { font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(255,255,255,0.4); border:1px solid rgba(255,255,255,0.15); padding:4px 10px; }
+.sidebar { background:var(--bg2); border-right:1px solid var(--rule); padding:1.5rem; overflow-y:auto; display:flex; flex-direction:column; gap:1.25rem; }
+.sidebar-section h2 { font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink3); margin-bottom:0.75rem; padding-bottom:0.4rem; border-bottom:1px solid var(--rule); }
+.field { margin-bottom:0.75rem; }
+.field label { display:block; font-size:11px; color:var(--ink3); font-weight:500; margin-bottom:4px; letter-spacing:0.03em; }
 .field input, .field select {
-  width: 100%;
-  padding: 7px 10px;
-  border: 1px solid var(--rule);
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 13px;
-  outline: none;
-  border-radius: 2px;
-  transition: border-color 0.15s;
+  width:100%; padding:7px 10px; border:1px solid var(--rule); background:var(--bg);
+  color:var(--ink); font-family:'IBM Plex Sans',sans-serif; font-size:13px;
+  outline:none; border-radius:2px; transition:border-color 0.15s;
 }
-.field input:focus, .field select:focus { border-color: var(--navy); }
-.field input[type="number"] { font-family: 'IBM Plex Mono', monospace; }
+.field input:focus, .field select:focus { border-color:var(--navy); }
+.field input[type="number"] { font-family:'IBM Plex Mono',monospace; }
 
-/* drug selector */
-.drug-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
+/* diagnosis tags */
+.dx-grid { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
+.dx-tag {
+  padding:4px 9px; border:1px solid var(--rule); background:var(--bg);
+  cursor:pointer; font-size:11px; color:var(--ink3); border-radius:20px;
+  transition:all 0.1s; user-select:none;
 }
+.dx-tag:hover { border-color:var(--navy); color:var(--navy); }
+.dx-tag.selected { background:var(--navy); border-color:var(--navy); color:#fff; }
+.dx-suggest { font-size:10px; color:var(--teal); margin-top:6px; line-height:1.5; min-height:14px; font-style:italic; }
+
+/* cyp2d6 */
+.cyp-section { padding:8px 10px; background:var(--bg); border:1px solid var(--rule); border-radius:2px; margin-top:4px; }
+.cyp-section label { font-size:11px; color:var(--ink3); font-weight:500; display:block; margin-bottom:4px; }
+.cyp-radio-group { display:flex; flex-direction:column; gap:4px; }
+.cyp-radio { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--ink2); }
+.cyp-radio input[type=radio] { accent-color:var(--navy); }
+.cyp-desc { font-size:10px; color:var(--ink3); margin-left:20px; }
+
+/* drug grid */
+.drug-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
 .drug-btn {
-  padding: 7px 6px;
-  border: 1px solid var(--rule);
-  background: var(--bg);
-  cursor: pointer;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ink3);
-  text-align: center;
-  border-radius: 2px;
-  transition: all 0.1s;
-  user-select: none;
+  padding:7px 6px; border:1px solid var(--rule); background:var(--bg);
+  cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11px;
+  font-weight:500; color:var(--ink3); text-align:center; border-radius:2px;
+  transition:all 0.1s; user-select:none; position:relative;
 }
-.drug-btn:hover { border-color: var(--navy); color: var(--navy); }
-.drug-btn.selected {
-  background: var(--navy);
-  border-color: var(--navy);
-  color: #fff;
-}
-.drug-btn.selected .drug-class {
-  color: rgba(255,255,255,0.6);
-}
-.drug-name { font-size: 11px; font-weight: 500; display: block; }
-.drug-class { font-size: 9px; color: var(--ink3); font-family: 'IBM Plex Sans', sans-serif; font-weight: 400; display: block; margin-top: 1px; }
+.drug-btn:hover { border-color:var(--navy); color:var(--navy); }
+.drug-btn.selected { background:var(--navy); border-color:var(--navy); color:#fff; }
+.drug-btn.selected .drug-class { color:rgba(255,255,255,0.6); }
+.drug-btn.suggested { border-color:var(--teal); }
+.drug-btn.suggested:not(.selected) { color:var(--teal); }
+.suggest-dot { position:absolute; top:3px; right:3px; width:5px; height:5px; background:var(--teal); border-radius:50%; display:none; }
+.drug-btn.suggested .suggest-dot { display:block; }
+.drug-btn.selected .suggest-dot { display:none; }
+.drug-name { font-size:11px; font-weight:500; display:block; }
+.drug-class { font-size:9px; color:var(--ink3); font-family:'IBM Plex Sans',sans-serif; font-weight:400; display:block; margin-top:1px; }
+.selected-list { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--navy); min-height:20px; padding:6px 8px; background:var(--bg); border:1px solid var(--rule); border-radius:2px; margin-bottom:0.75rem; line-height:1.6; }
+.selected-list.empty { color:var(--ink3); font-family:'IBM Plex Sans',sans-serif; font-style:italic; font-size:11px; }
+.btn-run { width:100%; padding:11px; background:var(--accent); color:#fff; border:none; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-size:13px; font-weight:500; letter-spacing:0.02em; border-radius:2px; transition:background 0.15s; }
+.btn-run:hover { background:#9B2D22; }
+.btn-run:disabled { background:var(--rule); color:var(--ink3); cursor:default; }
+.btn-clear { width:100%; padding:7px; background:transparent; color:var(--ink3); border:1px solid var(--rule); cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-size:12px; border-radius:2px; margin-top:4px; transition:all 0.1s; }
+.btn-clear:hover { border-color:var(--ink3); color:var(--ink2); }
 
-.btn-run {
-  width: 100%;
-  padding: 11px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  border-radius: 2px;
-  transition: background 0.15s;
-}
-.btn-run:hover { background: #9B2D22; }
-.btn-run:disabled { background: var(--rule); color: var(--ink3); cursor: default; }
+/* main */
+.main { padding:2rem; overflow-y:auto; display:flex; flex-direction:column; gap:1.5rem; }
+.result-card { border:1px solid var(--rule); background:var(--bg); border-radius:3px; overflow:hidden; }
+.result-header { padding:1rem 1.25rem; border-bottom:1px solid var(--rule); display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+.patient-name { font-family:'Libre Baskerville',serif; font-size:1.2rem; color:var(--ink); }
+.patient-meta { font-size:12px; color:var(--ink3); margin-top:2px; }
+.risk-badge-large { padding:6px 16px; font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; border-radius:2px; white-space:nowrap; }
+.risk-HIGH     { background:var(--red-bg); color:var(--red); border:1px solid #E8B4B4; }
+.risk-MODERATE { background:var(--amb-bg); color:var(--amber); border:1px solid #E8D0B4; }
+.risk-LOW-MOD  { background:var(--tel-bg); color:var(--teal); border:1px solid #B4D4DA; }
+.risk-LOW      { background:var(--grn-bg); color:var(--green); border:1px solid #B4D8BF; }
+.risk-PROTECTIVE { background:var(--grn-bg); color:var(--green); border:1px solid #B4D8BF; }
+.result-body { padding:1.25rem; }
 
-.btn-clear {
-  width: 100%;
-  padding: 7px;
-  background: transparent;
-  color: var(--ink3);
-  border: 1px solid var(--rule);
-  cursor: pointer;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 12px;
-  border-radius: 2px;
-  margin-top: 4px;
-  transition: all 0.1s;
-}
-.btn-clear:hover { border-color: var(--ink3); color: var(--ink2); }
-
-.selected-list {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  color: var(--navy);
-  min-height: 20px;
-  padding: 6px 8px;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  margin-bottom: 0.75rem;
-  line-height: 1.6;
-}
-.selected-list.empty { color: var(--ink3); font-family: 'IBM Plex Sans', sans-serif; font-style: italic; font-size: 11px; }
-
-/* ── MAIN ── */
-.main {
-  padding: 2rem;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* ── RESULT CARD ── */
-.result-card {
-  border: 1px solid var(--rule);
-  background: var(--bg);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.result-header {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--rule);
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.patient-name {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.2rem;
-  color: var(--ink);
-}
-.patient-meta {
-  font-size: 12px;
-  color: var(--ink3);
-  margin-top: 2px;
-}
-.risk-badge-large {
-  padding: 6px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-radius: 2px;
-  white-space: nowrap;
-}
-.risk-HIGH    { background: var(--red-bg); color: var(--red); border: 1px solid #E8B4B4; }
-.risk-MODERATE{ background: var(--amb-bg); color: var(--amber); border: 1px solid #E8D0B4; }
-.risk-LOW-MOD { background: var(--tel-bg); color: var(--teal); border: 1px solid #B4D4DA; }
-.risk-LOW     { background: var(--grn-bg); color: var(--green); border: 1px solid #B4D8BF; }
-.risk-PROTECTIVE { background: var(--grn-bg); color: var(--green); border: 1px solid #B4D8BF; }
-
-.result-body { padding: 1.25rem; }
+/* composite score */
+.score-strip { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:2px; margin-bottom:1.25rem; overflow:hidden; }
+.score-cell { background:var(--bg2); padding:0.75rem 1rem; text-align:center; }
+.score-num { font-family:'Libre Baskerville',serif; font-size:1.8rem; line-height:1; }
+.score-lbl { font-size:10px; color:var(--ink3); margin-top:3px; text-transform:uppercase; letter-spacing:0.06em; }
+.score-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; margin-top:6px; }
+.score-bar { height:100%; border-radius:2px; transition:width 0.8s ease; }
 
 /* combo rows */
-.combo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
-.combo-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 8px 12px;
-  background: var(--bg2);
-  border-radius: 2px;
-  border-left: 3px solid transparent;
-}
-.combo-row.HIGH     { border-left-color: var(--red); }
-.combo-row.MODERATE { border-left-color: #E07000; }
-.combo-row.LOW-MOD  { border-left-color: var(--teal); }
-.combo-row.LOW, .combo-row.PROTECTIVE { border-left-color: var(--green); }
+.combo-list { display:flex; flex-direction:column; gap:6px; margin-bottom:1.25rem; }
+.combo-row { display:grid; grid-template-columns:1fr auto; align-items:start; gap:0.75rem; padding:10px 12px; background:var(--bg2); border-radius:2px; border-left:3px solid transparent; }
+.combo-row.HIGH     { border-left-color:var(--red); }
+.combo-row.MODERATE { border-left-color:#E07000; }
+.combo-row.LOW-MOD  { border-left-color:var(--teal); }
+.combo-row.LOW, .combo-row.PROTECTIVE { border-left-color:var(--green); }
+.combo-left { display:flex; flex-direction:column; gap:4px; }
+.combo-name { font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:500; color:var(--ink); }
+.combo-detail { font-size:11px; color:var(--ink3); }
+.combo-right { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+.combo-score { font-family:'Libre Baskerville',serif; font-size:1.3rem; line-height:1; }
+.combo-dqtc { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink3); }
+.dqtc-bar-wrap { height:3px; background:var(--bg3); border-radius:2px; margin-top:3px; width:80px; }
+.dqtc-bar { height:100%; border-radius:2px; }
+.score-HIGH    { color:var(--red); }
+.score-MODERATE{ color:var(--amber); }
+.score-LOW-MOD { color:var(--teal); }
+.score-LOW, .score-PROTECTIVE { color:var(--green); }
+.faers-badge { font-size:10px; font-family:'IBM Plex Mono',monospace; padding:2px 7px; border-radius:2px; border:1px solid var(--rule); color:var(--ink3); display:inline-block; }
+.faers-badge.signal { background:#FDF5EC; color:var(--amber); border-color:#E8D0B4; }
 
-.combo-name {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink);
-}
-.combo-dqtc {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
-  font-weight: 500;
-  min-width: 70px;
-  text-align: right;
-}
-.combo-ikr {
-  font-size: 11px;
-  color: var(--ink3);
-  min-width: 70px;
-  text-align: right;
-}
-.combo-mech {
-  font-size: 10px;
-  color: var(--ink3);
-  min-width: 120px;
-  text-align: right;
-  font-style: italic;
-}
-.dqtc-HIGH    { color: var(--red); }
-.dqtc-MODERATE{ color: var(--amber); }
-.dqtc-LOW-MOD { color: var(--teal); }
-.dqtc-LOW, .dqtc-PROTECTIVE { color: var(--green); }
+/* triple section */
+.triple-section { margin-top:0.75rem; }
+.triple-section h4 { font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink3); margin-bottom:6px; }
+.triple-row { display:flex; align-items:center; justify-content:space-between; padding:6px 10px; background:var(--bg2); border-radius:2px; border-left:3px solid transparent; margin-bottom:4px; font-size:12px; }
+.triple-row.HIGH     { border-left-color:var(--red); }
+.triple-row.MODERATE { border-left-color:#E07000; }
+.triple-row.LOW-MOD  { border-left-color:var(--teal); }
+.triple-name { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink); }
+.triple-dqtc { font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:500; }
 
-/* bar */
-.dqtc-bar-wrap {
-  height: 4px;
-  background: var(--bg3);
-  border-radius: 2px;
-  margin-top: 4px;
-  overflow: hidden;
-}
-.dqtc-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+/* notes */
+.clinical-note { padding:0.875rem 1rem; border:1px solid var(--rule); background:var(--bg2); border-radius:2px; border-left:3px solid var(--navy); font-size:13px; color:var(--ink2); line-height:1.6; margin-top:0.5rem; }
+.clinical-note strong { color:var(--navy); font-weight:500; }
+.note-amber { border-left-color:var(--amber); }
+.note-teal  { border-left-color:var(--teal); }
+.note-red   { border-left-color:var(--red); }
+.note-purple { border-left-color:var(--purple); }
 
-/* clinical note */
-.clinical-note {
-  padding: 0.875rem 1rem;
-  border: 1px solid var(--rule);
-  background: var(--bg2);
-  border-radius: 2px;
-  border-left: 3px solid var(--navy);
-  font-size: 13px;
-  color: var(--ink2);
-  line-height: 1.6;
-}
-.clinical-note strong { color: var(--navy); font-weight: 500; }
+/* age warning */
+.age-warning { padding:0.75rem 1rem; border:1px solid #E8D0B4; background:#FDF5EC; border-radius:2px; font-size:12px; color:var(--amber); margin-top:0.5rem; line-height:1.5; }
+.age-warning strong { font-weight:500; }
 
-/* FAERS signal badge */
-.faers-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 0.75rem;
-}
-.faers-badge {
-  font-size: 10px;
-  font-family: 'IBM Plex Mono', monospace;
-  padding: 3px 8px;
-  border-radius: 2px;
-  border: 1px solid var(--rule);
-  color: var(--ink3);
-}
-.faers-badge.signal { background: #FDF5EC; color: var(--amber); border-color: #E8D0B4; }
+/* cyp2d6 adjusted */
+.adjusted-badge { font-size:10px; padding:2px 7px; background:var(--pur-bg); color:var(--purple); border:1px solid #D4B8F0; border-radius:2px; font-family:'IBM Plex Mono',monospace; }
 
-/* disclaimer */
-.disclaimer {
-  font-size: 11px;
-  color: var(--ink3);
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  line-height: 1.5;
-}
-
-/* empty state */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-  gap: 0.75rem;
-}
-.empty-icon {
-  font-size: 3rem;
-  opacity: 0.15;
-}
-.empty-title {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.1rem;
-  color: var(--ink3);
-}
-.empty-sub { font-size: 12px; color: var(--ink3); max-width: 280px; line-height: 1.5; }
-
-/* history */
-.history-section h2 {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink3);
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--rule);
-}
-.history-list { display: flex; flex-direction: column; gap: 4px; }
-.history-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 8px 12px;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--ink2);
-  transition: border-color 0.1s;
-}
-.history-item:hover { border-color: var(--navy); }
-.history-name { font-weight: 500; flex: 1; }
-.history-drugs { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink3); }
-.history-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; }
-
-@media (max-width: 900px) {
-  body { grid-template-columns: 1fr; }
-  .sidebar { border-right: none; border-bottom: 1px solid var(--rule); }
+.disclaimer { font-size:11px; color:var(--ink3); padding:0.75rem 1rem; border:1px solid var(--rule); border-radius:2px; line-height:1.5; margin-top:0.75rem; }
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; gap:0.75rem; }
+.empty-icon { font-size:3rem; opacity:0.15; }
+.empty-title { font-family:'Libre Baskerville',serif; font-size:1.1rem; color:var(--ink3); }
+.empty-sub { font-size:12px; color:var(--ink3); max-width:300px; line-height:1.5; }
+.history-section h2 { font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink3); margin-bottom:0.75rem; padding-bottom:0.4rem; border-bottom:1px solid var(--rule); }
+.history-list { display:flex; flex-direction:column; gap:4px; }
+.history-item { display:flex; align-items:center; gap:0.75rem; padding:8px 12px; background:var(--bg); border:1px solid var(--rule); border-radius:2px; cursor:pointer; font-size:12px; color:var(--ink2); transition:border-color 0.1s; }
+.history-item:hover { border-color:var(--navy); }
+.history-name { font-weight:500; flex:1; }
+.history-drugs { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink3); }
+.history-badge { font-size:10px; font-weight:600; letter-spacing:0.04em; }
+@media (max-width:900px) {
+  body { grid-template-columns:1fr; }
+  .sidebar { border-right:none; border-bottom:1px solid var(--rule); }
 }
 </style>
 </head>
@@ -411,7 +202,7 @@ header {
     <h1>CardioSafe <em>Pediatric</em> — Clinical Simulator</h1>
     <div class="header-sub">Mechanistic cardiac risk · Adolescent psychiatric polypharmacy</div>
   </div>
-  <div class="header-badge">ORd 2011 · Research use only</div>
+  <div class="header-badge">ORd 2011 · v2.0 · Research use only</div>
 </header>
 
 <aside class="sidebar">
@@ -424,7 +215,7 @@ header {
     </div>
     <div class="field">
       <label>Age (years)</label>
-      <input type="number" id="patientAge" min="6" max="18" placeholder="12" value="">
+      <input type="number" id="patientAge" min="4" max="18" placeholder="e.g. 10">
     </div>
     <div class="field">
       <label>Sex</label>
@@ -435,8 +226,33 @@ header {
       </select>
     </div>
     <div class="field">
-      <label>Diagnosis / indication</label>
-      <input type="text" id="patientDx" placeholder="e.g. ADHD + anxiety">
+      <label>Diagnoses <span style="color:var(--ink3);font-weight:400">(select all that apply)</span></label>
+      <div class="dx-grid" id="dxGrid"></div>
+      <div class="dx-suggest" id="dxSuggest"></div>
+    </div>
+    <div class="field">
+      <label>Additional notes</label>
+      <input type="text" id="patientNotes" placeholder="e.g. prior ECG, cardiac history">
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h2>Pharmacogenomics</h2>
+    <div class="cyp-section">
+      <label>CYP2D6 metabolizer status</label>
+      <div class="cyp-radio-group">
+        <label class="cyp-radio">
+          <input type="radio" name="cyp2d6" value="unknown" checked> Unknown / not tested
+        </label>
+        <label class="cyp-radio">
+          <input type="radio" name="cyp2d6" value="extensive"> Extensive metabolizer (normal)
+          <span class="cyp-desc">Standard Cmax assumed</span>
+        </label>
+        <label class="cyp-radio">
+          <input type="radio" name="cyp2d6" value="poor"> Poor metabolizer
+          <span class="cyp-desc">ARI, RIS, NOR, IMI Cmax scaled 2x</span>
+        </label>
+      </div>
     </div>
   </div>
 
@@ -456,8 +272,8 @@ header {
   <div class="sidebar-section">
     <h2>About</h2>
     <p style="font-size:11px;color:var(--ink3);line-height:1.5;">
-      Mechanistic cardiac risk assessment using O'Hara-Rudy 2011 action potential modeling and FDA FAERS pharmacovigilance data.<br><br>
-      <strong style="color:var(--red);">Research use only.</strong> Not validated for clinical decision-making. All ΔQTc estimates use adult Cmax values.
+      Composite score (0–100) integrates ΔQTc (weight 0.50), IKr block (0.20), and FAERS pharmacovigilance signal (0.30), plus CYP2D6 and conduction flags. Mechanistic simulation uses O'Hara-Rudy 2011 at 500-beat steady state.<br><br>
+      <strong style="color:var(--red);">Research use only.</strong> Not validated for clinical decision-making.
     </p>
   </div>
 
@@ -467,7 +283,7 @@ header {
   <div class="empty-state" id="emptyState">
     <div class="empty-icon">♥</div>
     <div class="empty-title">No patient loaded</div>
-    <div class="empty-sub">Select medications from the sidebar and click Assess Cardiac Risk to generate a patient-specific report.</div>
+    <div class="empty-sub">Select diagnoses to see drug suggestions, then add medications and click Assess Cardiac Risk.</div>
   </div>
 </main>
 
@@ -477,396 +293,494 @@ header {
 // Source: results/risk_grid_results.csv + results/faers/faers_combo_ror.csv
 // Run `python3 src/generate_sim_data.py` to regenerate after a new risk_grid run.
 
+const DRUGS = [
+  {code:"MPH", name:"Methylphenidate", cls:"Stimulant"},
+  {code:"AMP", name:"Amphetamine",     cls:"Stimulant"},
+  {code:"RIS", name:"Risperidone",     cls:"Antipsychotic"},
+  {code:"QUE", name:"Quetiapine",      cls:"Antipsychotic"},
+  {code:"ARI", name:"Aripiprazole",    cls:"Antipsychotic"},
+  {code:"SER", name:"Sertraline",      cls:"SSRI"},
+  {code:"FLU", name:"Fluoxetine",      cls:"SSRI"},
+  {code:"ESC", name:"Escitalopram",    cls:"SSRI"},
+  {code:"CLO", name:"Clonidine",       cls:"Alpha-2"},
+  {code:"GUA", name:"Guanfacine",      cls:"Alpha-2"},
+  {code:"IMI", name:"Imipramine",      cls:"TCA"},
+  {code:"NOR", name:"Nortriptyline",   cls:"TCA"},
+];
+
 const DQTC = {
-  "AMP+ARI":18.1,
-  "AMP+CLO":6.8,
-  "AMP+ESC":9.1,
-  "AMP+FLU":10.0,
-  "AMP+GUA":6.8,
-  "AMP+IMI":10.5,
-  "AMP+MPH":19.1,
-  "AMP+NOR":14.8,
-  "AMP+QUE":11.0,
-  "AMP+RIS":10.0,
-  "AMP+SER":9.6,
-  "ARI+CLO":7.3,
-  "ARI+ESC":9.5,
-  "ARI+FLU":10.0,
-  "ARI+GUA":7.3,
-  "ARI+IMI":11.0,
-  "ARI+MPH":18.1,
-  "ARI+NOR":15.0,
-  "ARI+QUE":11.5,
-  "ARI+RIS":10.0,
-  "ARI+SER":9.5,
-  "CLO+ESC":-1.7,
-  "CLO+FLU":-1.1,
-  "CLO+GUA":-1.5,
-  "CLO+IMI":-0.6,
-  "CLO+MPH":6.8,
-  "CLO+NOR":4.1,
-  "CLO+QUE":-0.1,
-  "CLO+RIS":-1.1,
-  "CLO+SER":-1.7,
-  "ESC+FLU":1.0,
-  "ESC+GUA":-1.7,
-  "ESC+IMI":2.0,
-  "ESC+MPH":9.1,
-  "ESC+NOR":6.0,
-  "ESC+QUE":2.0,
-  "ESC+RIS":1.0,
-  "ESC+SER":0.5,
-  "FLU+GUA":-1.1,
-  "FLU+IMI":2.5,
-  "FLU+MPH":10.0,
-  "FLU+NOR":6.5,
-  "FLU+QUE":3.0,
-  "FLU+RIS":1.5,
-  "FLU+SER":1.5,
-  "GUA+IMI":-0.6,
-  "GUA+MPH":6.8,
-  "GUA+NOR":4.1,
-  "GUA+QUE":-0.1,
-  "GUA+RIS":-1.1,
-  "GUA+SER":-1.7,
-  "IMI+MPH":10.5,
-  "IMI+NOR":7.5,
-  "IMI+QUE":3.5,
-  "IMI+RIS":2.5,
-  "IMI+SER":2.0,
-  "MPH+NOR":14.8,
-  "MPH+QUE":11.0,
-  "MPH+RIS":10.0,
-  "MPH+SER":9.6,
-  "NOR+QUE":8.0,
-  "NOR+RIS":6.5,
-  "NOR+SER":6.5,
-  "QUE+RIS":3.0,
-  "QUE+SER":2.5,
-  "RIS+SER":1.5
+  "AMP+ARI":18.1,"AMP+CLO":6.8,"AMP+ESC":9.1,"AMP+FLU":10.0,"AMP+GUA":6.8,
+  "AMP+IMI":10.5,"AMP+MPH":19.1,"AMP+NOR":14.8,"AMP+QUE":11.0,"AMP+RIS":10.0,
+  "AMP+SER":9.6,"ARI+CLO":7.3,"ARI+ESC":9.5,"ARI+FLU":10.0,"ARI+GUA":7.3,
+  "ARI+IMI":11.0,"ARI+MPH":18.1,"ARI+NOR":15.0,"ARI+QUE":11.5,"ARI+RIS":10.0,
+  "ARI+SER":9.5,"CLO+ESC":-1.7,"CLO+FLU":-1.1,"CLO+GUA":-1.5,"CLO+IMI":-0.6,
+  "CLO+MPH":6.8,"CLO+NOR":4.1,"CLO+QUE":-0.1,"CLO+RIS":-1.1,"CLO+SER":-1.7,
+  "ESC+FLU":1.0,"ESC+GUA":-1.7,"ESC+IMI":2.0,"ESC+MPH":9.1,"ESC+NOR":6.0,
+  "ESC+QUE":2.0,"ESC+RIS":1.0,"ESC+SER":0.5,"FLU+GUA":-1.1,"FLU+IMI":2.5,
+  "FLU+MPH":10.0,"FLU+NOR":6.5,"FLU+QUE":3.0,"FLU+RIS":1.5,"FLU+SER":1.5,
+  "GUA+IMI":-0.6,"GUA+MPH":6.8,"GUA+NOR":4.1,"GUA+QUE":-0.1,"GUA+RIS":-1.1,
+  "GUA+SER":-1.7,"IMI+MPH":10.5,"IMI+NOR":7.5,"IMI+QUE":3.5,"IMI+RIS":2.5,
+  "IMI+SER":2.0,"MPH+NOR":14.8,"MPH+QUE":11.0,"MPH+RIS":10.0,"MPH+SER":9.6,
+  "NOR+QUE":8.0,"NOR+RIS":6.5,"NOR+SER":6.5,"QUE+RIS":3.0,"QUE+SER":2.5,"RIS+SER":1.5
 };
-
 const IKR = {
-  "AMP+ARI":4.22,
-  "AMP+CLO":0.0,
-  "AMP+ESC":0.03,
-  "AMP+FLU":0.33,
-  "AMP+GUA":0.0,
-  "AMP+IMI":0.73,
-  "AMP+MPH":0.0,
-  "AMP+NOR":2.65,
-  "AMP+QUE":0.93,
-  "AMP+RIS":0.36,
-  "AMP+SER":0.19,
-  "ARI+CLO":4.22,
-  "ARI+ESC":4.25,
-  "ARI+FLU":4.53,
-  "ARI+GUA":4.22,
-  "ARI+IMI":4.92,
-  "ARI+MPH":4.22,
-  "ARI+NOR":6.76,
-  "ARI+QUE":5.11,
-  "ARI+RIS":4.56,
-  "ARI+SER":4.4,
-  "CLO+ESC":0.03,
-  "CLO+FLU":0.33,
-  "CLO+GUA":0.0,
-  "CLO+IMI":0.73,
-  "CLO+MPH":0.0,
-  "CLO+NOR":2.65,
-  "CLO+QUE":0.93,
-  "CLO+RIS":0.36,
-  "CLO+SER":0.19,
-  "ESC+FLU":0.36,
-  "ESC+GUA":0.03,
-  "ESC+IMI":0.76,
-  "ESC+MPH":0.03,
-  "ESC+NOR":2.69,
-  "ESC+QUE":0.96,
-  "ESC+RIS":0.39,
-  "ESC+SER":0.22,
-  "FLU+GUA":0.33,
-  "FLU+IMI":1.06,
-  "FLU+MPH":0.33,
-  "FLU+NOR":2.98,
-  "FLU+QUE":1.25,
-  "FLU+RIS":0.68,
-  "FLU+SER":0.52,
-  "GUA+IMI":0.73,
-  "GUA+MPH":0.0,
-  "GUA+NOR":2.65,
-  "GUA+QUE":0.93,
-  "GUA+RIS":0.36,
-  "GUA+SER":0.19,
-  "IMI+MPH":0.73,
-  "IMI+NOR":3.37,
-  "IMI+QUE":1.65,
-  "IMI+RIS":1.09,
-  "IMI+SER":0.92,
-  "MPH+NOR":2.65,
-  "MPH+QUE":0.93,
-  "MPH+RIS":0.36,
-  "MPH+SER":0.19,
-  "NOR+QUE":3.56,
-  "NOR+RIS":3.0,
-  "NOR+SER":2.84,
-  "QUE+RIS":1.28,
-  "QUE+SER":1.12,
-  "RIS+SER":0.55
+  "AMP+ARI":4.22,"AMP+CLO":0.0,"AMP+ESC":0.03,"AMP+FLU":0.33,"AMP+GUA":0.0,
+  "AMP+IMI":0.73,"AMP+MPH":0.0,"AMP+NOR":2.65,"AMP+QUE":0.93,"AMP+RIS":0.36,
+  "AMP+SER":0.19,"ARI+CLO":4.22,"ARI+ESC":4.25,"ARI+FLU":4.53,"ARI+GUA":4.22,
+  "ARI+IMI":4.92,"ARI+MPH":4.22,"ARI+NOR":6.76,"ARI+QUE":5.11,"ARI+RIS":4.56,
+  "ARI+SER":4.4,"CLO+ESC":0.03,"CLO+FLU":0.33,"CLO+GUA":0.0,"CLO+IMI":0.73,
+  "CLO+MPH":0.0,"CLO+NOR":2.65,"CLO+QUE":0.93,"CLO+RIS":0.36,"CLO+SER":0.19,
+  "ESC+FLU":0.36,"ESC+GUA":0.03,"ESC+IMI":0.76,"ESC+MPH":0.03,"ESC+NOR":2.69,
+  "ESC+QUE":0.96,"ESC+RIS":0.39,"ESC+SER":0.22,"FLU+GUA":0.33,"FLU+IMI":1.06,
+  "FLU+MPH":0.33,"FLU+NOR":2.98,"FLU+QUE":1.25,"FLU+RIS":0.68,"FLU+SER":0.52,
+  "GUA+IMI":0.73,"GUA+MPH":0.0,"GUA+NOR":2.65,"GUA+QUE":0.93,"GUA+RIS":0.36,
+  "GUA+SER":0.19,"IMI+MPH":0.73,"IMI+NOR":3.37,"IMI+QUE":1.65,"IMI+RIS":1.09,
+  "IMI+SER":0.92,"MPH+NOR":2.65,"MPH+QUE":0.93,"MPH+RIS":0.36,"MPH+SER":0.19,
+  "NOR+QUE":3.56,"NOR+RIS":3.0,"NOR+SER":2.84,"QUE+RIS":1.28,"QUE+SER":1.12,"RIS+SER":0.55
 };
-
 const FAERS_ROR = {
-  "AMP+SER":2.81,
-  "ARI+ESC":2.31,
-  "ARI+GUA":10.25,
-  "ARI+IMI":14.67,
-  "ARI+MPH":8.15,
-  "ARI+RIS":1.71,
-  "ARI+SER":6.78,
-  "ESC+IMI":28.01,
-  "FLU+QUE":9.18,
-  "FLU+RIS":3.69,
-  "GUA+MPH":3.4,
-  "GUA+QUE":13.15,
-  "GUA+SER":2.58,
-  "IMI+SER":16.22,
-  "MPH+QUE":5.25,
-  "MPH+SER":12.79,
-  "QUE+SER":5.84
+  "AMP+SER":2.81,"ARI+ESC":2.31,"ARI+GUA":10.25,"ARI+IMI":14.67,"ARI+MPH":8.15,
+  "ARI+RIS":1.71,"ARI+SER":6.78,"ESC+IMI":28.01,"FLU+QUE":9.18,"FLU+RIS":3.69,
+  "GUA+MPH":3.4,"GUA+QUE":13.15,"GUA+SER":2.58,"IMI+SER":16.22,"MPH+QUE":5.25,
+  "MPH+SER":12.79,"QUE+SER":5.84
 };
-
 const FAERS_SIGNAL = new Set([
-  "AMP+SER",
-  "ARI+ESC",
-  "ARI+GUA",
-  "ARI+IMI",
-  "ARI+MPH",
-  "ARI+RIS",
-  "ARI+SER",
-  "ESC+IMI",
-  "FLU+QUE",
-  "FLU+RIS",
-  "GUA+MPH",
-  "GUA+QUE",
-  "GUA+SER",
-  "IMI+SER",
-  "MPH+QUE",
-  "MPH+SER",
-  "QUE+SER"
+  "AMP+SER","ARI+ESC","ARI+GUA","ARI+IMI","ARI+MPH","ARI+RIS","ARI+SER",
+  "ESC+IMI","FLU+QUE","FLU+RIS","GUA+MPH","GUA+QUE","GUA+SER","IMI+SER",
+  "MPH+QUE","MPH+SER","QUE+SER"
 ]);
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let selected = new Set();
-let history  = [];
+// Triple combinations from 500-beat sweep
+const TRIPLES = [
+  {combo:"MPH+ARI+FLU", dq:19.0, tier:"MODERATE"},
+  {combo:"MPH+ARI+SER", dq:18.6, tier:"MODERATE"},
+  {combo:"MPH+ARI+ESC", dq:18.1, tier:"MODERATE"},
+  {combo:"MPH+NOR+ARI", dq:21.7, tier:"HIGH"},
+  {combo:"MPH+RIS+SER", dq:10.5, tier:"MODERATE"},
+  {combo:"MPH+RIS+FLU", dq:10.5, tier:"MODERATE"},
+  {combo:"MPH+QUE+SER", dq:11.5, tier:"MODERATE"},
+  {combo:"MPH+CLO+ARI", dq:16.3, tier:"MODERATE"},
+  {combo:"AMP+ARI+SER", dq:18.6, tier:"MODERATE"},
+];
 
-// ── BUILD DRUG GRID ───────────────────────────────────────────────────────────
-function buildDrugGrid() {
-  const grid = document.getElementById('drugGrid');
-  grid.innerHTML = '';
+// CYP2D6 substrates that scale with poor metabolizer status
+const CYP2D6_SUBSTRATES = {ARI:2.0, RIS:1.75, NOR:2.0, IMI:1.5};
+
+// ── DIAGNOSIS SYSTEM ─────────────────────────────────────────────────────────
+const DIAGNOSES = [
+  {id:"ADHD",      label:"ADHD",         suggest:["MPH","AMP","CLO","GUA"],         note:"Stimulants are first-line. Alpha-2 agonists used for augmentation or tics."},
+  {id:"ANXIETY",   label:"Anxiety",      suggest:["SER","FLU","ESC"],               note:"SSRIs are first-line for pediatric anxiety disorders."},
+  {id:"DEPRESSION",label:"Depression",   suggest:["SER","FLU","ESC"],               note:"SSRIs are first-line for pediatric depression."},
+  {id:"ODD",       label:"ODD",          suggest:["RIS","ARI"],                     note:"Atypical antipsychotics used for severe irritability/aggression."},
+  {id:"BIPOLAR",   label:"Bipolar",      suggest:["QUE","ARI","RIS"],               note:"Atypical antipsychotics for pediatric bipolar spectrum."},
+  {id:"AUTISM",    label:"Autism",       suggest:["RIS","ARI","MPH"],               note:"RIS and ARI FDA-approved for autism-related irritability."},
+  {id:"PSYCHOSIS", label:"Psychosis",    suggest:["RIS","QUE","ARI"],               note:"Atypical antipsychotics; RIS most studied in adolescents."},
+  {id:"TICS",      label:"Tics / TS",    suggest:["CLO","GUA","ARI"],               note:"Alpha-2 agonists first-line for tics; ARI second-line."},
+  {id:"ENURESIS",  label:"Enuresis",     suggest:["IMI"],                           note:"Imipramine used off-label for nocturnal enuresis."},
+  {id:"SLEEP",     label:"Sleep issues", suggest:["CLO","GUA"],                     note:"Alpha-2 agonists commonly used for sleep-onset in ADHD."},
+];
+
+// Age-based mechanistic warnings (indexed by condition)
+const AGE_WARNINGS = {
+  "MPH+SER":  {childROR:43.71, adolROR:1.86, mechanism:"higher baseline HR + weight-adjusted dosing"},
+  "MPH+ARI":  {childROR:23.71, adolROR:0.47, mechanism:"higher baseline HR + weight-adjusted dosing"},
+  "MPH+QUE":  {childROR:16.45, adolROR:1.84, mechanism:"higher baseline HR"},
+  "ARI+GUA":  {childROR:21.72, adolROR:1.69, mechanism:"conduction sensitivity"},
+  "QUE+GUA":  {childROR:32.15, adolROR:3.91, mechanism:"conduction sensitivity"},
+  "QUE+FLU":  {childROR:3.75,  adolROR:10.88,mechanism:"CYP2D6 ontogeny — higher in adolescents"},
+};
+
+// ── HELPER FUNCTIONS ─────────────────────────────────────────────────────────
+function canonicalKey(a,b){ return [a,b].sort().join('+'); }
+function getDQTc(a,b){ return DQTC[canonicalKey(a,b)]??null; }
+function getIKR(a,b){ return IKR[canonicalKey(a,b)]??0; }
+function isFaers(a,b){ return FAERS_SIGNAL.has(canonicalKey(a,b)); }
+function getFaersROR(a,b){ return FAERS_ROR[canonicalKey(a,b)]??null; }
+function riskTier(dq){
+  if(dq===null||dq===undefined) return 'LOW';
+  if(dq>=20) return 'HIGH';
+  if(dq>=10) return 'MODERATE';
+  if(dq>=5)  return 'LOW-MOD';
+  if(dq>=0)  return 'LOW';
+  return 'PROTECTIVE';
+}
+function mechLabel(ikr,dq){
+  if(dq===null||Math.abs(dq)<2) return 'minimal';
+  if(dq<0) return 'autonomic (bradycardic)';
+  if(ikr<1&&dq>5) return 'sympathomimetic';
+  if(ikr<3&&dq>5) return 'sympathomimetic + mild hERG';
+  if(ikr>=5) return 'hERG-driven';
+  return 'mixed';
+}
+function tierBarColor(tier){
+  return {HIGH:'#8B1A1A',MODERATE:'#8B4A0A','LOW-MOD':'#0D5C6B',LOW:'#1A5C2A',PROTECTIVE:'#0D5C6B'}[tier]||'#7A7468';
+}
+function tierColor(tier){
+  return {HIGH:'#8B1A1A',MODERATE:'#8B4A0A','LOW-MOD':'#0D5C6B',LOW:'#1A5C2A',PROTECTIVE:'#1A5C2A'}[tier]||'#7A7468';
+}
+function compositeScore(dq, ikr, ror, hasFaers, hasCyp2d6Flag, hasConductionFlag){
+  const c_dqtc  = Math.min(100, Math.max(0, (dq/20)*100));
+  const c_ikr   = Math.min(100, (ikr/10)*100);
+  const c_faers = hasFaers && ror>1 ? Math.min(100,(Math.log(ror)/Math.log(30))*100) : 0;
+  let score = 0.50*c_dqtc + 0.20*c_ikr + 0.30*c_faers;
+  if(hasCyp2d6Flag) score += 15;
+  if(hasConductionFlag) score += 10;
+  return Math.min(100, Math.round(score));
+}
+function scoreLabel(s){
+  if(s>=75) return 'HIGH';
+  if(s>=50) return 'MODERATE';
+  if(s>=25) return 'LOW-MOD';
+  return 'LOW';
+}
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── CYP2D6 SCALING ───────────────────────────────────────────────────────────
+function getCypMultiplier(code){
+  const status = document.querySelector('input[name=cyp2d6]:checked')?.value || 'unknown';
+  if(status!=='poor') return 1.0;
+  return CYP2D6_SUBSTRATES[code] ?? 1.0;
+}
+
+function adjustedDQTc(a, b, baseDQ){
+  const ma = getCypMultiplier(a);
+  const mb = getCypMultiplier(b);
+  if(ma===1.0 && mb===1.0) return {dq: baseDQ, adjusted:false};
+  // Approximate: scale IKr block proportionally to Cmax multiplier
+  // hERG block = Cmax/(Cmax+IC50); at 2x Cmax: new_block = 2C/(2C+IC50)
+  // delta-QTc adjustment is roughly proportional to IKr block change
+  const ikr = getIKR(a, b);
+  // Sympathomimetic component: scale by Cmax multiplier for non-stimulant
+  // For stimulants (MPH/AMP), CYP2D6 doesn't apply — they use MAO
+  const stimulants = new Set(['MPH','AMP']);
+  let dqAdj = baseDQ;
+  // Scale hERG-driven portion
+  if(ikr > 0.5){
+    const ikrScale = stimulants.has(a) ? mb : (stimulants.has(b) ? ma : Math.max(ma,mb));
+    dqAdj = baseDQ * (0.5 + 0.5*ikrScale); // rough proportional adjustment
+  }
+  return {dq: Math.round(dqAdj*10)/10, adjusted:(ma!==1.0||mb!==1.0)};
+}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let selected = new Set();
+let selectedDx = new Set();
+let history = [];
+
+// ── BUILD UI ─────────────────────────────────────────────────────────────────
+function buildDxGrid(){
+  const grid = document.getElementById('dxGrid');
+  DIAGNOSES.forEach(dx => {
+    const tag = document.createElement('button');
+    tag.className = 'dx-tag';
+    tag.id = `dx-${dx.id}`;
+    tag.textContent = dx.label;
+    tag.onclick = () => toggleDx(dx.id);
+    grid.appendChild(tag);
+  });
+}
+
+function toggleDx(id){
+  if(selectedDx.has(id)){
+    selectedDx.delete(id);
+    document.getElementById(`dx-${id}`)?.classList.remove('selected');
+  } else {
+    selectedDx.add(id);
+    document.getElementById(`dx-${id}`)?.classList.add('selected');
+  }
+  updateSuggestions();
+}
+
+function updateSuggestions(){
+  const suggested = new Set();
+  const notes = [];
+  selectedDx.forEach(id => {
+    const dx = DIAGNOSES.find(d=>d.id===id);
+    if(dx){ dx.suggest.forEach(c=>suggested.add(c)); notes.push(dx.note); }
+  });
+  // Update drug button styling
   DRUGS.forEach(d => {
+    const btn = document.getElementById(`drug-${d.code}`);
+    if(!btn) return;
+    if(suggested.has(d.code)){ btn.classList.add('suggested'); }
+    else { btn.classList.remove('suggested'); }
+  });
+  const suggestEl = document.getElementById('dxSuggest');
+  if(suggested.size>0){
+    const names = [...suggested].map(c=>DRUGS.find(d=>d.code===c)?.name||c).join(', ');
+    suggestEl.textContent = `Typical for selected diagnoses: ${names}`;
+  } else {
+    suggestEl.textContent = '';
+  }
+}
+
+function buildDrugGrid(){
+  const grid = document.getElementById('drugGrid');
+  grid.innerHTML='';
+  DRUGS.forEach(d=>{
     const btn = document.createElement('button');
-    btn.className = 'drug-btn';
-    btn.id = `drug-${d.code}`;
-    btn.innerHTML = `<span class="drug-name">${d.code}</span><span class="drug-class">${d.cls}</span>`;
-    btn.onclick = () => toggleDrug(d.code);
+    btn.className='drug-btn';
+    btn.id=`drug-${d.code}`;
+    btn.innerHTML=`<div class="suggest-dot"></div><span class="drug-name">${d.code}</span><span class="drug-class">${d.cls}</span>`;
+    btn.onclick=()=>toggleDrug(d.code);
     grid.appendChild(btn);
   });
 }
 
-function toggleDrug(code) {
-  if (selected.has(code)) {
+function toggleDrug(code){
+  if(selected.has(code)){
     selected.delete(code);
-    document.getElementById(`drug-${code}`).classList.remove('selected');
+    document.getElementById(`drug-${code}`)?.classList.remove('selected');
   } else {
     selected.add(code);
-    document.getElementById(`drug-${code}`).classList.add('selected');
+    document.getElementById(`drug-${code}`)?.classList.add('selected');
   }
   updateSelectedList();
-  document.getElementById('runBtn').disabled = selected.size < 2;
+  document.getElementById('runBtn').disabled = selected.size<2;
 }
 
-function clearDrugs() {
-  selected.forEach(c => document.getElementById(`drug-${c}`)?.classList.remove('selected'));
+function clearDrugs(){
+  selected.forEach(c=>document.getElementById(`drug-${c}`)?.classList.remove('selected'));
   selected.clear();
   updateSelectedList();
-  document.getElementById('runBtn').disabled = true;
+  document.getElementById('runBtn').disabled=true;
 }
 
-function updateSelectedList() {
-  const el = document.getElementById('selectedList');
-  if (selected.size === 0) {
-    el.textContent = 'No medications selected';
-    el.className = 'selected-list empty';
+function updateSelectedList(){
+  const el=document.getElementById('selectedList');
+  if(selected.size===0){
+    el.textContent='No medications selected';
+    el.className='selected-list empty';
   } else {
-    const drugs = DRUGS.filter(d => selected.has(d.code));
-    el.innerHTML = drugs.map(d => `<span style="color:var(--navy);font-weight:500">${d.code}</span> ${d.name}`).join('<br>');
-    el.className = 'selected-list';
+    const drugs=DRUGS.filter(d=>selected.has(d.code));
+    el.innerHTML=drugs.map(d=>`<span style="color:var(--navy);font-weight:500">${d.code}</span> ${d.name}`).join('<br>');
+    el.className='selected-list';
   }
 }
 
-// ── ANALYSIS ──────────────────────────────────────────────────────────────────
-function runAnalysis() {
-  const name  = document.getElementById('patientName').value.trim() || 'Patient';
-  const age   = document.getElementById('patientAge').value || '—';
+// ── ANALYSIS ─────────────────────────────────────────────────────────────────
+function runAnalysis(){
+  const name  = document.getElementById('patientName').value.trim()||'Patient';
+  const age   = parseInt(document.getElementById('patientAge').value)||null;
   const sex   = document.getElementById('patientSex').value;
-  const dx    = document.getElementById('patientDx').value.trim();
-
+  const notes = document.getElementById('patientNotes').value.trim();
   const codes = Array.from(selected);
-  const combos = [];
+  const cypStatus = document.querySelector('input[name=cyp2d6]:checked')?.value||'unknown';
 
-  // All pairwise combos
-  for (let i = 0; i < codes.length; i++) {
-    for (let j = i+1; j < codes.length; j++) {
-      const a = codes[i], b = codes[j];
-      const dq = getDQTc(a, b);
-      const ikr = getIKR(a, b);
-      const tier = riskTier(dq);
-      const faers = isFaers(a, b);
-      const ror = getFaersROR(a, b);
-      combos.push({ a, b, dq, ikr, tier, faers, ror });
+  const dxLabels = [...selectedDx].map(id=>DIAGNOSES.find(d=>d.id===id)?.label||id);
+
+  // Pairwise combos
+  const combos=[];
+  for(let i=0;i<codes.length;i++){
+    for(let j=i+1;j<codes.length;j++){
+      const a=codes[i],b=codes[j];
+      const baseDQ=getDQTc(a,b);
+      const {dq, adjusted}=adjustedDQTc(a,b,baseDQ??0);
+      const ikr=getIKR(a,b);
+      const tier=riskTier(dq);
+      const faers=isFaers(a,b);
+      const ror=getFaersROR(a,b);
+      const hasCyp=(codes.includes('FLU')&&['RIS','ARI','QUE'].includes(a||b));
+      const hasCond=codes.includes('GUA')&&['RIS','QUE','ARI'].some(c=>codes.includes(c));
+      const score=compositeScore(dq,ikr,ror,faers,hasCyp,hasCond);
+      combos.push({a,b,dq,baseDQ,ikr,tier,faers,ror,adjusted,score,scoreLabel:scoreLabel(score)});
     }
   }
+  combos.sort((x,y)=>y.score-x.score);
 
-  combos.sort((x, y) => (y.dq ?? -99) - (x.dq ?? -99));
+  // Overall worst
+  const tierOrder=["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
+  let worstTier="LOW";
+  combos.forEach(c=>{
+    if(tierOrder.indexOf(c.tier)<tierOrder.indexOf(worstTier)) worstTier=c.tier;
+  });
+  const topScore = combos.length>0 ? combos[0].score : 0;
 
-  // Overall tier = worst
-  const tierOrder = ["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
-  let worstTier = "LOW";
-  combos.forEach(c => {
-    if (c.tier && tierOrder.indexOf(c.tier) < tierOrder.indexOf(worstTier)) {
-      worstTier = c.tier;
-    }
+  // Relevant triples
+  const relevantTriples = TRIPLES.filter(t=>{
+    const parts=t.combo.split('+');
+    return parts.every(p=>codes.includes(p));
   });
 
-  // Sex warning
-  const sexWarning = sex === 'F'
-    ? 'Female sex is associated with longer baseline QTc (mean 410 ± 20 ms vs. 400 ± 20 ms in males) due to hormonal IKs modulation. This model does not account for sex differences — risk may be underestimated.'
-    : sex === 'M'
-    ? 'Male sex is associated with slightly shorter baseline QTc. Sex-specific IKs modulation is not modeled.'
-    : null;
-
-  // CYP2D6 flag
-  const hasFluoxetine = codes.includes('FLU');
-  const cyp2d6Substrates = ['RIS','ARI','QUE'].filter(c => codes.includes(c));
-  const cypWarning = (hasFluoxetine && cyp2d6Substrates.length > 0)
-    ? `Fluoxetine is a potent CYP2D6 inhibitor. ${cyp2d6Substrates.join(', ')} are CYP2D6 substrates — true plasma concentrations may be 2–4× higher than assumed, increasing actual cardiac risk.`
-    : null;
-
-  // Guanfacine conduction warning
-  const hasGua = codes.includes('GUA');
-  const antipsychoticsPresent = ['RIS','QUE','ARI'].filter(c => codes.includes(c));
-  const guaWarning = (hasGua && antipsychoticsPresent.length > 0)
-    ? `Guanfacine + antipsychotic combinations show elevated FAERS cardiac signal (ROR 10–13) despite low model ΔQTc. This likely reflects PR interval prolongation and AV conduction slowing — a mechanism not captured by QTc-based modeling.`
-    : null;
-
-  // Clinical recommendation
-  let recText = '';
-  if (worstTier === 'HIGH') {
-    recText = 'HIGH cardiac risk. Consider alternative combinations. If proceeding, baseline ECG required; repeat at each dose change. Cardiology consultation recommended.';
-  } else if (worstTier === 'MODERATE') {
-    recText = 'MODERATE cardiac risk. Baseline ECG recommended. Monitor heart rate and QTc at initiation and dose changes. Consider lower starting doses.';
-  } else if (worstTier === 'LOW-MOD') {
-    recText = 'LOW-MODERATE cardiac risk. Baseline ECG reasonable. Clinical monitoring for palpitations, presyncope, or HR elevation at follow-up.';
-  } else {
-    recText = 'LOW cardiac risk based on available modeling data. Standard clinical monitoring applies.';
+  // Age-specific warnings (mechanistic, not FAERS)
+  const ageWarnings=[];
+  if(age!==null){
+    combos.forEach(c=>{
+      const key=canonicalKey(c.a,c.b);
+      const w=AGE_WARNINGS[key];
+      if(!w) return;
+      if(age<=12 && w.childROR>w.adolROR){
+        ageWarnings.push({
+          combo:`${c.a}+${c.b}`,
+          msg:`Children aged 6–12 have higher baseline heart rates (~90 bpm vs ~75 bpm in adolescents) and receive higher weight-adjusted doses. These pharmacological factors amplify sympathomimetic ΔQTc effects — the cardiac burden for this combination is likely greater at age ${age} than adult or adolescent reference data suggests.`
+        });
+      } else if(age>=13 && w.adolROR>w.childROR){
+        ageWarnings.push({
+          combo:`${c.a}+${c.b}`,
+          msg:`This CYP2D6-mediated combination shows higher pharmacovigilance signal in adolescents (age 13–17) than younger children, consistent with more mature hepatic CYP2D6 activity producing larger fluoxetine-driven Cmax increases at age ${age}.`
+        });
+      }
+    });
   }
 
+  // Flags
+  const hasFluoxetine=codes.includes('FLU');
+  const cyp2d6Substrates=['RIS','ARI','QUE'].filter(c=>codes.includes(c));
+  const cypWarning=(hasFluoxetine&&cyp2d6Substrates.length>0)
+    ?`Fluoxetine inhibits CYP2D6. ${cyp2d6Substrates.join(', ')} plasma concentrations may be 1.5–1.7× higher than modeled. This is partially accounted for in the composite score CYP2D6 flag.`
+    :null;
+  const guaWarning=(codes.includes('GUA')&&['RIS','QUE','ARI'].some(c=>codes.includes(c)))
+    ?`Guanfacine + antipsychotic combinations show PR interval prolongation and AV conduction slowing — a mechanism not captured by QTc modeling. FAERS ROR for these combinations is 10–13 in pediatric patients.`
+    :null;
+  const poorMetabolizerWarning=(cypStatus==='poor')
+    ?`CYP2D6 poor metabolizer status selected. Cmax scaled 2.0× for ARI/NOR, 1.75× for RIS, 1.5× for IMI where present. Adjusted ΔQTc values shown where applicable.`
+    :null;
+  const sexWarning=(sex==='F')
+    ?`Female sex is associated with longer baseline QTc (mean 410 ms vs 400 ms in males) due to lower IKs from estrogen effects. This model does not account for sex differences — risk may be underestimated in female patients.`
+    :null;
+
+  // Clinical recommendation
+  let recText='';
+  if(worstTier==='HIGH') recText='HIGH cardiac risk. Consider alternative combinations. If proceeding, baseline ECG required before starting and after each dose change. Cardiology consultation recommended.';
+  else if(worstTier==='MODERATE') recText='MODERATE cardiac risk. Baseline ECG recommended before starting. Repeat ECG at 4–6 weeks or after dose changes. Monitor heart rate and blood pressure at follow-up.';
+  else if(worstTier==='LOW-MOD') recText='LOW-MODERATE cardiac risk. Baseline ECG reasonable. Clinical monitoring for palpitations, presyncope, or heart rate elevation at follow-up.';
+  else recText='LOW cardiac risk based on available modeling data. Standard clinical monitoring applies.';
+
   // Render
-  const main = document.getElementById('main');
+  const main=document.getElementById('main');
   document.getElementById('emptyState')?.remove();
 
-  const metaParts = [`Age ${age}`];
-  if (sex) metaParts.push({ M:'Male', F:'Female' }[sex] || sex);
-  if (dx)  metaParts.push(dx);
+  const metaParts=[age?`Age ${age}`:''];
+  if(sex) metaParts.push({M:'Male',F:'Female'}[sex]||sex);
+  if(dxLabels.length) metaParts.push(dxLabels.join(', '));
+  const drugNames=DRUGS.filter(d=>codes.includes(d.code)).map(d=>d.name).join(', ');
 
-  const drugNames = DRUGS.filter(d => codes.includes(d.code)).map(d => d.name).join(', ');
-
-  const card = document.createElement('div');
-  card.className = 'result-card';
-  card.innerHTML = `
+  const card=document.createElement('div');
+  card.className='result-card';
+  card.innerHTML=`
     <div class="result-header">
       <div>
         <div class="patient-name">${escHtml(name)}</div>
-        <div class="patient-meta">${metaParts.join(' · ')} &nbsp;|&nbsp; ${escHtml(drugNames)}</div>
+        <div class="patient-meta">${metaParts.filter(Boolean).join(' · ')} | ${escHtml(drugNames)}</div>
+        ${cypStatus==='poor'?'<div style="margin-top:4px"><span class="adjusted-badge">CYP2D6 poor metabolizer — adjusted</span></div>':''}
       </div>
       <div class="risk-badge-large risk-${worstTier}">${worstTier.replace('-',' ')}</div>
     </div>
     <div class="result-body">
+      ${renderScoreStrip(topScore, combos)}
       ${renderCombos(combos)}
-      <div class="clinical-note" style="margin-top:1rem">
+      ${relevantTriples.length ? renderTriples(relevantTriples) : ''}
+      ${ageWarnings.map(w=>`
+        <div class="age-warning" style="margin-top:0.5rem">
+          <strong>Age note — ${w.combo}:</strong> ${w.msg}
+        </div>`).join('')}
+      <div class="clinical-note" style="margin-top:0.75rem">
         <strong>Clinical note:</strong> ${recText}
       </div>
-      ${cypWarning ? `<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--amber)"><strong>CYP2D6 interaction flag:</strong> ${cypWarning}</div>` : ''}
-      ${guaWarning ? `<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--amber)"><strong>Conduction note:</strong> ${guaWarning}</div>` : ''}
-      ${sexWarning ? `<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--teal)"><strong>Sex note:</strong> ${sexWarning}</div>` : ''}
-      <div class="disclaimer" style="margin-top:1rem">
-        ΔQTc values from O'Hara-Rudy 2011 mechanistic simulation at 500-beat steady state, 60 bpm. All Cmax values adult-derived. FAERS pharmacovigilance signals from 552,832 pediatric cases (2015–2024).
-        <strong style="color:var(--red)"> Research use only — not validated for clinical decision-making.</strong>
+      ${cypWarning?`<div class="clinical-note note-amber" style="margin-top:0.5rem"><strong>CYP2D6 interaction:</strong> ${cypWarning}</div>`:''}
+      ${guaWarning?`<div class="clinical-note note-amber" style="margin-top:0.5rem"><strong>Conduction note:</strong> ${guaWarning}</div>`:''}
+      ${poorMetabolizerWarning?`<div class="clinical-note note-purple" style="margin-top:0.5rem"><strong>Poor metabolizer adjustment:</strong> ${poorMetabolizerWarning}</div>`:''}
+      ${sexWarning?`<div class="clinical-note note-teal" style="margin-top:0.5rem"><strong>Sex note:</strong> ${sexWarning}</div>`:''}
+      ${notes?`<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--ink3)"><strong>Notes:</strong> ${escHtml(notes)}</div>`:''}
+      <div class="disclaimer" style="margin-top:0.75rem">
+        Composite score integrates ΔQTc (0.50), IKr block (0.20), FAERS ROR (0.30), plus CYP2D6 and conduction flags. ORd 2011 simulation at 500-beat steady state. Adult Cmax values unless CYP2D6 poor metabolizer selected.
+        <strong style="color:var(--red)"> Research use only.</strong>
       </div>
-    </div>
-  `;
+    </div>`;
 
-  main.insertBefore(card, main.firstChild);
-
-  // Add to history
-  history.unshift({ name, drugs: codes, tier: worstTier, timestamp: new Date() });
+  main.insertBefore(card,main.firstChild);
+  history.unshift({name,drugs:codes,tier:worstTier,score:topScore,timestamp:new Date()});
   renderHistory();
 }
 
-function renderCombos(combos) {
-  const maxDQ = 22;
+function renderScoreStrip(topScore, combos){
+  const topCombo = combos[0];
+  const overallTier = scoreLabel(topScore);
+  const barColor = tierBarColor(overallTier);
+  const avgDQ = combos.length ? (combos.reduce((s,c)=>s+(c.dq||0),0)/combos.length).toFixed(1) : '—';
   return `
-    <div class="combo-list">
-      ${combos.map(c => {
-        const sign  = c.dq >= 0 ? '+' : '';
-        const bw    = Math.min(100, Math.abs(c.dq ?? 0) / maxDQ * 100);
-        const mech  = mechLabel(c.ikr, c.dq);
-        const rorStr = c.ror ? ` · FAERS ROR ${c.ror.toFixed(2)}` : '';
-        const fTag  = c.faers
-          ? `<span class="faers-badge signal">⚠ FAERS signal${rorStr}</span>`
-          : `<span class="faers-badge">no FAERS signal</span>`;
-        return `
-          <div class="combo-row ${c.tier}">
-            <div>
-              <div class="combo-name">${c.a} + ${c.b}</div>
-              <div class="dqtc-bar-wrap"><div class="dqtc-bar" style="width:${bw}%;background:${tierBarColor(c.tier)}"></div></div>
-              <div style="margin-top:4px">${fTag}</div>
-            </div>
-            <div class="combo-dqtc dqtc-${c.tier}">${sign}${c.dq?.toFixed(1) ?? 'n/a'} ms</div>
-            <div class="combo-ikr">IKr ${c.ikr.toFixed(2)}%</div>
-            <div class="combo-mech">${mech}</div>
-          </div>`;
-      }).join('')}
+    <div class="score-strip">
+      <div class="score-cell">
+        <div class="score-num score-${overallTier}" style="color:${tierBarColor(overallTier)}">${topScore}</div>
+        <div class="score-lbl">Composite Score</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${topScore}%;background:${barColor}"></div></div>
+      </div>
+      <div class="score-cell">
+        <div class="score-num" style="font-size:1.3rem;color:var(--ink2)">${topCombo?((topCombo.dq>=0?'+':'')+topCombo.dq.toFixed(1)+' ms'):'—'}</div>
+        <div class="score-lbl">Highest ΔQTc</div>
+        ${topCombo?`<div style="font-size:10px;color:var(--ink3);margin-top:3px">${topCombo.a}+${topCombo.b}</div>`:''}
+      </div>
+      <div class="score-cell">
+        <div class="score-num" style="font-size:1.3rem;color:var(--ink2)">${combos.length}</div>
+        <div class="score-lbl">Pair${combos.length!==1?'s':''} Assessed</div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:3px">avg ΔQTc ${avgDQ} ms</div>
+      </div>
     </div>`;
 }
 
-function renderHistory() {
-  const existing = document.getElementById('historySection');
-  if (existing) existing.remove();
-  if (history.length === 0) return;
+function renderCombos(combos){
+  const maxScore=100;
+  return `<div class="combo-list">${combos.map(c=>{
+    const sign=c.dq>=0?'+':'';
+    const bw=Math.min(100,Math.abs(c.dq||0)/22*100);
+    const mech=mechLabel(c.ikr,c.dq);
+    const rorStr=c.ror?` · FAERS ROR ${c.ror.toFixed(2)}`:'';
+    const fTag=c.faers
+      ?`<span class="faers-badge signal">⚠ FAERS signal${rorStr}</span>`
+      :`<span class="faers-badge">no FAERS signal</span>`;
+    const adjTag=c.adjusted?`<span class="adjusted-badge" style="margin-left:4px">CYP2D6 adj</span>`:'';
+    return `
+      <div class="combo-row ${c.tier}">
+        <div class="combo-left">
+          <div class="combo-name">${c.a} + ${c.b} &nbsp;<span style="font-size:10px;color:var(--ink3);font-family:IBM Plex Sans,sans-serif;font-weight:400">${mech}</span></div>
+          <div style="margin-top:3px">${fTag}${adjTag}</div>
+          <div class="dqtc-bar-wrap" style="margin-top:5px"><div class="dqtc-bar" style="width:${bw}%;background:${tierBarColor(c.tier)}"></div></div>
+        </div>
+        <div class="combo-right">
+          <div class="combo-score score-${c.scoreLabel}" style="color:${tierBarColor(c.scoreLabel)}">${c.score}</div>
+          <div class="combo-dqtc">${sign}${c.dq?.toFixed(1)||'n/a'} ms</div>
+          <div style="font-size:10px;color:var(--ink3)">IKr ${c.ikr.toFixed(2)}%</div>
+        </div>
+      </div>`;
+  }).join('')}</div>`;
+}
 
-  const main = document.getElementById('main');
-  const section = document.createElement('div');
-  section.id = 'historySection';
-  section.className = 'history-section';
-  section.innerHTML = `
+function renderTriples(triples){
+  return `
+    <div class="triple-section">
+      <h4>Triple combination analysis</h4>
+      ${triples.map(t=>`
+        <div class="triple-row ${t.tier}">
+          <span class="triple-name">${t.combo}</span>
+          <span class="triple-dqtc score-${t.tier}" style="color:${tierBarColor(t.tier)}">${t.dq>=0?'+':''}${t.dq.toFixed(1)} ms</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderHistory(){
+  const existing=document.getElementById('historySection');
+  if(existing) existing.remove();
+  if(history.length===0) return;
+  const main=document.getElementById('main');
+  const section=document.createElement('div');
+  section.id='historySection';
+  section.className='history-section';
+  section.style.marginTop='0.5rem';
+  section.innerHTML=`
     <h2>Previous assessments</h2>
     <div class="history-list">
-      ${history.slice(0,8).map((h,i) => `
+      ${history.slice(0,6).map(h=>`
         <div class="history-item">
           <span class="history-name">${escHtml(h.name)}</span>
           <span class="history-drugs">${h.drugs.join(' + ')}</span>
-          <span class="history-badge" style="color:${tierColor(h.tier)}">${h.tier}</span>
+          <span class="history-badge" style="color:${tierColor(h.tier)}">${h.tier} · ${h.score}</span>
         </div>`).join('')}
     </div>`;
   main.appendChild(section);
 }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────────────────
+buildDxGrid();
 buildDrugGrid();
 </script>
 </body>
