@@ -259,14 +259,7 @@ header{grid-column:1/-1;background:var(--navy);padding:1.25rem 2rem;display:flex
         <option value="F">Female</option>
       </select>
     </div>
-    <div class="field">
-      <label>Baseline QTc (ms) <span style="color:var(--ink3);font-weight:400">— from recent ECG</span></label>
-      <div class="qtc-baseline-row">
-        <input type="number" id="baselineQTc" min="300" max="600" placeholder="e.g. 420" step="1">
-        <span style="font-size:11px;color:var(--ink3);white-space:nowrap">ms</span>
-      </div>
-      <div class="qtc-normal" id="qtcStatus"></div>
-    </div>
+
     <div class="field">
       <label>Diagnoses <span style="color:var(--ink3);font-weight:400">(select all that apply)</span></label>
       <div class="dx-grid" id="dxGrid"></div>
@@ -337,7 +330,15 @@ header{grid-column:1/-1;background:var(--navy);padding:1.25rem 2rem;display:flex
         </div>
       </div>
 
-      <div style="margin-top:1rem;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Additional notes</div>
+      <div style="margin-top:1rem;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Baseline QTc</div>
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:8px;line-height:1.4;">If a recent ECG is available, enter the baseline QTc. The tool will predict the absolute QTc on the current regimen and flag pre-existing prolongation.</div>
+      <div class="qtc-baseline-row" style="display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin-bottom:4px;">
+        <input type="number" id="baselineQTc" min="300" max="600" placeholder="e.g. 420 ms" step="1" style="width:100%;padding:7px 10px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:13px;outline:none;border-radius:2px;">
+        <span style="font-size:11px;color:var(--ink3);white-space:nowrap">ms</span>
+      </div>
+      <div class="qtc-normal" id="qtcStatus" style="font-size:10px;min-height:14px;margin-bottom:1rem;font-family:'IBM Plex Mono',monospace;"></div>
+
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Additional notes</div>
       <input type="text" id="patientNotes" placeholder="e.g. prior ECG, cardiac history" style="width:100%;padding:7px 10px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;border-radius:2px;">
     </div>
   </div>
@@ -355,7 +356,7 @@ header{grid-column:1/-1;background:var(--navy);padding:1.25rem 2rem;display:flex
   <div class="empty-state" id="emptyState">
     <div class="empty-icon">♥</div>
     <div class="empty-title">No patient loaded</div>
-    <div class="empty-sub">Select diagnoses to see drug suggestions, then add medications and click Assess Cardiac Risk.</div>
+    <div class="empty-sub">Select diagnoses to see drug suggestions, add medications, and click Assess Cardiac Risk. Baseline QTc and other advanced inputs are optional.</div>
   </div>
 </main>
 
