@@ -189,6 +189,13 @@ header {
 .history-name { font-weight:500; flex:1; }
 .history-drugs { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink3); }
 .history-badge { font-size:10px; font-weight:600; letter-spacing:0.04em; }
+/* advanced toggle */
+.advanced-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; padding: 6px 0; user-select: none;
+}
+.advanced-toggle:hover span { color: var(--ink2) !important; }
+
 /* dose panel */
 .dose-panel {
   background: var(--bg); border: 1px solid var(--rule); border-radius: 2px;
@@ -229,10 +236,11 @@ header {
 
 <aside class="sidebar">
 
+  <!-- ── CORE PATIENT INFO ── -->
   <div class="sidebar-section">
     <h2>Patient</h2>
     <div class="field">
-      <label>Patient name / ID</label>
+      <label>Name / ID</label>
       <input type="text" id="patientName" placeholder="e.g. Patient A or MRN-001">
     </div>
     <div class="field">
@@ -252,56 +260,73 @@ header {
       <div class="dx-grid" id="dxGrid"></div>
       <div class="dx-suggest" id="dxSuggest"></div>
     </div>
-    <div class="field">
-      <label>Weight (kg)</label>
-      <input type="number" id="patientWeight" min="10" max="120" placeholder="e.g. 32" step="0.5">
-    </div>
-    <div class="field">
-      <label>Additional notes</label>
-      <input type="text" id="patientNotes" placeholder="e.g. prior ECG, cardiac history">
-    </div>
   </div>
 
+  <!-- ── MEDICATIONS ── -->
   <div class="sidebar-section">
-    <h2>Pharmacogenomics</h2>
-    <div class="cyp-section">
-      <label>CYP2D6 metabolizer status</label>
-      <div class="cyp-radio-group">
-        <label class="cyp-radio">
-          <input type="radio" name="cyp2d6" value="unknown" checked> Unknown / not tested
-        </label>
-        <label class="cyp-radio">
-          <input type="radio" name="cyp2d6" value="extensive"> Extensive metabolizer (normal)
-          <span class="cyp-desc">Standard Cmax assumed</span>
-        </label>
-        <label class="cyp-radio">
-          <input type="radio" name="cyp2d6" value="poor"> Poor metabolizer
-          <span class="cyp-desc">ARI, RIS, NOR, IMI Cmax scaled 2x</span>
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <h2>Medications &amp; Doses</h2>
-    <div style="font-size:10px;color:var(--ink3);margin-bottom:6px;font-style:italic;">Click a selected drug to enter patient-specific dose</div>
+    <h2>Medications</h2>
     <div class="selected-list empty" id="selectedList">No medications selected</div>
     <div class="drug-grid" id="drugGrid"></div>
     <div id="dosePanel"></div>
     <button class="btn-clear" onclick="clearDrugs()">Clear all</button>
   </div>
 
+  <!-- ── RUN ── -->
   <div class="sidebar-section">
     <button class="btn-run" id="runBtn" onclick="runAnalysis()" disabled>
       Assess Cardiac Risk
     </button>
   </div>
 
+  <!-- ── ADVANCED (collapsed by default) ── -->
   <div class="sidebar-section">
-    <h2>About</h2>
+    <div class="advanced-toggle" onclick="toggleAdvanced()" id="advancedToggle">
+      <span style="font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);">Advanced options</span>
+      <span id="advancedChevron" style="font-size:11px;color:var(--ink3);transition:transform 0.2s;">▸</span>
+    </div>
+    <div id="advancedPanel" style="display:none;margin-top:1rem;display:none;">
+
+      <div style="font-size:11px;color:var(--ink3);line-height:1.5;margin-bottom:1rem;padding:8px 10px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;">
+        These inputs improve accuracy for specific patients but require clinical or genetic data. Leave blank to use population-average adult reference values.
+      </div>
+
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Dose scaling</div>
+      <div class="field">
+        <label>Weight (kg)</label>
+        <input type="number" id="patientWeight" min="10" max="120" placeholder="e.g. 32" step="0.5">
+      </div>
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:1rem;line-height:1.4;">Enter weight, then click ⚖ on a selected drug to enter that drug's dose. The simulator scales Cmax proportionally to actual vs adult-reference exposure.</div>
+
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">CYP2D6 genotype</div>
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:8px;line-height:1.4;">CYP2D6 is a liver enzyme that clears several drugs in this panel (aripiprazole, risperidone, nortriptyline, imipramine). About 7–10% of people are poor metabolizers — their drug levels run 1.75–2× higher than expected. Only relevant if the patient has been genotyped.</div>
+      <div class="cyp-section">
+        <div class="cyp-radio-group">
+          <label class="cyp-radio">
+            <input type="radio" name="cyp2d6" value="unknown" checked> Unknown (default)
+          </label>
+          <label class="cyp-radio">
+            <input type="radio" name="cyp2d6" value="extensive"> Extensive metabolizer
+            <span class="cyp-desc">Normal clearance — standard Cmax</span>
+          </label>
+          <label class="cyp-radio">
+            <input type="radio" name="cyp2d6" value="poor"> Poor metabolizer
+            <span class="cyp-desc">ARI ×2, RIS ×1.75, NOR ×2, IMI ×1.5</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Additional notes</div>
+      <input type="text" id="patientNotes" placeholder="e.g. prior ECG, cardiac history"
+        style="width:100%;padding:7px 10px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;border-radius:2px;">
+
+    </div>
+  </div>
+
+  <!-- ── ABOUT ── -->
+  <div class="sidebar-section">
     <p style="font-size:11px;color:var(--ink3);line-height:1.5;">
-      Composite score (0–100) integrates ΔQTc (weight 0.50), IKr block (0.20), and FAERS pharmacovigilance signal (0.30), plus CYP2D6 and conduction flags. Mechanistic simulation uses O'Hara-Rudy 2011 at 500-beat steady state.<br><br>
-      <strong style="color:var(--red);">Research use only.</strong> Not validated for clinical decision-making.
+      Composite score (0–100) integrates ΔQTc, IKr block, and FAERS pharmacovigilance signal. O'Hara-Rudy 2011 at 500-beat steady state.<br><br>
+      <strong style="color:var(--red);">Research use only.</strong> Not for clinical decision-making.
     </p>
   </div>
 
@@ -639,14 +664,21 @@ function saveDose(code){
   const weightEl = document.getElementById(`dp-weight-${code}`);
   if(!doseEl) return;
   const dose = parseFloat(doseEl.value);
-  const weight = parseFloat(weightEl.value);
-  if(dose && weight){
+  // Use entered weight, fall back to patient weight field, or block
+  const patientW = parseFloat(document.getElementById('patientWeight')?.value);
+  const weight = parseFloat(weightEl.value) || patientW || null;
+  if(dose && weight && !isNaN(dose) && !isNaN(weight)){
     doseState[code] = {dose_mg_per_kg: dose, weight_kg: weight};
-    const btn = document.getElementById(`drug-${code}`);
-    if(btn){
-      const scale = getCmaxScale(code, dose, weight);
-      btn.innerHTML = `<div class="suggest-dot"></div><span class="drug-name">${code}</span><span class="drug-class" style="color:rgba(255,255,255,0.8)">${scale.toFixed(2)}× Cmax</span>`;
-    }
+    const scale = getCmaxScale(code, dose, weight);
+    const clsEl = document.querySelector(`#drug-${code} .drug-class`);
+    if(clsEl){ clsEl.textContent = scale.toFixed(2)+'× Cmax'; clsEl.style.color='rgba(255,255,255,0.8)'; }
+    const doseBtn = document.getElementById(`dosebtn-${code}`);
+    if(doseBtn) doseBtn.style.display='block';
+  } else if(dose && !weight){
+    // Show inline error
+    const resEl = document.getElementById(`dp-result-${code}`);
+    if(resEl) resEl.innerHTML = '<span style="color:var(--red)">Enter patient weight to apply dose scaling</span>';
+    return; // Don't close panel
   }
   activeDosePanel = null;
   document.getElementById('dosePanel').innerHTML = '';
@@ -654,9 +686,10 @@ function saveDose(code){
 
 function clearDose(code){
   delete doseState[code];
-  const btn = document.getElementById(`drug-${code}`);
   const drug = DRUGS.find(d=>d.code===code);
-  if(btn && drug) btn.innerHTML = `<div class="suggest-dot"></div><span class="drug-name">${code}</span><span class="drug-class">${drug.cls}</span>`;
+  const clsEl = document.querySelector(`#drug-${code} .drug-class`);
+  if(clsEl && drug) clsEl.textContent = drug.cls;
+  if(clsEl) clsEl.style.color = '';
   activeDosePanel = null;
   document.getElementById('dosePanel').innerHTML = '';
 }
@@ -692,13 +725,15 @@ function getScaledDQTc(a, b, baseDQ){
     // Use max scale as conservative estimate
     dqAdj = dqAdj * Math.max(scaleA, scaleB);
   }
-  return {dq: Math.round(dqAdj*10)/10, scaled: true, scaleA, scaleB};
+  const finalDQ = isNaN(dqAdj) ? baseDQ : Math.round(dqAdj*10)/10;
+  return {dq: finalDQ, scaled: true, scaleA, scaleB};
 }
 
 function getDoseScale(code){
   const state = doseState[code];
   if(!state || !state.dose_mg_per_kg || !state.weight_kg) return 1.0;
-  return getCmaxScale(code, state.dose_mg_per_kg, state.weight_kg);
+  const scale = getCmaxScale(code, state.dose_mg_per_kg, state.weight_kg);
+  return isNaN(scale) || scale <= 0 ? 1.0 : scale;
 }
 
 function toggleDrug(code){
@@ -722,8 +757,8 @@ function toggleDrug(code){
     // Restore dose scale label if dose was previously set
     if(doseState[code]){
       const scale = getCmaxScale(code, doseState[code].dose_mg_per_kg, doseState[code].weight_kg);
-      const drug = DRUGS.find(d=>d.code===code);
-      if(btn && drug) btn.querySelector('.drug-class').textContent = scale.toFixed(2)+'× Cmax';
+      const clsEl = btn?.querySelector('.drug-class');
+      if(clsEl){ clsEl.textContent = scale.toFixed(2)+'× Cmax'; clsEl.style.color='rgba(255,255,255,0.8)'; }
     }
   }
   updateSelectedList();
@@ -993,6 +1028,15 @@ function renderHistory(){
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
+function toggleAdvanced(){
+  const panel = document.getElementById('advancedPanel');
+  const chevron = document.getElementById('advancedChevron');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
+  chevron.textContent = isOpen ? '▸' : '▾';
+}
+
 buildDxGrid();
 buildDrugGrid();
 </script>
