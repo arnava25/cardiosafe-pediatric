@@ -292,10 +292,19 @@ header {
 
       <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Dose scaling</div>
       <div class="field">
-        <label>Weight (kg)</label>
-        <input type="number" id="patientWeight" min="10" max="120" placeholder="e.g. 32" step="0.5">
+        <label>Weight</label>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;">
+          <input type="number" id="patientWeight" min="20" max="300" placeholder="e.g. 32" step="0.5">
+          <div style="display:flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--bg);height:34px;">
+            <button id="unitKg" onclick="setWeightUnit('kg')"
+              style="padding:0 10px;border:none;cursor:pointer;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;background:var(--navy);color:#fff;transition:all 0.1s;">kg</button>
+            <button id="unitLbs" onclick="setWeightUnit('lbs')"
+              style="padding:0 10px;border:none;cursor:pointer;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;background:transparent;color:var(--ink3);transition:all 0.1s;">lbs</button>
+          </div>
+        </div>
+        <div id="weightConvert" style="font-size:10px;color:var(--teal);margin-top:3px;min-height:14px;font-family:'IBM Plex Mono',monospace;"></div>
       </div>
-      <div style="font-size:10px;color:var(--ink3);margin-bottom:1rem;line-height:1.4;">Enter weight, then click ⚖ on a selected drug to enter that drug's dose. The simulator scales Cmax proportionally to actual vs adult-reference exposure.</div>
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:1rem;line-height:1.4;">Enter weight, then click ⚖ on a selected drug to enter that drug's dose. Dosing is always in mg/kg/day (standard pediatric convention).</div>
 
       <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">CYP2D6 genotype</div>
       <div style="font-size:10px;color:var(--ink3);margin-bottom:8px;line-height:1.4;">CYP2D6 is a liver enzyme that clears several drugs in this panel (aripiprazole, risperidone, nortriptyline, imipramine). About 7–10% of people are poor metabolizers — their drug levels run 1.75–2× higher than expected. Only relevant if the patient has been genotyped.</div>
@@ -621,7 +630,12 @@ function toggleDosePanel(code){
   activeDosePanel = code;
   const ref = ADULT_REF_PK[code];
   const existing = doseState[code] || {};
-  const patientWeight = parseFloat(document.getElementById('patientWeight')?.value) || '';
+  const patientWeightKg = getWeightKg();  // always read live from field
+  const patientWeight = patientWeightKg || '';
+  // Don't use cached weight from doseState — user may have updated weight field
+  if(existing.weight_kg && patientWeightKg && existing.weight_kg !== patientWeightKg){
+    existing.weight_kg = patientWeightKg;  // sync cache to current field
+  }
   panel.innerHTML = `
     <div class="dose-panel open" id="dp-${code}">
       <h4>${ref.label} — Patient dose</h4>
@@ -634,7 +648,7 @@ function toggleDosePanel(code){
         <div class="dose-input-wrap">
           <label>Weight (kg)</label>
           <input type="number" id="dp-weight-${code}" placeholder="${patientWeight||'e.g. 32'}" step="0.5" min="10" max="120"
-            value="${existing.weight_kg||patientWeight||''}" oninput="updateDosePreview('${code}')">
+            value="${patientWeightKg||existing.weight_kg||''}" oninput="updateDosePreview('${code}')">
         </div>
       </div>
       <div class="dose-note">${ref.note}</div>
@@ -665,7 +679,7 @@ function saveDose(code){
   if(!doseEl) return;
   const dose = parseFloat(doseEl.value);
   // Use entered weight, fall back to patient weight field, or block
-  const patientW = parseFloat(document.getElementById('patientWeight')?.value);
+  const patientW = getWeightKg();
   const weight = parseFloat(weightEl.value) || patientW || null;
   if(dose && weight && !isNaN(dose) && !isNaN(weight)){
     doseState[code] = {dose_mg_per_kg: dose, weight_kg: weight};
@@ -804,7 +818,7 @@ function runAnalysis(){
 
   // Pairwise combos
   const combos=[];
-  const patientWeight = parseFloat(document.getElementById('patientWeight')?.value) || null;
+  const patientWeight = getWeightKg();
   for(let i=0;i<codes.length;i++){
     for(let j=i+1;j<codes.length;j++){
       const a=codes[i],b=codes[j];
@@ -931,6 +945,40 @@ function runAnalysis(){
   main.insertBefore(card,main.firstChild);
   history.unshift({name,drugs:codes,tier:worstTier,score:topScore,timestamp:new Date()});
   renderHistory();
+  resetForm();
+}
+
+function resetForm(){
+  // Clear patient fields
+  document.getElementById('patientName').value = '';
+  document.getElementById('patientAge').value = '';
+  document.getElementById('patientSex').value = '';
+  document.getElementById('patientWeight').value = '';
+  document.getElementById('patientNotes').value = '';
+  document.getElementById('weightConvert').textContent = '';
+
+  // Clear diagnoses
+  selectedDx.clear();
+  document.querySelectorAll('.dx-tag').forEach(t=>t.classList.remove('selected'));
+  document.getElementById('dxSuggest').textContent = '';
+  DRUGS.forEach(d=>document.getElementById(`drug-${d.code}`)?.classList.remove('suggested'));
+
+  // Clear medications and dose state
+  clearDrugs();
+  Object.keys(doseState).forEach(k=>delete doseState[k]);
+
+  // Reset CYP2D6 to unknown
+  const unknownRadio = document.querySelector('input[name=cyp2d6][value=unknown]');
+  if(unknownRadio) unknownRadio.checked = true;
+
+  // Reset weight unit to kg
+  setWeightUnit('kg');
+
+  // Close advanced panel
+  const advPanel = document.getElementById('advancedPanel');
+  const chevron = document.getElementById('advancedChevron');
+  if(advPanel) advPanel.style.display = 'none';
+  if(chevron){ chevron.style.transform=''; chevron.textContent='▸'; }
 }
 
 function renderScoreStrip(topScore, combos){
@@ -1028,6 +1076,58 @@ function renderHistory(){
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
+// ── WEIGHT UNIT HELPERS ──────────────────────────────────────────────────────
+let weightUnit = 'kg';
+
+function setWeightUnit(unit){
+  weightUnit = unit;
+  const kgBtn  = document.getElementById('unitKg');
+  const lbsBtn = document.getElementById('unitLbs');
+  if(kgBtn)  { kgBtn.style.background  = unit==='kg'  ? 'var(--navy)' : 'transparent'; kgBtn.style.color  = unit==='kg'  ? '#fff' : 'var(--ink3)'; }
+  if(lbsBtn) { lbsBtn.style.background = unit==='lbs' ? 'var(--navy)' : 'transparent'; lbsBtn.style.color = unit==='lbs' ? '#fff' : 'var(--ink3)'; }
+  const wEl = document.getElementById('patientWeight');
+  if(unit === 'lbs'){
+    if(wEl){ wEl.placeholder='e.g. 70'; wEl.max=265; }
+  } else {
+    if(wEl){ wEl.placeholder='e.g. 32'; wEl.max=120; }
+  }
+  updateWeightConvert();
+}
+
+function updateWeightConvert(){
+  const raw = parseFloat(document.getElementById('patientWeight')?.value);
+  const convertEl = document.getElementById('weightConvert');
+  if(!convertEl) return;
+  if(isNaN(raw)){ convertEl.textContent=''; return; }
+  if(weightUnit === 'lbs'){
+    convertEl.textContent = `= ${Math.round(raw * 0.4536 * 10)/10} kg`;
+  } else {
+    convertEl.textContent = `= ${Math.round(raw / 0.4536 * 10)/10} lbs`;
+  }
+}
+
+function updateWeightUnit(){ updateWeightConvert(); }
+
+function getWeightKg(){
+  const raw = parseFloat(document.getElementById('patientWeight')?.value);
+  if(isNaN(raw)) return null;
+  return weightUnit === 'lbs' ? Math.round(raw * 0.4536 * 10) / 10 : raw;
+}
+
+// Also update convert display when weight changes
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('patientWeight')?.addEventListener('input', ()=>{
+    updateWeightConvert();
+    // Sync open dose panel weight field if present
+    if(activeDosePanel){
+      const dpWeight = document.getElementById(`dp-weight-${activeDosePanel}`);
+      const kg = getWeightKg();
+      if(dpWeight && kg && !dpWeight.value) dpWeight.value = kg;
+      else if(dpWeight && kg) { dpWeight.value = kg; updateDosePreview(activeDosePanel); }
+    }
+  });
+});
+
 function toggleAdvanced(){
   const panel = document.getElementById('advancedPanel');
   const chevron = document.getElementById('advancedChevron');
