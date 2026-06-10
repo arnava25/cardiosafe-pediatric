@@ -869,7 +869,9 @@ function buildCombos(codes){
         const adultB=ADULT_REF_PK[b]?.free_cmax_nm||1;
         const pedsA=PEDIATRIC_CMAX[a]||adultA;
         const pedsB=PEDIATRIC_CMAX[b]||adultB;
-        const ratioA=pedsA/adultA, ratioB=pedsB/adultB;
+        // Ratio capped at 10x to prevent extreme values from sparse peds data
+        const ratioA=Math.min(pedsA/adultA, 10.0);
+        const ratioB=Math.min(pedsB/adultB, 10.0);
         if(stimulants.has(a)||stimulants.has(b)){
           const stimRatio=stimulants.has(a)?ratioA:ratioB;
           const nonStimRatio=stimulants.has(a)?ratioB:ratioA;
@@ -878,10 +880,16 @@ function buildCombos(codes){
         } else {
           pkDQ=baseDQ*Math.max(ratioA,ratioB);
         }
-        pkDQ=Math.round(pkDQ*10)/10;
+        // Cap delta-QTc at physiologically plausible maximum (50ms)
+        pkDQ=Math.min(Math.round(pkDQ*10)/10, 50.0);
       }
       const{dq:cypDQ,adjusted:cypAdj}=adjustedDQTc(a,b,pkDQ);
-      const{dq:scaledDQ,scaled:doseScaled,scaleA,scaleB}=getScaledDQTc(a,b,cypDQ);
+      // Dose scaling overrides pediatric Cmax scaling when both are present
+      // (user-entered dose data is more specific than population-level peds reference)
+      const hasDoseA=doseState[a]&&doseState[a].dose_mg_per_kg&&doseState[a].weight_kg;
+      const hasDoseB=doseState[b]&&doseState[b].dose_mg_per_kg&&doseState[b].weight_kg;
+      const baseForDose=(hasDoseA||hasDoseB)?baseDQ:cypDQ;
+      const{dq:scaledDQ,scaled:doseScaled,scaleA,scaleB}=getScaledDQTc(a,b,hasDoseA||hasDoseB?adjustedDQTc(a,b,baseDQ).dq:cypDQ);
       const dq=scaledDQ;
       const ikr=getIKR(a,b);
       const tier=riskTier(dq);
@@ -948,9 +956,16 @@ function runComparison(name,age,sex,baselineQTc,dxLabels,cypStatus){
       <button class="btn-print" onclick="window.print()">🖨 Print</button>
     </div>
     <div style="padding:0.75rem 1rem;border:1px solid var(--rule);border-radius:2px;background:var(--bg2);font-size:12px;color:var(--ink2);margin-bottom:1rem;">
-      ${improvement>10?`<span style="color:var(--green);font-weight:500">↓ Proposed regimen reduces composite risk score by ${improvement} points.</span>`
-        :improvement<-10?`<span style="color:var(--red);font-weight:500">↑ Proposed regimen increases composite risk score by ${Math.abs(improvement)} points.</span>`
-        :`<span style="color:var(--ink3)">Comparable risk profiles — score difference: ${Math.abs(improvement)} points.</span>`}
+      ${(()=>{
+        const tierOrder=["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
+        const tierA=tierOrder.indexOf(worstA), tierB=tierOrder.indexOf(worstB);
+        const tierImproved=tierB>tierA, tierWorsened=tierB<tierA;
+        if(tierImproved) return `<span style="color:var(--green);font-weight:500">↓ Proposed regimen reduces risk tier: ${worstA} → ${worstB} (score ${topScoreA} → ${topScoreB}).</span>`;
+        if(tierWorsened) return `<span style="color:var(--red);font-weight:500">↑ Proposed regimen increases risk tier: ${worstA} → ${worstB} (score ${topScoreA} → ${topScoreB}).</span>`;
+        if(improvement>5) return `<span style="color:var(--green);font-weight:500">↓ Same tier — proposed regimen reduces composite score by ${improvement} points (${topScoreA} → ${topScoreB}).</span>`;
+        if(improvement<-5) return `<span style="color:var(--red);font-weight:500">↑ Same tier — proposed regimen increases composite score by ${Math.abs(improvement)} points (${topScoreA} → ${topScoreB}).</span>`;
+        return `<span style="color:var(--ink3)">Comparable risk profiles — same tier (${worstA}), score difference ${Math.abs(improvement)} points.</span>`;
+      })()}
     </div>
     <div class="comparison-grid">
       <div>
