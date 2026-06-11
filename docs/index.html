@@ -235,7 +235,10 @@ header{grid-column:1/-1;background:var(--navy);padding:1.25rem 2rem;display:flex
   <div class="header-right">
     <button class="btn-mode active" id="btnSingle" onclick="setMode('single')">Single patient</button>
     <button class="btn-mode" id="btnCompare" onclick="setMode('compare')">Compare regimens</button>
-    <div class="header-badge">ORd 2011 · v3.0 · Research use only</div>
+    <span style="width:1px;height:20px;background:rgba(255,255,255,0.2)"></span>
+    <button class="btn-mode active" id="btnGenuine" onclick="setMetric('genuine')">Genuine ΔAPD₉₀</button>
+    <button class="btn-mode" id="btnBazett" onclick="setMetric('bazett')">Bazett ΔQTc</button>
+    <div class="header-badge">ORd 2011 · v4 · Research/curiosity</div>
   </div>
 </header>
 
@@ -346,8 +349,8 @@ header{grid-column:1/-1;background:var(--navy);padding:1.25rem 2rem;display:flex
 
   <div class="sidebar-section">
     <p style="font-size:11px;color:var(--ink3);line-height:1.5;">
-      Composite score (0–100) integrates ΔQTc, IKr block, and FAERS pharmacovigilance signal. O'Hara-Rudy 2011 at 500-beat steady state.<br><br>
-      <strong style="color:var(--red);">Research use only.</strong> Not for clinical decision-making.
+      Toggle <strong>Genuine ΔAPD₉₀</strong> vs <strong>Bazett ΔQTc</strong> in the header: stimulant pairs show large Bazett QTc but near-zero genuine change (a rate-correction artifact), while hERG blockers show small but real prolongation. Composite score is a rough personal heuristic (active Δ + IKr + FAERS), not a validated index. O'Hara-Rudy 2011, 500-beat steady state.<br><br>
+      <strong style="color:var(--red);">Research/curiosity only.</strong> Not for clinical decisions.
     </p>
   </div>
 
@@ -379,34 +382,209 @@ const DRUGS = [
 ];
 
 const DQTC={
-  "AMP+ARI":18.1,"AMP+CLO":6.8,"AMP+ESC":9.1,"AMP+FLU":10.0,"AMP+GUA":6.8,
-  "AMP+IMI":10.5,"AMP+MPH":19.1,"AMP+NOR":14.8,"AMP+QUE":11.0,"AMP+RIS":10.0,
-  "AMP+SER":9.6,"ARI+CLO":7.3,"ARI+ESC":9.5,"ARI+FLU":10.0,"ARI+GUA":7.3,
-  "ARI+IMI":11.0,"ARI+MPH":18.1,"ARI+NOR":15.0,"ARI+QUE":11.5,"ARI+RIS":10.0,
-  "ARI+SER":9.5,"CLO+ESC":-1.7,"CLO+FLU":-1.1,"CLO+GUA":-1.5,"CLO+IMI":-0.6,
-  "CLO+MPH":6.8,"CLO+NOR":4.1,"CLO+QUE":-0.1,"CLO+RIS":-1.1,"CLO+SER":-1.7,
-  "ESC+FLU":1.0,"ESC+GUA":-1.7,"ESC+IMI":2.0,"ESC+MPH":9.1,"ESC+NOR":6.0,
-  "ESC+QUE":2.0,"ESC+RIS":1.0,"ESC+SER":0.5,"FLU+GUA":-1.1,"FLU+IMI":2.5,
-  "FLU+MPH":10.0,"FLU+NOR":6.5,"FLU+QUE":3.0,"FLU+RIS":1.5,"FLU+SER":1.5,
-  "GUA+IMI":-0.6,"GUA+MPH":6.8,"GUA+NOR":4.1,"GUA+QUE":-0.1,"GUA+RIS":-1.1,
-  "GUA+SER":-1.7,"IMI+MPH":10.5,"IMI+NOR":7.5,"IMI+QUE":3.5,"IMI+RIS":2.5,
-  "IMI+SER":2.0,"MPH+NOR":14.8,"MPH+QUE":11.0,"MPH+RIS":10.0,"MPH+SER":9.6,
-  "NOR+QUE":8.0,"NOR+RIS":6.5,"NOR+SER":6.5,"QUE+RIS":3.0,"QUE+SER":2.5,"RIS+SER":1.5
+  "AMP+ARI":18.3,
+  "AMP+CLO":2.7,
+  "AMP+ESC":11.1,
+  "AMP+FLU":11.6,
+  "AMP+GUA":2.7,
+  "AMP+IMI":12.1,
+  "AMP+MPH":20.0,
+  "AMP+NOR":15.4,
+  "AMP+QUE":12.6,
+  "AMP+RIS":11.6,
+  "AMP+SER":11.6,
+  "ARI+CLO":-2.3,
+  "ARI+ESC":7.0,
+  "ARI+FLU":7.5,
+  "ARI+GUA":-2.3,
+  "ARI+IMI":8.0,
+  "ARI+MPH":18.3,
+  "ARI+NOR":11.5,
+  "ARI+QUE":8.5,
+  "ARI+RIS":7.5,
+  "ARI+SER":7.5,
+  "CLO+ESC":-9.2,
+  "CLO+FLU":-8.6,
+  "CLO+GUA":-14.4,
+  "CLO+IMI":-8.1,
+  "CLO+MPH":2.7,
+  "CLO+NOR":-5.0,
+  "CLO+QUE":-7.6,
+  "CLO+RIS":-8.6,
+  "CLO+SER":-9.2,
+  "ESC+FLU":0.5,
+  "ESC+GUA":-9.2,
+  "ESC+IMI":1.0,
+  "ESC+MPH":11.1,
+  "ESC+NOR":4.5,
+  "ESC+QUE":1.5,
+  "ESC+RIS":0.5,
+  "ESC+SER":0.0,
+  "FLU+GUA":-8.6,
+  "FLU+IMI":1.5,
+  "FLU+MPH":11.6,
+  "FLU+NOR":5.0,
+  "FLU+QUE":2.0,
+  "FLU+RIS":1.0,
+  "FLU+SER":0.5,
+  "GUA+IMI":-8.1,
+  "GUA+MPH":2.7,
+  "GUA+NOR":-5.0,
+  "GUA+QUE":-7.6,
+  "GUA+RIS":-8.6,
+  "GUA+SER":-9.2,
+  "IMI+MPH":12.1,
+  "IMI+NOR":5.5,
+  "IMI+QUE":2.5,
+  "IMI+RIS":1.5,
+  "IMI+SER":1.5,
+  "MPH+NOR":15.4,
+  "MPH+QUE":12.6,
+  "MPH+RIS":11.6,
+  "MPH+SER":11.6,
+  "NOR+QUE":6.0,
+  "NOR+RIS":5.0,
+  "NOR+SER":4.5,
+  "QUE+RIS":2.0,
+  "QUE+SER":1.5,
+  "RIS+SER":0.5
+};
+
+const DAPD={
+  "AMP+ARI":3.8,
+  "AMP+CLO":1.3,
+  "AMP+ESC":-3.0,
+  "AMP+FLU":-2.5,
+  "AMP+GUA":1.3,
+  "AMP+IMI":-2.1,
+  "AMP+MPH":-8.4,
+  "AMP+NOR":1.1,
+  "AMP+QUE":-1.6,
+  "AMP+RIS":-2.5,
+  "AMP+SER":-2.5,
+  "ARI+CLO":10.4,
+  "ARI+ESC":7.0,
+  "ARI+FLU":7.5,
+  "ARI+GUA":10.4,
+  "ARI+IMI":8.0,
+  "ARI+MPH":3.8,
+  "ARI+NOR":11.5,
+  "ARI+QUE":8.5,
+  "ARI+RIS":7.5,
+  "ARI+SER":7.5,
+  "CLO+ESC":3.3,
+  "CLO+FLU":3.8,
+  "CLO+GUA":10.6,
+  "CLO+IMI":4.4,
+  "CLO+MPH":1.3,
+  "CLO+NOR":7.7,
+  "CLO+QUE":4.9,
+  "CLO+RIS":3.8,
+  "CLO+SER":3.3,
+  "ESC+FLU":0.5,
+  "ESC+GUA":3.3,
+  "ESC+IMI":1.0,
+  "ESC+MPH":-3.0,
+  "ESC+NOR":4.5,
+  "ESC+QUE":1.5,
+  "ESC+RIS":0.5,
+  "ESC+SER":0.0,
+  "FLU+GUA":3.8,
+  "FLU+IMI":1.5,
+  "FLU+MPH":-2.5,
+  "FLU+NOR":5.0,
+  "FLU+QUE":2.0,
+  "FLU+RIS":1.0,
+  "FLU+SER":0.5,
+  "GUA+IMI":4.4,
+  "GUA+MPH":1.3,
+  "GUA+NOR":7.7,
+  "GUA+QUE":4.9,
+  "GUA+RIS":3.8,
+  "GUA+SER":3.3,
+  "IMI+MPH":-2.1,
+  "IMI+NOR":5.5,
+  "IMI+QUE":2.5,
+  "IMI+RIS":1.5,
+  "IMI+SER":1.5,
+  "MPH+NOR":1.1,
+  "MPH+QUE":-1.6,
+  "MPH+RIS":-2.5,
+  "MPH+SER":-2.5,
+  "NOR+QUE":6.0,
+  "NOR+RIS":5.0,
+  "NOR+SER":4.5,
+  "QUE+RIS":2.0,
+  "QUE+SER":1.5,
+  "RIS+SER":0.5
 };
 const IKR={
-  "AMP+ARI":4.22,"AMP+CLO":0.0,"AMP+ESC":0.03,"AMP+FLU":0.33,"AMP+GUA":0.0,
-  "AMP+IMI":0.73,"AMP+MPH":0.0,"AMP+NOR":2.65,"AMP+QUE":0.93,"AMP+RIS":0.36,
-  "AMP+SER":0.19,"ARI+CLO":4.22,"ARI+ESC":4.25,"ARI+FLU":4.53,"ARI+GUA":4.22,
-  "ARI+IMI":4.92,"ARI+MPH":4.22,"ARI+NOR":6.76,"ARI+QUE":5.11,"ARI+RIS":4.56,
-  "ARI+SER":4.4,"CLO+ESC":0.03,"CLO+FLU":0.33,"CLO+GUA":0.0,"CLO+IMI":0.73,
-  "CLO+MPH":0.0,"CLO+NOR":2.65,"CLO+QUE":0.93,"CLO+RIS":0.36,"CLO+SER":0.19,
-  "ESC+FLU":0.36,"ESC+GUA":0.03,"ESC+IMI":0.76,"ESC+MPH":0.03,"ESC+NOR":2.69,
-  "ESC+QUE":0.96,"ESC+RIS":0.39,"ESC+SER":0.22,"FLU+GUA":0.33,"FLU+IMI":1.06,
-  "FLU+MPH":0.33,"FLU+NOR":2.98,"FLU+QUE":1.25,"FLU+RIS":0.68,"FLU+SER":0.52,
-  "GUA+IMI":0.73,"GUA+MPH":0.0,"GUA+NOR":2.65,"GUA+QUE":0.93,"GUA+RIS":0.36,
-  "GUA+SER":0.19,"IMI+MPH":0.73,"IMI+NOR":3.37,"IMI+QUE":1.65,"IMI+RIS":1.09,
-  "IMI+SER":0.92,"MPH+NOR":2.65,"MPH+QUE":0.93,"MPH+RIS":0.36,"MPH+SER":0.19,
-  "NOR+QUE":3.56,"NOR+RIS":3.0,"NOR+SER":2.84,"QUE+RIS":1.28,"QUE+SER":1.12,"RIS+SER":0.55
+  "AMP+ARI":4.22,
+  "AMP+CLO":0.0,
+  "AMP+ESC":0.03,
+  "AMP+FLU":0.33,
+  "AMP+GUA":0.0,
+  "AMP+IMI":0.73,
+  "AMP+MPH":0.0,
+  "AMP+NOR":2.65,
+  "AMP+QUE":0.93,
+  "AMP+RIS":0.36,
+  "AMP+SER":0.19,
+  "ARI+CLO":4.22,
+  "ARI+ESC":4.25,
+  "ARI+FLU":4.53,
+  "ARI+GUA":4.22,
+  "ARI+IMI":4.92,
+  "ARI+MPH":4.22,
+  "ARI+NOR":6.76,
+  "ARI+QUE":5.11,
+  "ARI+RIS":4.56,
+  "ARI+SER":4.4,
+  "CLO+ESC":0.03,
+  "CLO+FLU":0.33,
+  "CLO+GUA":0.0,
+  "CLO+IMI":0.73,
+  "CLO+MPH":0.0,
+  "CLO+NOR":2.65,
+  "CLO+QUE":0.93,
+  "CLO+RIS":0.36,
+  "CLO+SER":0.19,
+  "ESC+FLU":0.36,
+  "ESC+GUA":0.03,
+  "ESC+IMI":0.76,
+  "ESC+MPH":0.03,
+  "ESC+NOR":2.69,
+  "ESC+QUE":0.96,
+  "ESC+RIS":0.39,
+  "ESC+SER":0.22,
+  "FLU+GUA":0.33,
+  "FLU+IMI":1.06,
+  "FLU+MPH":0.33,
+  "FLU+NOR":2.98,
+  "FLU+QUE":1.25,
+  "FLU+RIS":0.68,
+  "FLU+SER":0.52,
+  "GUA+IMI":0.73,
+  "GUA+MPH":0.0,
+  "GUA+NOR":2.65,
+  "GUA+QUE":0.93,
+  "GUA+RIS":0.36,
+  "GUA+SER":0.19,
+  "IMI+MPH":0.73,
+  "IMI+NOR":3.37,
+  "IMI+QUE":1.65,
+  "IMI+RIS":1.09,
+  "IMI+SER":0.92,
+  "MPH+NOR":2.65,
+  "MPH+QUE":0.93,
+  "MPH+RIS":0.36,
+  "MPH+SER":0.19,
+  "NOR+QUE":3.56,
+  "NOR+RIS":3.0,
+  "NOR+SER":2.84,
+  "QUE+RIS":1.28,
+  "QUE+SER":1.12,
+  "RIS+SER":0.55
 };
 const FAERS_ROR={
   "AMP+SER":2.81,"ARI+ESC":2.31,"ARI+GUA":10.25,"ARI+IMI":14.67,"ARI+MPH":8.15,
@@ -430,41 +608,22 @@ const AGE_ROR={
   "QUE+FLU": {child:3.75,  adol:10.88},
 };
 
-// Bazett decomposition (mean artifact ms, genuine ICaL ms) per combo
-const BAZETT={
-  "AMP+MPH":{artifact:2.9,genuine:15.8},"AMP+ARI":{artifact:9.6,genuine:7.6},
-  "ARI+MPH":{artifact:9.6,genuine:7.6},"AMP+QUE":{artifact:2.9,genuine:7.6},
-  "MPH+QUE":{artifact:2.9,genuine:7.6},"AMP+SER":{artifact:1.5,genuine:7.6},
-  "MPH+SER":{artifact:1.5,genuine:7.6},"AMP+NOR":{artifact:6.2,genuine:8.1},
-  "MPH+NOR":{artifact:6.2,genuine:8.1},"AMP+RIS":{artifact:2.0,genuine:7.6},
-  "MPH+RIS":{artifact:2.0,genuine:7.6},"AMP+FLU":{artifact:2.0,genuine:7.6},
-  "FLU+MPH":{artifact:2.0,genuine:7.6},"AMP+IMI":{artifact:2.9,genuine:7.6},
-  "IMI+MPH":{artifact:2.9,genuine:7.6},"CLO+MPH":{artifact:1.5,genuine:7.6},
-  "GUA+MPH":{artifact:1.5,genuine:7.6},"ESC+MPH":{artifact:1.5,genuine:7.6},
-};
-
 // Mechanism explanations
 const MECH_TEXT={
-  "sympathomimetic":"Stimulant drugs (MPH, AMP) increase sympathetic tone via central norepinephrine/dopamine release. This elevates heart rate (CL reduction) and upregulates cardiac ICaL via PKA-mediated GCaL phosphorylation. Bazett decomposition shows ~73% of predicted ΔQTc is genuine ICaL-mediated APD90 prolongation, with ~27% Bazett correction artifact.",
-  "sympathomimetic + mild hERG":"Stimulant-driven sympathomimetic effects (HR elevation + ICaL upregulation) combine with weak hERG/IKr block from the co-administered drug. The sympathomimetic component dominates the ΔQTc prediction.",
-  "hERG-driven":"Delta-QTc is primarily from hERG (IKr) channel block — drug binding to the hERG inner vestibule reduces the repolarizing IKr current, directly prolonging APD90. This is the mechanism targeted by CiPA/CredibleMeds screening.",
-  "mixed":"Both hERG block and sympathomimetic mechanisms contribute significantly to predicted ΔQTc.",
-  "autonomic (bradycardic)":"Alpha-2 agonists (clonidine, guanfacine) reduce sympathetic tone, lowering heart rate and partially shortening APD90 relative to baseline. The negative ΔQTc reflects this autonomic modulation.",
-  "minimal":"Predicted ΔQTc is below the 2 ms threshold for clinical significance. The drug combination does not substantially alter ventricular repolarization at modeled Cmax values.",
+  "minimal":"At modeled therapeutic exposure this combination does not meaningfully change ventricular repolarization (genuine ΔAPD90 within a few ms of baseline).",
+  "small":"A small genuine change in repolarization, below the ~5 ms threshold used here for concern.",
+  "genuine prolongation":"Genuine APD90 prolongation driven mainly by the autonomic/alpha-2 component rather than hERG block. Part of this can reflect bradycardia-driven restitution rather than a pure channel effect.",
+  "genuine, hERG-mediated":"Genuine APD90 prolongation from hERG (IKr) block: the co-administered drug reduces the repolarizing IKr current, directly lengthening the action potential. This is the mechanism CiPA/CredibleMeds screening targets.",
+  "shortening (faster repolarization)":"Net APD90 shortening relative to baseline. In stimulant-containing pairs this is the genuine picture once the rate effect is removed: the apparent QTc rise is a Bazett rate-correction artifact, not true prolongation.",
+  "rate artifact (sympathomimetic)":"The apparent Bazett ΔQTc is largely a rate-correction artifact: stimulants raise heart rate, which inflates Bazett-corrected QTc even though the genuine action-potential duration barely changes or shortens.",
+  "rate artifact + mild hERG":"Apparent Bazett ΔQTc combines a stimulant-driven rate artifact with weak hERG block from the partner drug; the genuine repolarization change is much smaller than the Bazett number suggests.",
+  "hERG-driven":"Apparent ΔQTc is primarily hERG (IKr) block, which genuinely prolongs the action potential.",
+  "autonomic (bradycardic)":"Alpha-2 agonists (clonidine, guanfacine) lower heart rate, driving Bazett ΔQTc negative even when the genuine action-potential duration is unchanged or slightly prolonged.",
+  "mixed":"Both hERG block and rate effects contribute to the apparent ΔQTc.",
 };
 
 // Triples
-const TRIPLES=[
-  {combo:"MPH+ARI+FLU",dq:19.0,tier:"MODERATE"},
-  {combo:"MPH+ARI+SER",dq:18.6,tier:"MODERATE"},
-  {combo:"MPH+ARI+ESC",dq:18.1,tier:"MODERATE"},
-  {combo:"MPH+NOR+ARI",dq:21.7,tier:"HIGH"},
-  {combo:"MPH+RIS+SER",dq:10.5,tier:"MODERATE"},
-  {combo:"MPH+RIS+FLU",dq:10.5,tier:"MODERATE"},
-  {combo:"MPH+QUE+SER",dq:11.5,tier:"MODERATE"},
-  {combo:"MPH+CLO+ARI",dq:16.3,tier:"MODERATE"},
-  {combo:"AMP+ARI+SER",dq:18.6,tier:"MODERATE"},
-];
+const TRIPLES=[{"combo": "NOR+MPH+ARI", "genuine": 7.9, "bazett": 22.5, "tier": "LOW-MOD"}, {"combo": "MPH+ARI+FLU", "genuine": 4.3, "bazett": 18.7, "tier": "LOW"}, {"combo": "MPH+ARI+SER", "genuine": 3.8, "bazett": 18.3, "tier": "LOW"}, {"combo": "MPH+ARI+ESC", "genuine": 3.8, "bazett": 18.3, "tier": "LOW"}, {"combo": "AMP+ARI+SER", "genuine": 3.8, "bazett": 18.3, "tier": "LOW"}, {"combo": "MPH+QUE+SER", "genuine": -1.2, "bazett": 13.0, "tier": "PROTECTIVE"}, {"combo": "IMI+MPH+RIS", "genuine": -1.2, "bazett": 13.0, "tier": "PROTECTIVE"}, {"combo": "IMI+MPH+SER", "genuine": -1.6, "bazett": 12.6, "tier": "PROTECTIVE"}, {"combo": "MPH+RIS+FLU", "genuine": -2.1, "bazett": 12.1, "tier": "PROTECTIVE"}, {"combo": "MPH+RIS+SER", "genuine": -2.1, "bazett": 12.1, "tier": "PROTECTIVE"}, {"combo": "AMP+RIS+SER", "genuine": -2.1, "bazett": 12.1, "tier": "PROTECTIVE"}, {"combo": "MPH+CLO+ARI", "genuine": 7.8, "bazett": 9.1, "tier": "LOW-MOD"}, {"combo": "MPH+GUA+ARI", "genuine": 7.8, "bazett": 9.1, "tier": "LOW-MOD"}, {"combo": "MPH+CLO+RIS", "genuine": 1.3, "bazett": 2.7, "tier": "LOW"}, {"combo": "MPH+GUA+SER", "genuine": 1.3, "bazett": 2.7, "tier": "LOW"}, {"combo": "ARI+FLU+CLO", "genuine": 11.0, "bazett": -1.8, "tier": "MODERATE"}, {"combo": "QUE+SER+CLO", "genuine": 4.9, "bazett": -7.6, "tier": "LOW"}, {"combo": "RIS+SER+CLO", "genuine": 3.8, "bazett": -8.6, "tier": "LOW"}];
 
 const CYP2D6_SUBSTRATES={ARI:2.0,RIS:1.75,NOR:2.0,IMI:1.5};
 
@@ -517,6 +676,7 @@ let selected=new Set(), selectedB=new Set(), selectedDx=new Set(), history=[];
 let activeDosePanel=null;
 const doseState={};
 let appMode='single'; // 'single' | 'compare'
+let riskMetric='genuine'; // 'genuine' (ΔAPD90) | 'bazett' (ΔQTc)
 let cmaxMode='adult'; // 'adult' | 'pediatric'
 let weightUnit='kg';
 const doseStateB={};
@@ -528,7 +688,9 @@ function getDQTc(a,b){return DQTC[canonicalKey(a,b)]??null;}
 function getIKR(a,b){return IKR[canonicalKey(a,b)]??0;}
 function isFaers(a,b){return FAERS_SIGNAL.has(canonicalKey(a,b));}
 function getFaersROR(a,b){return FAERS_ROR[canonicalKey(a,b)]??null;}
-function getBazett(a,b){return BAZETT[canonicalKey(a,b)]??null;}
+function getGenuine(a,b){return DAPD[canonicalKey(a,b)]??null;}
+function getBazettDelta(a,b){return DQTC[canonicalKey(a,b)]??null;}
+function getActiveDelta(a,b){return riskMetric==='genuine'?(getGenuine(a,b)??0):(getBazettDelta(a,b)??0);}
 function getAgeROR(a,b){return AGE_ROR[canonicalKey(a,b)]??null;}
 function riskTier(dq){
   if(dq===null||dq===undefined)return'LOW';
@@ -536,11 +698,19 @@ function riskTier(dq){
   if(dq>=5)return'LOW-MOD';if(dq>=0)return'LOW';return'PROTECTIVE';
 }
 function mechLabel(ikr,dq){
-  if(dq===null||Math.abs(dq)<2)return'minimal';
-  if(dq<0)return'autonomic (bradycardic)';
-  if(ikr<1&&dq>5)return'sympathomimetic';
-  if(ikr<3&&dq>5)return'sympathomimetic + mild hERG';
-  if(ikr>=5)return'hERG-driven';return'mixed';
+  if(riskMetric==='bazett'){
+    if(dq===null||Math.abs(dq)<2)return'minimal';
+    if(dq<0)return'autonomic (bradycardic)';
+    if(ikr<1&&dq>5)return'rate artifact (sympathomimetic)';
+    if(ikr<3&&dq>5)return'rate artifact + mild hERG';
+    if(ikr>=5)return'hERG-driven';return'mixed';
+  }
+  if(dq===null)return'minimal';
+  if(dq<=-3)return'shortening (faster repolarization)';
+  if(dq>=5&&ikr>=3)return'genuine, hERG-mediated';
+  if(dq>=5)return'genuine prolongation';
+  if(Math.abs(dq)<2)return'minimal';
+  return'small';
 }
 function tierBarColor(tier){return{HIGH:'#8B1A1A',MODERATE:'#8B4A0A','LOW-MOD':'#0D5C6B',LOW:'#1A5C2A',PROTECTIVE:'#0D5C6B'}[tier]||'#7A7468';}
 function tierColor(tier){return{HIGH:'#8B1A1A',MODERATE:'#8B4A0A','LOW-MOD':'#0D5C6B',LOW:'#1A5C2A',PROTECTIVE:'#1A5C2A'}[tier]||'#7A7468';}
@@ -745,6 +915,12 @@ function setMode(mode){
   const main=document.getElementById('main');
   // reset main area
   main.innerHTML=`<div class="empty-state" id="emptyState"><div class="empty-icon">♥</div><div class="empty-title">No patient loaded</div><div class="empty-sub">${mode==='compare'?'Enter current and proposed regimens to compare cardiac risk.':'Select diagnoses to see drug suggestions, then add medications and click Assess Cardiac Risk.'}</div></div>`;
+}
+
+function setMetric(m){
+  riskMetric=m;
+  document.getElementById('btnGenuine').classList.toggle('active',m==='genuine');
+  document.getElementById('btnBazett').classList.toggle('active',m==='bazett');
 }
 
 // ── QTc BASELINE ──────────────────────────────────────────────────────────────
@@ -974,7 +1150,8 @@ function buildCombos(codes, doseScaleFn=null){
   for(let i=0;i<codes.length;i++){
     for(let j=i+1;j<codes.length;j++){
       const a=codes[i],b=codes[j];
-      const baseDQ=getDQTc(a,b)??0;
+      const baseDQ=getActiveDelta(a,b);
+      const genuineV=getGenuine(a,b),bazettV=getBazettDelta(a,b);
       // Apply Cmax mode scaling to baseDQ
       // If pediatric mode, scale the delta proportionally (hERG-driven combos scale with Cmax ratio)
       let pkDQ=baseDQ;
@@ -1020,7 +1197,7 @@ function buildCombos(codes, doseScaleFn=null){
       const hasCyp=(codes.includes('FLU')&&(['RIS','ARI','QUE'].includes(a)||['RIS','ARI','QUE'].includes(b)));
       const hasCond=codes.includes('GUA')&&['RIS','QUE','ARI'].some(c=>codes.includes(c));
       const score=compositeScore(dq,ikr,ror,faers,hasCyp,hasCond);
-      combos.push({a,b,dq,baseDQ,pkDQ,ikr,tier,faers,ror,adjusted:cypAdj||doseScaled,doseScaled,scaleA,scaleB,score,scoreLabel:scoreLabel(score)});
+      combos.push({a,b,dq,baseDQ,pkDQ,ikr,tier,faers,ror,genuineV,bazettV,adjusted:cypAdj||doseScaled,doseScaled,scaleA,scaleB,score,scoreLabel:scoreLabel(score)});
     }
   }
   return combos.sort((x,y)=>y.score-x.score);
@@ -1177,9 +1354,9 @@ function buildResultCard({name,metaParts,drugNames,codes,combos,worstTier,topSco
       ${pedsWarning?`<div class="clinical-note note-teal" style="margin-top:0.5rem"><strong>Pediatric Cmax:</strong> ${pedsWarning}</div>`:''}
       ${notes?`<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--ink3)"><strong>Notes:</strong> ${escHtml(notes)}</div>`:''}
       <div class="disclaimer" style="margin-top:0.75rem">
-        Composite score integrates ΔQTc (0.50), IKr block (0.20), FAERS ROR (0.30) + CYP2D6/conduction flags.
+        Risk tier uses ${riskMetric==='genuine'?'genuine ΔAPD₉₀':'Bazett ΔQTc'}; composite score is a rough personal heuristic (active Δ + IKr + FAERS), not validated.
         ORd 2011 at 500-beat steady state. ${cmaxMode==='pediatric'?'Pediatric-specific Cmax (9/12 drugs).':'Adult reference Cmax.'}
-        <strong style="color:var(--red)"> Research use only.</strong>
+        <strong style="color:var(--red)"> Research/curiosity only.</strong>
       </div>
     </div>`;
   return card;
@@ -1199,7 +1376,7 @@ function renderScoreStrip(topScore,combos){
       </div>
       <div class="score-cell">
         <div class="score-num" style="font-size:1.3rem;color:var(--ink2)">${topCombo?((topCombo.dq>=0?'+':'')+topCombo.dq.toFixed(1)+' ms'):'—'}</div>
-        <div class="score-lbl">Highest ΔQTc</div>
+        <div class="score-lbl">Highest Δ (${riskMetric==='genuine'?'APD₉₀':'Bazett QTc'})</div>
         ${topCombo?`<div style="font-size:10px;color:var(--ink3);margin-top:3px">${topCombo.a}+${topCombo.b}</div>`:''}
       </div>
       <div class="score-cell">
@@ -1251,17 +1428,18 @@ function renderCombos(combos,age,baselineQTc){
         <span class="age-ror-badge ${ageROR.adol>10?'age-ror-high':ageROR.adol>3?'age-ror-med':'age-ror-low'}">13–17 yr: ${ageROR.adol}</span>
       </div>`:'' ;
 
-    // Bazett decomposition
-    const baz=getBazett(c.a,c.b);
-    const bazHtml=baz&&c.dq>3?`
+    // Genuine (APD90) vs Bazett (QTc) — the core insight
+    const gv=c.genuineV, bv=c.bazettV;
+    let divergeFlag='';
+    if(gv!==null&&bv!==null){
+      if(bv-gv>=5&&gv<5)divergeFlag=`<span class="bazett-label" style="color:var(--amber)">← Bazett rate artifact</span>`;
+      else if(gv-bv>=5)divergeFlag=`<span class="bazett-label" style="color:var(--teal)">← Bazett masks prolongation</span>`;
+    }
+    const bazHtml=(gv!==null&&bv!==null)?`
       <div class="bazett-strip">
-        <span class="bazett-label">ΔQTc:</span>
-        <div class="bazett-bar-bg">
-          <div class="bazett-artifact" style="width:${Math.round(baz.artifact/c.dq*100)}%"></div>
-          <div class="bazett-genuine" style="width:${Math.round(baz.genuine/c.dq*100)}%"></div>
-        </div>
-        <span class="bazett-label" style="color:#D97706">Bazett ${baz.artifact.toFixed(1)}ms</span>
-        <span class="bazett-label" style="color:#1B3A6B">ICaL ${baz.genuine.toFixed(1)}ms</span>
+        <span class="bazett-label" style="color:#1B3A6B;font-weight:500">genuine ΔAPD₉₀ ${gv>=0?'+':''}${gv.toFixed(1)}ms</span>
+        <span class="bazett-label" style="color:#D97706">Bazett ΔQTc ${bv>=0?'+':''}${bv.toFixed(1)}ms</span>
+        ${divergeFlag}
       </div>`:'' ;
 
     // Absolute QTc
@@ -1287,7 +1465,7 @@ function renderCombos(combos,age,baselineQTc){
           </div>
           <div class="combo-right">
             <div class="combo-score score-${c.scoreLabel}" style="color:${tierBarColor(c.scoreLabel)}">${c.score}</div>
-            <div class="combo-dqtc">${sign}${c.dq?.toFixed(1)||'n/a'} ms${absQtc}</div>
+            <div class="combo-dqtc">${sign}${c.dq?.toFixed(1)||'n/a'} ms <span style="opacity:0.7">${riskMetric==='genuine'?'APD₉₀':'QTc'}</span>${absQtc}</div>
             <div style="font-size:10px;color:var(--ink3)">IKr ${c.ikr.toFixed(2)}%</div>
           </div>
         </div>
@@ -1299,7 +1477,7 @@ function renderTriples(triples){
   return `<div class="triple-section"><h4>Triple combination analysis</h4>${triples.map(t=>`
     <div class="triple-row ${t.tier}">
       <span class="triple-name">${t.combo}</span>
-      <span class="triple-dqtc score-${t.tier}" style="color:${tierBarColor(t.tier)}">${t.dq>=0?'+':''}${t.dq.toFixed(1)} ms</span>
+      <span class="triple-dqtc score-${t.tier}" style="color:${tierBarColor(t.tier)}">gen ${t.genuine>=0?'+':''}${t.genuine.toFixed(1)} · Baz ${t.bazett>=0?'+':''}${t.bazett.toFixed(1)} ms</span>
     </div>`).join('')}</div>`;
 }
 

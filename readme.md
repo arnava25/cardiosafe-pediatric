@@ -4,143 +4,98 @@
 
 [![status](https://img.shields.io/badge/status-preprint%20in%20preparation-blue)](https://github.com/arnava25/cardiosafe-pediatric)
 [![model](https://img.shields.io/badge/model-O'Hara--Rudy%202011-navy)](https://doi.org/10.1371/journal.pcbi.1002061)
-[![data](https://img.shields.io/badge/validation-FDA%20FAERS%202015--2024-green)](https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html)
+[![validation](https://img.shields.io/badge/validation-FDA%20FAERS%20pediatric-green)](https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html)
 
 ---
 
 ## Overview
 
-Children and adolescents with psychiatric conditions are frequently prescribed multiple medications simultaneously: stimulants, antipsychotics, antidepressants, and alpha-2 agonists, often in combination. These drugs carry real cardiac risks, but existing safety frameworks focus almost exclusively on hERG channel block, missing the sympathomimetic and autonomic mechanisms that dominate risk in the most common pediatric polypharmacy patterns.
+Children and adolescents with psychiatric conditions are frequently prescribed several medications at once: stimulants, antipsychotics, antidepressants, and alpha-2 agonists, often in combination. These drugs carry real cardiac liabilities, and standard safety screening (CiPA, CredibleMeds) classifies them almost entirely by hERG channel block.
 
-CardioSafe Pediatric fills that gap. It couples **O'Hara-Rudy (ORd) 2011 ventricular action potential modeling** with a three-pathway drug effect architecture and validates predictions against **FDA FAERS pharmacovigilance data** across 552,832 pediatric cases spanning 10 years (2015–2024).
+CardioSafe Pediatric couples a validated **O'Hara-Rudy (ORd) 2011 ventricular action potential model** with a three-pathway psychiatric-drug effect module (hERG/IKr block, sympathomimetic heart-rate elevation, alpha-2 autonomic modulation) across 12 drugs and 84 polypharmacy combinations, and cross-references the predictions against **FDA FAERS pharmacovigilance data** (2015 to 2024, roughly 16 million reports, about 552,000 pediatric cases).
 
-> **This is a hypothesis-generating computational framework, not a validated clinical guideline.** Findings identify specific drug combinations warranting prospective ECG monitoring study.
-
----
-
-## Central Findings
-
-**Finding 1 — Sympathomimetic dominance:** 28 of 31 MODERATE-risk combinations have IKr block below 5%. Sympathomimetic heart rate elevation, not hERG block, is the dominant cardiac risk mechanism for stimulant-containing polypharmacy. This mechanism is entirely invisible to standard ion channel screening frameworks including CiPA and CredibleMeds.
-
-**Finding 2 — Age stratification:** Stimulant cardiac adverse event signals in FDA FAERS are 23 to 50 times higher in children aged 6–12 than in adolescents aged 13–17 (MPH+SER: ROR 43.71 vs 1.86; MPH+ARI: ROR 23.71 vs 0.47). CYP2D6-mediated combination signals show the opposite pattern, consistent with hepatic enzyme ontogeny.
-
-**Finding 3 — CredibleMeds gap:** Both stimulants (MPH, AMP) have no QTDrugs designation in CredibleMeds for the general population. MPH+ARI, the highest composite-risk combination (score 72.2), generates zero cardiac safety alert from CredibleMeds.
+> This is a hypothesis-generating computational framework, not a validated clinical guideline. It is intended to identify combinations and questions worth prospective study, nothing more.
 
 ---
 
-## Key Results
+## Central Finding
 
-### Polypharmacy risk grid (84 combinations, 500-beat steady state)
+**Most of the apparent QTc prolongation in stimulant-containing polypharmacy is a heart-rate-correction artifact, not genuine action potential prolongation.**
 
-| Risk tier | Combinations | ΔQTc threshold |
-|---|---|---|
-| HIGH | 0 | ≥ 20 ms |
-| **MODERATE** | **31** | 10–19 ms |
-| LOW-MOD | 18 | 5–9 ms |
-| LOW / protective | 35 | < 5 ms |
+When the model output is separated into the genuine change in action potential duration (ΔAPD90) versus the Bazett rate-corrected ΔQTc, the two diverge sharply and are negatively correlated across the 66 drug pairs (r approximately −0.34). Stimulants raise heart rate, which inflates Bazett-corrected QTc even when the underlying action potential barely changes or shortens.
 
-No pairwise combinations reach HIGH tier at 500-beat steady state. MPH+AMP at +19.1 ms is the highest pairwise delta-QTc.
-
-Selected pairwise results:
-
-| Combination | ΔQTc | IKr block | Mechanism |
-|---|---|---|---|
-| MPH + AMP | +19.1 ms | 0.00% | Sympathomimetic (pure) |
-| MPH + ARI | +18.1 ms | 4.22% | Sympathomimetic + hERG |
-| ARI + NOR | +15.0 ms | 6.76% | hERG block |
-| MPH + NOR | +14.8 ms | 2.65% | Sympathomimetic + hERG |
-| MPH + QUE | +11.0 ms | 0.93% | Sympathomimetic |
-| MPH + SER | +9.6 ms | 0.19% | Sympathomimetic |
-| RIS + SER | +1.5 ms | 0.55% | Minimal |
-| CLO + GUA | −1.5 ms | 0.00% | Autonomic (bradycardic) |
-
-Selected clinical triples:
-
-| Combination | ΔQTc |
-|---|---|
-| MPH + ARI + FLU | +19.0 ms |
-| MPH + ARI + SER | +18.6 ms |
-| MPH + ARI + ESC | +18.1 ms |
-
-### FAERS pharmacovigilance validation
-
-FDA FAERS 2015Q1–2024Q4 · 16.1M cases · 552,832 pediatric cases (age < 18)
-
-11 of 12 drugs showed cardiac pharmacovigilance signal. Clonidine (ROR 1.22, no signal) is consistent with its modeled cardioprotective effect.
-
-Key combination signals:
-
-| Combination | n | FAERS ROR | Model ΔQTc | Notes |
+| Combination | Bazett ΔQTc | Genuine ΔAPD90 | IKr block | Reading |
 |---|---|---|---|---|
-| MPH + SER | 578 | 12.79 [9.84–16.62] | +9.6 ms | Strongest pediatric combo signal |
-| ARI + GUA | 359 | 10.25 [7.14–14.71] | +7.3 ms | Conduction gap |
-| MPH + ARI | 677 | 8.15 [6.10–10.90] | +18.1 ms | Concordant |
-| MPH + QUE | 274 | 5.25 [3.04–9.08] | +11.0 ms | Concordant |
+| MPH + AMP | +20.0 ms | **−8.4 ms** | 0.00% | Pure rate artifact; net genuine shortening |
+| ARI + MPH | +18.3 ms | +3.8 ms | 4.22% | Mostly rate artifact, small genuine change |
+| MPH + NOR | +15.4 ms | +1.1 ms | 2.65% | Mostly rate artifact |
+| MPH + QUE | +12.6 ms | −1.6 ms | 0.93% | Rate artifact; net shortening |
+| MPH + SER | +11.6 ms | −2.5 ms | 0.19% | Rate artifact; net shortening |
+| **ARI + NOR** | **+11.5 ms** | **+11.5 ms** | 6.76% | Genuine, hERG-mediated prolongation |
+| CLO + GUA | −14.4 ms | **+10.6 ms** | 0.00% | Bradycardia masks genuine prolongation |
+| RIS + SER | +0.5 ms | +0.5 ms | 0.55% | Minimal either way |
 
-**Composite score AUC-ROC: 0.771 overall, 0.812 excluding named mechanistic-gap pairs.** Binary sensitivity 0.235 reflects threshold placement; no-gap sensitivity 0.444, non-stimulant non-gap kappa 0.344.
+The implication runs in both directions. Bazett over-calls stimulant pairs, and it under-calls (even reverses the sign of) the alpha-2 combinations, where slowing the heart rate drives the corrected QTc negative while the genuine action potential lengthens.
 
-### Age-stratified pharmacovigilance
+### Over-flagging
 
-| Combination | Children ROR (6–12y) | Adolescents ROR (13–17y) | Direction |
+Tiering on Bazett ΔQTc flags **29 of 84 combinations** at 10 ms or above. Tiering on genuine ΔAPD90 flags only **5**. Standard QTc-based screening would over-call this drug set by roughly 6x, almost all of it stimulant-driven rate artifact.
+
+### Where genuine prolongation does occur
+
+It is small and concentrated in hERG-blocking antipsychotic and tricyclic combinations (ARI + NOR, +11.5 ms genuine) and, through bradycardia-driven restitution, in some alpha-2 combinations. No pairwise or triple combination reaches a genuine ΔAPD90 of 20 ms.
+
+Triples show the same split:
+
+| Combination | Bazett ΔQTc | Genuine ΔAPD90 |
+|---|---|---|
+| NOR + MPH + ARI | +22.5 ms | +7.9 ms |
+| MPH + RIS + SER | +12.1 ms | −2.1 ms |
+| ARI + FLU + CLO | −1.8 ms | +11.0 ms |
+
+ARI + FLU + CLO is the cleanest inversion: Bazett reads it as a non-event, the genuine action potential change is the largest of any triple.
+
+---
+
+## FAERS Pharmacovigilance
+
+The FAERS analysis is independent of the action potential model and stands on its own.
+
+FDA FAERS 2015Q1 to 2024Q4, roughly 16 million reports, about 552,000 pediatric cases (age under 18). Reporting odds ratios computed with a 0.5 continuity correction; a signal is the lower 95% confidence bound exceeding 1.0.
+
+| Combination | n | FAERS ROR | Genuine ΔAPD90 |
 |---|---|---|---|
-| MPH + SER | 43.71 | 1.86 | Higher in children (23x) |
-| MPH + ARI | 23.71 | 0.47 | Higher in children (50x) |
+| ESC + IMI | — | 28.01 | +1.0 ms |
+| IMI + SER | — | 16.22 | +1.5 ms |
+| MPH + SER | 578 | 12.79 [9.84 to 16.62] | −2.5 ms |
+| ARI + GUA | 359 | 10.25 [7.14 to 14.71] | +10.4 ms |
+| MPH + ARI | 677 | 8.15 [6.10 to 10.90] | +3.8 ms |
+| MPH + QUE | 274 | 5.25 [3.04 to 9.08] | −1.6 ms |
+
+### Age stratification (most robust empirical result)
+
+Stimulant-containing cardiac signals are far stronger in children 6 to 12 than in adolescents 13 to 17. CYP2D6-substrate combinations show the opposite direction, consistent with hepatic enzyme ontogeny.
+
+| Combination | Children 6 to 12 | Adolescents 13 to 17 | Direction |
+|---|---|---|---|
+| MPH + SER | 43.71 | 1.86 | ~23x higher in children |
+| MPH + ARI | 23.71 | 0.47 | ~50x higher in children |
 | QUE + GUA | 32.15 | 3.91 | Higher in children |
-| QUE + FLU | 3.75 | 10.88 | Higher in adolescents (CYP2D6) |
+| QUE + FLU | 3.75 | 10.88 | Higher in adolescents |
 
-### Developmental PK sensitivity
+### Concordance, stated honestly
 
-| Combination | Base ΔQTc | 1.5x ARI Cmax | Tier change |
-|---|---|---|---|
-| MPH + ARI | +18.1 ms | +21.4 ms | MODERATE → HIGH |
-| ARI + SER | +9.5 ms | +13.0 ms | LOW-MOD → MODERATE |
-| ARI + FLU | +10.0 ms | +13.0 ms | LOW-MOD → MODERATE |
-| MPH + RIS | +10.0 ms | +10.0 ms | LOW-MOD → MODERATE |
-
-### CYP2D6 Ito static model (fluoxetine co-administration)
-
-Hepatic inlet [I]total = 212.5 nM, Ki = 170 nM. Predicted AUC ratios: QUE 1.68x, ARI 1.29x, RIS 1.75x, NOR 2.00x, IMI 1.44x. FLU+NOR escalates from LOW-MOD to MODERATE at adjusted Cmax.
-
-### Composite risk score (0–100)
-
-Integrates delta-QTc (0.50), IKr block (0.20), FAERS ROR (0.30), plus CYP2D6 flag (+15 pts) and conduction flag (+10 pts).
-
-| Combination | Score | Notes |
-|---|---|---|
-| MPH + ARI | 72.2 | Top scorer |
-| ARI + GUA | 57.2 | Conduction flag lifts score |
-| MPH + SER | 46.9 | FAERS component 75 despite LOW-MOD ΔQTc |
-| MPH + AMP | 47.8 | Zero FAERS signal despite highest raw ΔQTc |
-| QUE + FLU | 44.6 | CYP2D6 flag lifts score |
-
-### Sympathomimetic parameter sensitivity
-
-5×5 grid (CL reduction 5–15%, GCaL upregulation 10–20%): MPH+ARI remained MODERATE or above in all 25 parameter combinations (+14.0 to +20.8 ms).
-
-### CredibleMeds comparison
-
-| Drug | CredibleMeds | CardioSafe gap |
-|---|---|---|
-| MPH | Special Risk (congenital LQTS only) | Sympathomimetic polypharmacy risk not captured |
-| AMP | Special Risk (congenital LQTS only) | Sympathomimetic polypharmacy risk not captured |
-| ARI | Possible Risk (weakest category) | CardioSafe flags higher risk; FAERS ROR 8.15 with MPH |
-| CLO | Not Classified | Conduction risk in polypharmacy not captured |
-| GUA | Not Classified | Conduction risk; FAERS ROR 4.63 |
+Model-FAERS concordance is **weak overall** (AUC approximately 0.55). The model has reasonable sensitivity for stimulant-containing combinations and near-zero sensitivity for non-stimulant ones. Even the stimulant concordance is confounded: both the model's Bazett ΔQTc and FAERS reporting frequency track "a stimulant is present," so agreement there does not establish a shared mechanism. The previously reported composite score that combined ΔQTc, IKr, and FAERS ROR into a single index was circular (FAERS appeared on both sides of the comparison) and has been removed from the codebase.
 
 ---
 
 ## Drug Architecture
 
-### Three-pathway drug effect model
+**Pathway 1, hERG/IKr block.** Competitive binding, `block_i = C_free / (C_free + IC50_i)`, combined across drugs as `1 - product(1 - block_i)` assuming independent sites, applied as GKr conductance scaling.
 
-**Pathway 1 — hERG/IKr block**
-Competitive binding: `block_i = C_free / (C_free + IC50_i)`. Combined: `1 - Π(1 - block_i)` (independent binding sites). Applied as GKr conductance scaling.
+**Pathway 2, sympathomimetic (MPH, AMP).** Heart-rate elevation modeled as a reduction in cycle length (about +7 bpm, midpoint of the published 3 to 8 bpm range). The genuine action potential effect at the cell level is minimal; the apparent QTc rise is overwhelmingly a Bazett rate-correction artifact.
 
-**Pathway 2 — Sympathomimetic** (MPH, AMP)
-10% CL reduction (≈ +7 bpm, midpoint of published 3–8 bpm range) + 15% GCaL upregulation (PKA-mediated, Soltis & Saucerman 2010). ΔQTc predictions reflect Bazett-apparent change from HR elevation, not true repolarization prolongation.
-
-**Pathway 3 — Autonomic modulation** (CLO, GUA)
-10% CL increase (bradycardia) + 5% GNa reduction. Produces negative ΔQTc via Bazett correction. PR interval and AV conduction effects not captured.
+**Pathway 3, autonomic modulation (CLO, GUA).** Heart-rate reduction (bradycardia) plus a small sodium-conductance reduction. Drives Bazett ΔQTc negative while the genuine action potential can lengthen. PR interval and AV conduction effects are not represented.
 
 ---
 
@@ -148,37 +103,31 @@ Competitive binding: `block_i = C_free / (C_free + IC50_i)`. Combined: `1 - Π(1
 
 | Component | Details |
 |---|---|
-| AP model | O'Hara-Rudy 2011, 41-variable ODE system |
+| AP model | O'Hara-Rudy 2011 endocardial cell, validated against a frozen golden baseline |
+| Engine | `src/ord_core.py`, canonical ORd; drug module in `src/ord_model.py` |
 | Integration | scipy.integrate.odeint, mxstep=5000, rtol=1e-6, atol=1e-8 |
-| Simulation | 500 beats, CL=1000 ms (60 bpm); convergence confirmed at n>300 |
-| APD90 | Duration from upstroke to 90% repolarization |
-| QTc | Bazett: APD90 / sqrt(RR_s) |
-| IC50 sources | ChEMBL v37 + Witchel 2002, Redfern 2003, Kongsamut 2002, Polak 2009, Kramer 2013, Perrin 2008 |
-| Cmax values | Adult PK + protein binding; pediatric references in Supplementary S2 |
-| FAERS | 40 quarters 2015Q1–2024Q4, pediatric filter age < 18, n=552,832 |
-| ROR | 0.5 continuity correction, signal = CI lower bound > 1.0 |
-| Concordance | AUC-ROC, Fisher exact, 10,000-iteration permutation test |
-| PK sensitivity | 1x / 1.5x / 3x Cmax for 5 CYP2D6 substrates |
-| CYP2D6 DDI | Ito static model, hepatic inlet [I]h |
-| Composite score | 0.50×ΔQTc + 0.20×IKr + 0.30×FAERS ROR + flags, capped at 100 |
+| Simulation | 500 beats, CL = 1000 ms (60 bpm); ionic steady state reached around beat 100 |
+| Baseline | APD90 = 263.6 ms at 60 bpm (Bazett QTc identical at RR = 1 s) |
+| APD90 | Absolute time from upstroke to 90% repolarization |
+| Rate correction | Bazett ΔQTc reported alongside genuine ΔAPD90 for every combination |
+| IC50 sources | ChEMBL where indexed, manually curated literature hERG values otherwise |
+| FAERS | 40 quarters, 2015Q1 to 2024Q4, pediatric filter age under 18 |
+| ROR | 0.5 continuity correction, signal = lower 95% bound above 1.0 |
 
----
+### ECG calibration
 
-## ECG Calibration
-
-Steady-state APD90 at 60 bpm (500 beats): **331.7 ms**. Systematic offset vs adolescent reference (Rijnbeek et al. 2014): **67 ± 9 ms**. Offset cancels exactly in ΔQTc calculations — confirmed numerically to floating-point precision.
+The model baseline carries a fixed additive offset relative to the Rijnbeek 2014 adolescent reference. Because the offset is a constant, it cancels exactly in any ΔQTc or ΔAPD90 comparison; the comparative findings above are offset-invariant. The absolute calibration figure is reported in `results/`.
 
 ---
 
 ## Known Limitations
 
-- All Cmax values are adult-derived; stimulant values are conservative (children get higher weight-adjusted doses); CYP2D6 substrate uncertainty quantified in PK sensitivity analysis
-- ORd model is adult ventricular; no validated adolescent-specific AP model exists
-- Sympathomimetic parameters (10% CL, 15% GCaL) are phenomenological; full PKA cascade not implemented; parameter sensitivity confirms robustness
-- No PR interval / AV conduction pathway; accounts for guanfacine FAERS discordances
-- No base-case CYP2D6 PK interaction terms; partially addressed by Ito model analysis
-- Active metabolites (norfluoxetine, 9-OH-risperidone) not modeled
-- Sex differences in IKs not modeled
+- The ORd model is an adult ventricular cell; no validated adolescent-specific action potential model exists.
+- Cmax values are largely adult-derived. Stimulant values are conservative, since children receive higher weight-adjusted doses.
+- The sympathomimetic and autonomic pathways are phenomenological cycle-length and conductance adjustments, not a full autonomic or PKA cascade.
+- No PR interval or AV conduction pathway, which is why several guanfacine and clonidine FAERS signals are not reproduced by the model.
+- Active metabolites (norfluoxetine, 9-OH-risperidone) and sex differences in IKs are not modeled.
+- Dose-scaling, pediatric-Cmax, and CYP2D6 adjustments in the interactive simulator are heuristic extrapolations of the base grid values, not separately simulated points.
 
 ---
 
@@ -187,38 +136,33 @@ Steady-state APD90 at 60 bpm (500 beats): **331.7 ms**. Systematic offset vs ado
 ```
 cardiosafe-pediatric/
 ├── src/
-│   ├── ord_model.py                    # ORd AP model + drug effect architecture
-│   ├── risk_grid.py                    # Full 84-combination polypharmacy sweep
-│   ├── faers.py                        # FAERS download + parse + ROR pipeline
-│   ├── faers_secondary.py              # Temporal trend + age stratification
-│   ├── ecg_calibration.py              # APD90 vs pediatric ECG reference
-│   ├── concordance_stats.py            # Model-FAERS classification metrics
-│   ├── concordance_stats_stratified.py # Mechanism-stratified concordance
-│   ├── concordance_nogap.py            # No-gap concordance + AUC-ROC
-│   ├── pk_sensitivity.py               # Developmental PK sensitivity sweep
-│   ├── cyp2d6_ito.py                   # CYP2D6 Ito static DDI model
-│   ├── composite_score.py              # Composite cardiac risk score
-│   ├── sympathomimetic_sensitivity.py  # Sympathomimetic parameter sensitivity
-│   ├── generate_sim_data.py            # Auto-generate clinical simulator data
-│   └── figures.py                      # Manuscript figures (Figures 1–5)
+│   ├── ord_core.py             # Validated canonical ORd engine (golden baseline)
+│   ├── ord_model.py            # Three-pathway drug effect module
+│   ├── risk_grid.py            # 84-combination polypharmacy sweep
+│   ├── rate_correction.py      # Genuine ΔAPD90 vs Bazett ΔQTc decomposition
+│   ├── concordance_metrics.py  # Model vs FAERS classification metrics
+│   ├── supratherapeutic_sweep.py
+│   ├── faers.py                # FAERS download, parse, ROR pipeline
+│   ├── faers_secondary.py      # Temporal trend + age stratification
+│   ├── generate_sim_data.py    # Regenerates clinical_sim.html data from the grid
+│   └── figures.py              # Manuscript figures
 ├── data/
 │   ├── herg_master_params.csv
-│   └── faers_cache/                    # gitignored, ~2GB
+│   └── faers_cache/            # gitignored
 ├── results/
 │   ├── risk_grid_results.csv
-│   ├── sympathomimetic_sensitivity.csv
-│   ├── pk_sensitivity.csv
-│   ├── cyp2d6_ito_results.csv
-│   ├── composite_scores.csv
+│   ├── pairwise_results.csv
+│   ├── triple_results.csv
+│   ├── rate_correction_comparison.csv
 │   └── faers/
 │       ├── faers_drug_ror.csv
 │       ├── faers_combo_ror.csv
-│       ├── concordance_statistics.csv
 │       ├── temporal_trend.csv
 │       └── age_stratification.csv
-└── docs/
-    ├── clinical_sim.html               # Patient-specific clinical risk simulator
-    └── figures/                        # Figures 1–5 + Supplementary S1
+├── docs/
+│   ├── clinical_sim.html       # Personal exploration tool (not a validated instrument)
+│   └── figures/
+└── archive/                    # Superseded artifacts from the pre-validation engine
 ```
 
 ---
@@ -229,17 +173,13 @@ cardiosafe-pediatric/
 pip install numpy scipy pandas matplotlib seaborn scikit-learn tqdm pyarrow requests chembl-webresource-client
 ```
 
-## Quick Start
+## Reproducing the results
 
-```python
-from src.ord_model import run_simulation
-
-baseline = run_simulation(None, n_beats=500)
-result = run_simulation(
-    {"Methylphenidate": "therapeutic", "Aripiprazole": "therapeutic"},
-    n_beats=500
-)
-print(f"ΔQTc: {result['QTc'] - baseline['QTc']:+.1f} ms")
+```bash
+python src/risk_grid.py            # regenerates results/risk_grid_results.csv
+python src/rate_correction.py      # genuine vs Bazett decomposition
+python src/faers.py --analyze      # FAERS ROR pipeline
+python src/concordance_metrics.py  # model vs FAERS concordance
 ```
 
 ---
@@ -248,20 +188,17 @@ print(f"ΔQTc: {result['QTc'] - baseline['QTc']:+.1f} ms")
 
 O'Hara T et al. *PLoS Comput Biol.* 2011;7(5):e1002061.
 Dutta S et al. *Front Physiol.* 2017;8:616.
-Rijnbeek PR et al. *J Electrocardiol.* 2014;47(6):914–921.
-Redfern WS et al. *Cardiovasc Res.* 2003;58(1):32–45.
-Soltis AR, Saucerman JJ. *Biophys J.* 2010;99(7):2038–2047.
-Aman MG et al. *Clin Ther.* 2007;29:1476–86.
-Findling RL et al. *J Clin Psychopharmacol.* 2008;28(4):441–446.
-Templeton I et al. *Drug Metab Dispos.* 2016;44(1):57–65.
+Rijnbeek PR et al. *J Electrocardiol.* 2014;47(6):914 to 921.
+Redfern WS et al. *Cardiovasc Res.* 2003;58(1):32 to 45.
+Aman MG et al. *Clin Ther.* 2007;29:1476 to 1486.
+Templeton I et al. *Drug Metab Dispos.* 2016;44(1):57 to 65.
 
 ---
 
 ## Status
 
-All analyses complete. Manuscript in preparation. Preprint submission pending.
-Target journals: *npj Digital Medicine* · *Clinical Pharmacology & Therapeutics* · *JACAP*
+Rebuilt on the validated ORd engine. Core grid, rate-correction decomposition, and FAERS pipeline complete; manuscript being updated to the rate-correction framing; supratherapeutic sweep in progress.
 
 ## Author
 
-Arnav Amit · Independent researcher · arnav.amit1@gmail.com
+Arnav Amit, independent researcher, arnav.amit1@gmail.com

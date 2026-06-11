@@ -1,270 +1,73 @@
+#!/usr/bin/env python3
 """
-generate_sim_data.py — CardioSafe Pediatric
-============================================
-Reads results/risk_grid_results.csv and results/faers/faers_combo_ror.csv
-and regenerates the hardcoded JS data block in docs/clinical_sim.html.
+generate_sim_data.py - CardioSafe Pediatric (curiosity build)
+Regenerates the model-derived data constants in docs/clinical_sim.html from the
+validated results/risk_grid_results.csv:
+  DQTC    - Bazett delta-QTc per pair
+  DAPD    - genuine delta-APD90 per pair  (the real repolarization metric)
+  IKR     - hERG block percent per pair
+  TRIPLES - triples with genuine + Bazett + tier-on-genuine
+Also removes the obsolete BAZETT decomposition block.
+FAERS_ROR / FAERS_SIGNAL / AGE_ROR are model-independent and left untouched.
 
-Run after any risk_grid.py rerun to keep the simulator in sync.
-
-Usage:
-    python3 src/generate_sim_data.py
-    python3 src/generate_sim_data.py --dry-run   # print JS only, don't patch file
+Usage:  python3 src/generate_sim_data.py [--dry-run]
 """
-
-import sys
-import re
-import csv
-import json
-import argparse
+import sys, re, csv, json, argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-GRID_CSV   = ROOT / "results" / "risk_grid_results.csv"
-FAERS_CSV  = ROOT / "results" / "faers" / "faers_combo_ror.csv"
-SIM_HTML   = ROOT / "docs" / "clinical_sim.html"
+GRID = ROOT / "results" / "risk_grid_results.csv"
+HTML = ROOT / "docs" / "clinical_sim.html"
 
-DRUG_CODES = {
-    "Methylphenidate": "MPH",
-    "Amphetamine":     "AMP",
-    "Risperidone":     "RIS",
-    "Quetiapine":      "QUE",
-    "Aripiprazole":    "ARI",
-    "Sertraline":      "SER",
-    "Fluoxetine":      "FLU",
-    "Escitalopram":    "ESC",
-    "Clonidine":       "CLO",
-    "Guanfacine":      "GUA",
-    "Imipramine":      "IMI",
-    "Nortriptyline":   "NOR",
-}
+def key(c): return "+".join(sorted(str(c).split("+")))
+def tier(g): return "HIGH" if g>=20 else "MODERATE" if g>=10 else "LOW-MOD" if g>=5 else "LOW" if g>=0 else "PROTECTIVE"
 
-def canonical_key(drug_a, drug_b):
-    """Canonical sort order for pair key."""
-    codes = sorted([drug_a, drug_b])
-    return f"{codes[0]}+{codes[1]}"
-
-def load_grid():
-    """Load pairwise delta-QTc and IKr% from risk_grid_results.csv."""
-    dqtc = {}
-    ikr  = {}
-    if not GRID_CSV.exists():
-        print(f"ERROR: {GRID_CSV} not found", file=sys.stderr)
-        sys.exit(1)
-
-    with open(GRID_CSV) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            combo_str = row.get("combination", row.get("Combination", "")).strip()
-            drugs = [d.strip() for d in combo_str.split("+")]
-            if len(drugs) != 2:
-                continue  # skip triples
-
-            # combination field already uses codes (MPH, ARI, etc.)
-            # but fall back to full-name lookup if needed
-            a = DRUG_CODES.get(drugs[0], drugs[0])
-            b = DRUG_CODES.get(drugs[1], drugs[1])
-
-            try:
-                dq = float(row.get("ΔQTc_ms", row.get("delta_qtc", row.get("dQTc", row.get("ΔQTc", 0)))))
-                ik = float(row.get("IKr_block_pct", row.get("ikr_block_pct", row.get("IKr_block", row.get("ikr_block", 0)))))
-            except (ValueError, KeyError):
-                continue
-
-            key = canonical_key(a, b)
-            dqtc[key] = round(dq, 1)
-            ikr[key]  = round(ik, 2)
-
-    print(f"Loaded {len(dqtc)} pairwise combinations from risk_grid_results.csv")
-    return dqtc, ikr
-
-def load_faers():
-    """Load FAERS ROR data from faers_combo_ror.csv."""
-    ror     = {}
-    signals = set()
-    if not FAERS_CSV.exists():
-        print(f"WARNING: {FAERS_CSV} not found — FAERS data will be empty", file=sys.stderr)
-        return ror, signals
-
-    with open(FAERS_CSV) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            combo = row.get("combo", row.get("combination", "")).strip()
-            # combo is like "Methylphenidate+Sertraline" or "MPH+SER"
+def load(path):
+    dq, da, ik, trip = {}, {}, {}, []
+    with open(path) as f:
+        for r in csv.DictReader(f):
+            combo = r.get("combination","").strip()
+            if not combo: continue
             parts = combo.split("+")
-            if len(parts) != 2:
-                continue
-            a = DRUG_CODES.get(parts[0].strip(), parts[0].strip())
-            b = DRUG_CODES.get(parts[1].strip(), parts[1].strip())
-            key = canonical_key(a, b)
-
+            def col(*names):
+                for n in names:
+                    if n in r and r[n] not in ("", None): return r[n]
+                return None
             try:
-                ror_val = float(row.get("ROR", row.get("ror", 0)))
-                ci_lo   = float(row.get("CI_lo", row.get("ci_lo", 0)))
-            except (ValueError, KeyError):
+                bz = float(col("ΔQTc_ms","dQTc","delta_qtc"))
+                ap = float(col("ΔAPD90_ms","dAPD90","delta_apd"))
+                ir = float(col("IKr_block_pct","ikr_block_pct"))
+            except (TypeError, ValueError):
                 continue
+            if len(parts) == 2:
+                k = key(combo); dq[k]=round(bz,1); da[k]=round(ap,1); ik[k]=round(ir,2)
+            elif len(parts) == 3:
+                trip.append({"combo":combo,"genuine":round(ap,1),"bazett":round(bz,1),"tier":tier(ap)})
+    return dq, da, ik, trip
 
-            ror[key] = round(ror_val, 2)
-            if ci_lo > 1.0:
-                signals.add(key)
-
-    print(f"Loaded {len(ror)} FAERS ROR values, {len(signals)} signals")
-    return ror, signals
-
-def build_js(dqtc, ikr, ror, signals):
-    """Build the JS data block string."""
-
-    def js_obj(d):
-        lines = []
-        for k, v in sorted(d.items()):
-            lines.append(f'  "{k}":{json.dumps(v)}')
-        return "{\n" + ",\n".join(lines) + "\n}"
-
-    def js_set(s):
-        items = sorted(s)
-        quoted = [f'"{x}"' for x in items]
-        return "new Set([\n  " + ",\n  ".join(quoted) + "\n])"
-
-    drugs_js = """const DRUGS = [
-  {code:"MPH", name:"Methylphenidate", cls:"Stimulant"},
-  {code:"AMP", name:"Amphetamine",     cls:"Stimulant"},
-  {code:"RIS", name:"Risperidone",     cls:"Antipsychotic"},
-  {code:"QUE", name:"Quetiapine",      cls:"Antipsychotic"},
-  {code:"ARI", name:"Aripiprazole",    cls:"Antipsychotic"},
-  {code:"SER", name:"Sertraline",      cls:"SSRI"},
-  {code:"FLU", name:"Fluoxetine",      cls:"SSRI"},
-  {code:"ESC", name:"Escitalopram",    cls:"SSRI"},
-  {code:"CLO", name:"Clonidine",       cls:"Alpha-2"},
-  {code:"GUA", name:"Guanfacine",      cls:"Alpha-2"},
-  {code:"IMI", name:"Imipramine",      cls:"TCA"},
-  {code:"NOR", name:"Nortriptyline",   cls:"TCA"},
-];"""
-
-    js = f"""// ── AUTO-GENERATED by src/generate_sim_data.py — do not edit manually ──
-// Source: results/risk_grid_results.csv + results/faers/faers_combo_ror.csv
-// Run `python3 src/generate_sim_data.py` to regenerate after a new risk_grid run.
-
-{drugs_js}
-
-const DQTC = {js_obj(dqtc)};
-
-const IKR = {js_obj(ikr)};
-
-const FAERS_ROR = {js_obj({k: v for k, v in ror.items() if k in signals})};
-
-const FAERS_SIGNAL = {js_set(signals)};"""
-
-    helpers_js = """
-// ── HELPER FUNCTIONS ─────────────────────────────────────────────────────────
-function canonicalKey(a, b) {
-  return [a, b].sort().join('+');
-}
-function getDQTc(a, b) {
-  return DQTC[canonicalKey(a, b)] ?? null;
-}
-function getIKR(a, b) {
-  return IKR[canonicalKey(a, b)] ?? 0;
-}
-function isFaers(a, b) {
-  return FAERS_SIGNAL.has(canonicalKey(a, b));
-}
-function getFaersROR(a, b) {
-  return FAERS_ROR[canonicalKey(a, b)] ?? null;
-}
-function riskTier(dq) {
-  if (dq === null || dq === undefined) return 'LOW';
-  if (dq >= 20) return 'HIGH';
-  if (dq >= 10) return 'MODERATE';
-  if (dq >= 5)  return 'LOW-MOD';
-  if (dq >= 0)  return 'LOW';
-  return 'PROTECTIVE';
-}
-function mechLabel(ikr, dq) {
-  if (dq === null || Math.abs(dq) < 2) return 'minimal';
-  if (dq < 0)       return 'autonomic (bradycardic)';
-  if (ikr < 1 && dq > 5) return 'sympathomimetic';
-  if (ikr < 3 && dq > 5) return 'sympathomimetic + mild hERG';
-  if (ikr >= 5)     return 'hERG-driven';
-  return 'mixed';
-}
-function tierBarColor(tier) {
-  return {HIGH:'#8B1A1A', MODERATE:'#8B4A0A', 'LOW-MOD':'#0D5C6B', LOW:'#1A5C2A', PROTECTIVE:'#0D5C6B'}[tier] || '#7A7468';
-}
-function tierColor(tier) {
-  return {HIGH:'#8B1A1A', MODERATE:'#8B4A0A', 'LOW-MOD':'#0D5C6B', LOW:'#1A5C2A', PROTECTIVE:'#1A5C2A'}[tier] || '#7A7468';
-}"""
-
-    js = js + helpers_js
-    return js
-
-def patch_html(js_block, dry_run=False):
-    """Replace the data block in clinical_sim.html."""
-    if not SIM_HTML.exists():
-        print(f"ERROR: {SIM_HTML} not found", file=sys.stderr)
-        sys.exit(1)
-
-    content = SIM_HTML.read_text()
-
-    # Find the block between markers
-    start_marker = "// ── DATA ──"
-    end_marker   = "// ── STATE ──"
-
-    start_idx = content.find(start_marker)
-    end_idx   = content.find(end_marker)
-
-    if start_idx == -1 or end_idx == -1:
-        # Fall back: replace between known variable declarations
-        # Find first const DQTC and last const FAERS_SIGNAL
-        start_idx = content.find("const DQTC")
-        # Find the closing }; after FAERS_SIGNAL
-        faers_start = content.find("const FAERS_SIGNAL")
-        end_idx = content.find("// ── STATE ──", faers_start)
-        if start_idx == -1:
-            print("ERROR: could not find data block in clinical_sim.html", file=sys.stderr)
-            print("Printing JS to stdout instead:")
-            print(js_block)
-            return
-
-    new_content = (
-        content[:start_idx] +
-        start_marker + "\n" +
-        js_block + "\n\n" +
-        content[end_idx:]
-    )
-
-    if dry_run:
-        print("── DRY RUN — JS block that would be inserted ──")
-        print(js_block)
-        return
-
-    SIM_HTML.write_text(new_content)
-    print(f"Patched: {SIM_HTML}")
-    entry_count = js_block.count('\n  "')
-    print(f"  DQTC entries:   {entry_count}")
+def obj(d): return "{\n" + ",\n".join(f'  "{k}":{json.dumps(v)}' for k,v in sorted(d.items())) + "\n}"
 
 def main():
-    parser = argparse.ArgumentParser(description="Regenerate clinical simulator data from risk grid results")
-    parser.add_argument("--dry-run", action="store_true", help="Print JS only, do not patch HTML")
-    args = parser.parse_args()
-
-    print("CardioSafe Pediatric — Clinical Simulator Data Generator")
-    print(f"Grid CSV:  {GRID_CSV}")
-    print(f"FAERS CSV: {FAERS_CSV}")
-    print(f"Sim HTML:  {SIM_HTML}")
-    print()
-
-    dqtc, ikr   = load_grid()
-    ror, signals = load_faers()
-
-    # Sanity check
-    if len(dqtc) < 60:
-        print(f"WARNING: only {len(dqtc)} pairs loaded — expected ~66. Check CSV format.")
-
-    js_block = build_js(dqtc, ikr, ror, signals)
-    patch_html(js_block, dry_run=args.dry_run)
-
-    print()
-    print("Done. Open docs/clinical_sim.html to verify.")
-    print("Commit: git add docs/clinical_sim.html && git commit -m 'feat: update simulator data from 500-beat risk grid'")
+    ap = argparse.ArgumentParser(); ap.add_argument("--dry-run", action="store_true"); a = ap.parse_args()
+    dq, da, ik, trip = load(GRID)
+    print(f"pairs: {len(dq)}  triples: {len(trip)}")
+    blocks = {
+        "DQTC": "const DQTC=" + obj(dq) + ";",
+        "DAPD": "const DAPD=" + obj(da) + ";",
+        "IKR":  "const IKR="  + obj(ik) + ";",
+        "TRIPLES": "const TRIPLES=" + json.dumps(trip) + ";",
+    }
+    if a.dry_run:
+        print("\n\n".join(blocks.values())); return
+    html = HTML.read_text()
+    html = re.sub(r'\n*//[^\n]*Bazett decomposition \(mean[^\n]*', '', html)
+    html = re.sub(r'\nconst BAZETT\s*=\s*\{[\s\S]*?\n\};', '', html)
+    html = re.sub(r'\nconst DAPD\s*=\s*\{[\s\S]*?\n\};', '', html)   # idempotent
+    html = re.sub(r'const DQTC\s*=\s*\{[\s\S]*?\n\};', lambda m: blocks["DQTC"]+"\n\n"+blocks["DAPD"], html, count=1)
+    html = re.sub(r'const IKR\s*=\s*\{[\s\S]*?\n\};',  lambda m: blocks["IKR"], html, count=1)
+    html = re.sub(r'const TRIPLES\s*=\s*\[[\s\S]*?\n\];', lambda m: blocks["TRIPLES"], html, count=1)
+    HTML.write_text(html)
+    print("patched", HTML)
 
 if __name__ == "__main__":
     main()
