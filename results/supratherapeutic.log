@@ -14,3 +14,67 @@ Baseline APD90 = 265.1 ms
   MPH+QUE+SER      1x= +1.0 -> 10x= +16.3 ms  | margin: 6.3x
   IMI+MPH+RIS      1x= +1.0 -> 10x= +15.8 ms  | margin: 6.4x
   AMP+QUE          1x= +0.5 -> 10x= +13.1 ms  | margin: 7.7x
+  MPH+QUE          1x= +0.5 -> 10x= +13.1 ms  | margin: 7.7x
+  IMI+MPH+SER      1x= +0.5 -> 10x= +13.1 ms  | margin: 7.7x
+  MPH+RIS+FLU      1x= +0.1 -> 10x=  +9.5 ms  | margin: >10x
+  MPH+RIS+SER      1x= +0.1 -> 10x=  +7.7 ms  | margin: >10x
+  MPH+IMI          1x= +0.1 -> 10x= +10.4 ms  | margin: 9.7x
+  AMP+IMI          1x= +0.1 -> 10x= +10.4 ms  | margin: 9.7x
+  AMP+RIS+SER      1x= +0.1 -> 10x=  +7.7 ms  | margin: >10x
+  ARI+NOR          1x=+12.0 -> 10x=+102.6 ms  | margin: 1.0x
+  MPH+CLO+ARI      1x= +8.7 -> 10x= +62.7 ms  | margin: 1.2x
+  MPH+GUA+ARI      1x= +8.7 -> 10x= +62.7 ms  | margin: 1.2x
+  QUE+ARI          1x= +9.0 -> 10x= +76.5 ms  | margin: 1.1x
+  ARI+IMI          1x= +8.5 -> 10x= +73.5 ms  | margin: 1.2x
+  ARI+SER          1x= +7.5 -> 10x= +65.0 ms  | margin: 1.3x
+  ARI+FLU          1x= +8.0 -> 10x= +67.0 ms  | margin: 1.3x
+  RIS+ARI          1x= +8.0 -> 10x= +67.5 ms  | margin: 1.3x
+  ARI+ESC          1x= +7.5 -> 10x= +62.0 ms  | margin: 1.4x
+  QUE+NOR          1x= +6.0 -> 10x= +55.5 ms  | margin: 1.7x
+  IMI+NOR          1x= +6.0 -> 10x= +52.5 ms  | margin: 1.7x
+  FLU+NOR          1x= +5.0 -> 10x= +46.0 ms  | margin: 2.0x
+  RIS+NOR          1x= +5.0 -> 10x= +46.5 ms  | margin: 2.0x
+  SER+NOR          1x= +5.0 -> 10x= +44.0 ms  | margin: 2.1x
+  ESC+NOR          1x= +4.5 -> 10x= +41.0 ms  | margin: 2.2x
+  QUE+IMI          1x= +3.0 -> 10x= +27.0 ms  | margin: 3.5x
+  QUE+FLU          1x= +2.0 -> 10x= +20.5 ms  | margin: 4.7x
+  RIS+QUE          1x= +2.5 -> 10x= +21.0 ms  | margin: 4.7x
+  RIS+IMI          1x= +2.0 -> 10x= +18.0 ms  | margin: 5.6x
+  QUE+SER          1x= +2.0 -> 10x= +18.0 ms  | margin: 5.3x
+  SER+IMI          1x= +1.5 -> 10x= +15.0 ms  | margin: 6.4x
+  QUE+ESC          1x= +1.5 -> 10x= +15.5 ms  | margin: 6.3x
+  FLU+IMI          1x= +2.0 -> 10x= +17.5 ms  | margin: 5.6x
+  ESC+IMI          1x= +1.5 -> 10x= +12.5 ms  | margin: 7.9x
+  RIS+FLU          1x= +1.5 -> 10x= +11.5 ms  | margin: 8.6x
+  SER+FLU          1x= +1.0 -> 10x=  +8.5 ms  | margin: >10x
+  RIS+SER          1x= +1.0 -> 10x=  +9.0 ms  | margin: >10x
+  ARI+FLU+CLO      1x=+10.6 -> 10x= +71.1 ms  | margin: 1.0x
+  ARI+GUA          1x=+10.0 -> 10x= +65.6 ms  | margin: 1.0x
+  ARI+CLO          1x=+10.0 -> 10x= +65.6 ms  | margin: 1.0x
+  CLO+NOR          1x= +7.3 -> 10x= +44.1 ms  | margin: 1.6x
+  GUA+NOR          1x= +7.3 -> 10x= +44.1 ms  | margin: 1.6x
+  QUE+SER+CLO      1x= +4.5 -> 10x= +21.0 ms  | margin: 3.9x
+  QUE+CLO          1x= +4.0 -> 10x= +17.7 ms  | margin: 4.7x
+  QUE+GUA          1x= +4.0 -> 10x= +17.7 ms  | margin: 4.7x
+  GUA+IMI          1x= +4.0 -> 10x= +15.0 ms  | margin: 5.9x
+  CLO+IMI          1x= +4.0 -> 10x= +15.0 ms  | margin: 5.9x
+  RIS+SER+CLO      1x= +3.4 -> 10x= +11.7 ms  | margin: 8.1x
+
+Saved -> results/supratherapeutic_sweep.csv
+
+── NARROWEST SAFETY MARGINS (genuine ΔAPD90 reaches concern soonest) ──
+  NOR+MPH+ARI      concern at 1.0x over therapeutic   (max +95.9 ms)
+  ARI+NOR          concern at 1.0x over therapeutic   (max +102.6 ms)
+  ARI+FLU+CLO      concern at 1.0x over therapeutic   (max +71.1 ms)
+  ARI+CLO          concern at 1.0x over therapeutic   (max +65.6 ms)
+  ARI+GUA          concern at 1.0x over therapeutic   (max +65.6 ms)
+  QUE+ARI          concern at 1.1x over therapeutic   (max +76.5 ms)
+  ARI+IMI          concern at 1.2x over therapeutic   (max +73.5 ms)
+  MPH+CLO+ARI      concern at 1.2x over therapeutic   (max +62.7 ms)
+  MPH+GUA+ARI      concern at 1.2x over therapeutic   (max +62.7 ms)
+  RIS+ARI          concern at 1.3x over therapeutic   (max +67.5 ms)
+Saved -> docs/figures/figureS_supratherapeutic.png
+
+Read it: combos with a NARROW margin (concern at 2-3x) are the ones that
+turn dangerous under CYP2D6 poor-metabolism or modest overdose -- exactly the
+regime FAERS and therapeutic-dose data can't see. Wide margin (>10x) = robust.
