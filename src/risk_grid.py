@@ -82,6 +82,12 @@ def build_combo_dict(drug_list):
     return {d: "therapeutic" for d in drug_list}
 
 def risk_flag(dQTc):
+    # Tiers anchored to ICH E14 clinical thresholds for drug-induced QTc change,
+    # not to any model-specific scale:
+    #   >=20 ms  substantial / marked prolongation
+    #   >=10 ms  clinically meaningful (E14 regulatory threshold)
+    #   >=5  ms  threshold of detection / borderline
+    # NOTE: revisit against the observed grid distribution before final reporting.
     if dQTc >= 20:  return "HIGH"
     if dQTc >= 10:  return "MODERATE"
     if dQTc >= 5:   return "LOW-MOD"
@@ -112,6 +118,8 @@ for drug_a, drug_b in pairs:
     combo = {drug_a: "therapeutic", drug_b: "therapeutic"}
     res = run_simulation(combo, PARAMS_PATH, n_beats=N_BEATS, verbose=False)
     dQTc = res["QTc"] - bQTc
+    qtcf  = res["APD90"] / (res["CL_effective"]/1000) ** (1/3)
+    dQTcF = qtcf - bQTc
     flag = risk_flag(dQTc)
     pair_results.append({
         "drug_A":         drug_a,
@@ -122,6 +130,8 @@ for drug_a, drug_b in pairs:
         "QTc_ms":         round(res["QTc"], 1),
         "ΔAPD90_ms":      round(res["APD90"] - bAPD, 1),
         "ΔQTc_ms":        round(dQTc, 1),
+        "QTcF_ms":        round(qtcf, 1),
+        "ΔQTcF_ms":       round(dQTcF, 1),
         "IKr_block_pct":  round(res["IKr_block_pct"], 2),
         "risk_flag":      flag,
         "CL_eff_ms":      round(res["CL_effective"], 1),
@@ -139,6 +149,8 @@ for triple in CLINICAL_TRIPLES:
     combo = build_combo_dict(triple)
     res = run_simulation(combo, PARAMS_PATH, n_beats=N_BEATS, verbose=False)
     dQTc = res["QTc"] - bQTc
+    qtcf  = res["APD90"] / (res["CL_effective"]/1000) ** (1/3)
+    dQTcF = qtcf - bQTc
     flag = risk_flag(dQTc)
     abbr = "+".join(ABBREVS[d] for d in triple)
     triple_results.append({
@@ -147,6 +159,8 @@ for triple in CLINICAL_TRIPLES:
         "n_drugs":        3,
         "APD90_ms":       round(res["APD90"], 1),
         "QTc_ms":         round(res["QTc"], 1),
+        "QTcF_ms":        round(qtcf, 1),
+        "ΔQTcF_ms":       round(dQTcF, 1),
         "ΔAPD90_ms":      round(res["APD90"] - bAPD, 1),
         "ΔQTc_ms":        round(dQTc, 1),
         "IKr_block_pct":  round(res["IKr_block_pct"], 2),
@@ -207,7 +221,7 @@ high_herg   = all_results[all_results["IKr_block_pct"] > 5]
 high_dqtc   = all_results[all_results["ΔQTc_ms"] >= 10]
 mech_driven = high_dqtc[high_dqtc["IKr_block_pct"] < 5]
 
-print(f"\n1. Combinations with ΔQTc≥10ms but IKr block <5% (sympathomimetic-driven):")
+print(f"\n1. ΔQTc>=10ms with low IKr block (<5%) -- prolongation NOT from hERG (ICaL / rate-mediated):")
 for _, row in mech_driven.iterrows():
     print(f"   {row['combination']:35s} ΔQTc={row['ΔQTc_ms']:+.1f}ms  IKr={row['IKr_block_pct']:.2f}%")
 
@@ -228,7 +242,9 @@ print(f"   - All ΔQTc estimates carry ~20-30% uncertainty from Cmax extrapolati
 print(f"   - CYP2D6 developmental variation could shift Cmax 1.5-3x for:")
 print(f"     risperidone, aripiprazole, fluoxetine, nortriptyline, imipramine")
 print(f"   - Adolescent baseline QTc differs from adult (shorter by ~10-15ms)")
-print(f"   - Pubertal hormonal effects on IKs not modeled (flag for future work)")
+print(f"   - Sympathomimetic beta-adrenergic modulation (IKs/ICaL) is a provisional")
+print(f"     parameterization (IKS_UPREG); magnitude not yet calibrated to pediatric data")
+
 
 # ── SAVE ──────────────────────────────────────────────────────────────────────
 all_results.to_csv(_RESULTS_DIR / "risk_grid_results.csv", index=False)

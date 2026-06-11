@@ -1,0 +1,16 @@
+Sweeping 57 hERG-relevant combos x 5 exposures at 150 beats. Concern line: genuine ΔAPD90 >= 10.0 ms.
+
+Baseline APD90 = 265.1 ms
+
+  NOR+MPH+ARI      1x=+10.0 -> 10x= +95.9 ms  | margin: 1.0x
+  MPH+ARI+FLU      1x= +6.4 -> 10x= +62.2 ms  | margin: 1.5x
+  MPH+ARI+SER      1x= +6.4 -> 10x= +59.9 ms  | margin: 1.5x
+  AMP+ARI          1x= +5.9 -> 10x= +57.2 ms  | margin: 1.7x
+  MPH+ARI+ESC      1x= +5.9 -> 10x= +57.7 ms  | margin: 1.7x
+  AMP+ARI+SER      1x= +6.4 -> 10x= +59.9 ms  | margin: 1.5x
+  MPH+ARI          1x= +5.9 -> 10x= +57.2 ms  | margin: 1.7x
+  AMP+NOR          1x= +3.2 -> 10x= +37.4 ms  | margin: 2.7x
+  MPH+NOR          1x= +3.2 -> 10x= +37.4 ms  | margin: 2.7x
+  MPH+QUE+SER      1x= +1.0 -> 10x= +16.3 ms  | margin: 6.3x
+  IMI+MPH+RIS      1x= +1.0 -> 10x= +15.8 ms  | margin: 6.4x
+  AMP+QUE          1x= +0.5 -> 10x= +13.1 ms  | margin: 7.7x

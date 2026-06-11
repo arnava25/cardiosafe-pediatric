@@ -14,3 +14,7 @@ results/risk_grid_500beat.log
 
 # Figures generated at root level by mistake
 figure5_sympathomimetic_sensitivity.png
+__pycache__/
+*.pyc
+.DS_Store
+*.pdf

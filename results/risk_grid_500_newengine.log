@@ -1,0 +1,279 @@
+======================================================================
+CardioSafe Pediatric — Full Polypharmacy Risk Grid
+======================================================================
+Drugs: 12 | Beats: 500 | CL: 1000.0 ms
+Simulation: Baseline  GKr=1.0000 (IKr block 0.00%)  CL_eff=1000.0
+  APD90: 263.6 ms  |  QTc: 263.6 ms  |  Vpeak: 40.0 mV
+
+Baseline: APD90=263.6 ms | QTc=263.6 ms
+
+── PAIRWISE COMBINATIONS (66 total) ──
+  ⚠️ HIGH      Methylphenidate      + Amphetamine          | ΔQTc=+20.0 ms
+  △ MOD        Methylphenidate      + Risperidone          | ΔQTc=+11.6 ms
+  △ MOD        Methylphenidate      + Quetiapine           | ΔQTc=+12.6 ms
+  △ MOD        Methylphenidate      + Aripiprazole         | ΔQTc=+18.3 ms
+  △ MOD        Methylphenidate      + Sertraline           | ΔQTc=+11.6 ms
+  △ MOD        Methylphenidate      + Fluoxetine           | ΔQTc=+11.6 ms
+  △ MOD        Methylphenidate      + Escitalopram         | ΔQTc=+11.1 ms
+  ✓ LOW        Methylphenidate      + Clonidine            | ΔQTc=+2.7 ms
+  ✓ LOW        Methylphenidate      + Guanfacine           | ΔQTc=+2.7 ms
+  △ MOD        Methylphenidate      + Imipramine           | ΔQTc=+12.1 ms
+  △ MOD        Methylphenidate      + Nortriptyline        | ΔQTc=+15.4 ms
+  △ MOD        Amphetamine          + Risperidone          | ΔQTc=+11.6 ms
+  △ MOD        Amphetamine          + Quetiapine           | ΔQTc=+12.6 ms
+  △ MOD        Amphetamine          + Aripiprazole         | ΔQTc=+18.3 ms
+  △ MOD        Amphetamine          + Sertraline           | ΔQTc=+11.6 ms
+  △ MOD        Amphetamine          + Fluoxetine           | ΔQTc=+11.6 ms
+  △ MOD        Amphetamine          + Escitalopram         | ΔQTc=+11.1 ms
+  ✓ LOW        Amphetamine          + Clonidine            | ΔQTc=+2.7 ms
+  ✓ LOW        Amphetamine          + Guanfacine           | ΔQTc=+2.7 ms
+  △ MOD        Amphetamine          + Imipramine           | ΔQTc=+12.1 ms
+  △ MOD        Amphetamine          + Nortriptyline        | ΔQTc=+15.4 ms
+  ✓ LOW        Risperidone          + Quetiapine           | ΔQTc=+2.0 ms
+  ~ LOW-MOD    Risperidone          + Aripiprazole         | ΔQTc=+7.5 ms
+  ✓ LOW        Risperidone          + Sertraline           | ΔQTc=+0.5 ms
+  ✓ LOW        Risperidone          + Fluoxetine           | ΔQTc=+1.0 ms
+  ✓ LOW        Risperidone          + Escitalopram         | ΔQTc=+0.5 ms
+  ✓ LOW        Risperidone          + Clonidine            | ΔQTc=-8.6 ms
+  ✓ LOW        Risperidone          + Guanfacine           | ΔQTc=-8.6 ms
+  ✓ LOW        Risperidone          + Imipramine           | ΔQTc=+1.5 ms
+  ~ LOW-MOD    Risperidone          + Nortriptyline        | ΔQTc=+5.0 ms
+  ~ LOW-MOD    Quetiapine           + Aripiprazole         | ΔQTc=+8.5 ms
+  ✓ LOW        Quetiapine           + Sertraline           | ΔQTc=+1.5 ms
+  ✓ LOW        Quetiapine           + Fluoxetine           | ΔQTc=+2.0 ms
+  ✓ LOW        Quetiapine           + Escitalopram         | ΔQTc=+1.5 ms
+  ✓ LOW        Quetiapine           + Clonidine            | ΔQTc=-7.6 ms
+  ✓ LOW        Quetiapine           + Guanfacine           | ΔQTc=-7.6 ms
+  ✓ LOW        Quetiapine           + Imipramine           | ΔQTc=+2.5 ms
+  ~ LOW-MOD    Quetiapine           + Nortriptyline        | ΔQTc=+6.0 ms
+  ~ LOW-MOD    Aripiprazole         + Sertraline           | ΔQTc=+7.5 ms
+  ~ LOW-MOD    Aripiprazole         + Fluoxetine           | ΔQTc=+7.5 ms
+  ~ LOW-MOD    Aripiprazole         + Escitalopram         | ΔQTc=+7.0 ms
+  ✓ LOW        Aripiprazole         + Clonidine            | ΔQTc=-2.3 ms
+  ✓ LOW        Aripiprazole         + Guanfacine           | ΔQTc=-2.3 ms
+  ~ LOW-MOD    Aripiprazole         + Imipramine           | ΔQTc=+8.0 ms
+  △ MOD        Aripiprazole         + Nortriptyline        | ΔQTc=+11.5 ms
+  ✓ LOW        Sertraline           + Fluoxetine           | ΔQTc=+0.5 ms
+  ✓ LOW        Sertraline           + Escitalopram         | ΔQTc=+0.0 ms
+  ✓ LOW        Sertraline           + Clonidine            | ΔQTc=-9.2 ms
+  ✓ LOW        Sertraline           + Guanfacine           | ΔQTc=-9.2 ms
+  ✓ LOW        Sertraline           + Imipramine           | ΔQTc=+1.5 ms
+  ✓ LOW        Sertraline           + Nortriptyline        | ΔQTc=+4.5 ms
+  ✓ LOW        Fluoxetine           + Escitalopram         | ΔQTc=+0.5 ms
+  ✓ LOW        Fluoxetine           + Clonidine            | ΔQTc=-8.6 ms
+  ✓ LOW        Fluoxetine           + Guanfacine           | ΔQTc=-8.6 ms
+  ✓ LOW        Fluoxetine           + Imipramine           | ΔQTc=+1.5 ms
+  ~ LOW-MOD    Fluoxetine           + Nortriptyline        | ΔQTc=+5.0 ms
+  ✓ LOW        Escitalopram         + Clonidine            | ΔQTc=-9.2 ms
+  ✓ LOW        Escitalopram         + Guanfacine           | ΔQTc=-9.2 ms
+  ✓ LOW        Escitalopram         + Imipramine           | ΔQTc=+1.0 ms
+  ✓ LOW        Escitalopram         + Nortriptyline        | ΔQTc=+4.5 ms
+  ✓ LOW        Clonidine            + Guanfacine           | ΔQTc=-14.4 ms
+  ✓ LOW        Clonidine            + Imipramine           | ΔQTc=-8.1 ms
+  ✓ LOW        Clonidine            + Nortriptyline        | ΔQTc=-5.0 ms
+  ✓ LOW        Guanfacine           + Imipramine           | ΔQTc=-8.1 ms
+  ✓ LOW        Guanfacine           + Nortriptyline        | ΔQTc=-5.0 ms
+  ~ LOW-MOD    Imipramine           + Nortriptyline        | ΔQTc=+5.5 ms
+
+── CLINICAL TRIPLE COMBINATIONS (18 total) ──
+  △ MOD        MPH+ARI+SER                    | ΔQTc=+18.3 ms
+  △ MOD        MPH+ARI+FLU                    | ΔQTc=+18.7 ms
+  △ MOD        MPH+ARI+ESC                    | ΔQTc=+18.3 ms
+  △ MOD        MPH+RIS+SER                    | ΔQTc=+12.1 ms
+  △ MOD        MPH+RIS+FLU                    | ΔQTc=+12.1 ms
+  △ MOD        MPH+QUE+SER                    | ΔQTc=+13.0 ms
+  ✓ LOW        MPH+CLO+RIS                    | ΔQTc=+2.7 ms
+  ~ LOW-MOD    MPH+CLO+ARI                    | ΔQTc=+9.1 ms
+  ~ LOW-MOD    MPH+GUA+ARI                    | ΔQTc=+9.1 ms
+  ✓ LOW        MPH+GUA+SER                    | ΔQTc=+2.7 ms
+  △ MOD        AMP+ARI+SER                    | ΔQTc=+18.3 ms
+  △ MOD        AMP+RIS+SER                    | ΔQTc=+12.1 ms
+  △ MOD        IMI+MPH+RIS                    | ΔQTc=+13.0 ms
+  ⚠️ HIGH      NOR+MPH+ARI                    | ΔQTc=+22.5 ms
+  △ MOD        IMI+MPH+SER                    | ΔQTc=+12.6 ms
+  ✓ LOW        RIS+SER+CLO                    | ΔQTc=-8.6 ms
+  ✓ LOW        ARI+FLU+CLO                    | ΔQTc=-1.8 ms
+  ✓ LOW        QUE+SER+CLO                    | ΔQTc=-7.6 ms
+
+======================================================================
+RISK STRATIFICATION SUMMARY
+======================================================================
+Total combinations tested: 84
+Total runtime: 251.5 min
+
+⚠️ HIGH (2 combinations):
+    NOR+MPH+ARI                         ΔQTc=+22.5 ms  IKr_block=6.76%
+    MPH+AMP                             ΔQTc=+20.0 ms  IKr_block=0.00%
+
+△ MOD (27 combinations):
+    MPH+ARI+FLU                         ΔQTc=+18.7 ms  IKr_block=4.53%
+    MPH+ARI+SER                         ΔQTc=+18.3 ms  IKr_block=4.40%
+    AMP+ARI                             ΔQTc=+18.3 ms  IKr_block=4.22%
+    MPH+ARI+ESC                         ΔQTc=+18.3 ms  IKr_block=4.25%
+    AMP+ARI+SER                         ΔQTc=+18.3 ms  IKr_block=4.40%
+    MPH+ARI                             ΔQTc=+18.3 ms  IKr_block=4.22%
+    AMP+NOR                             ΔQTc=+15.4 ms  IKr_block=2.65%
+    MPH+NOR                             ΔQTc=+15.4 ms  IKr_block=2.65%
+    MPH+QUE+SER                         ΔQTc=+13.0 ms  IKr_block=1.12%
+    IMI+MPH+RIS                         ΔQTc=+13.0 ms  IKr_block=1.09%
+    AMP+QUE                             ΔQTc=+12.6 ms  IKr_block=0.93%
+    MPH+QUE                             ΔQTc=+12.6 ms  IKr_block=0.93%
+    IMI+MPH+SER                         ΔQTc=+12.6 ms  IKr_block=0.92%
+    MPH+RIS+FLU                         ΔQTc=+12.1 ms  IKr_block=0.68%
+    MPH+RIS+SER                         ΔQTc=+12.1 ms  IKr_block=0.55%
+    MPH+IMI                             ΔQTc=+12.1 ms  IKr_block=0.73%
+    AMP+IMI                             ΔQTc=+12.1 ms  IKr_block=0.73%
+    AMP+RIS+SER                         ΔQTc=+12.1 ms  IKr_block=0.55%
+    MPH+SER                             ΔQTc=+11.6 ms  IKr_block=0.19%
+    AMP+SER                             ΔQTc=+11.6 ms  IKr_block=0.19%
+    AMP+FLU                             ΔQTc=+11.6 ms  IKr_block=0.33%
+    MPH+FLU                             ΔQTc=+11.6 ms  IKr_block=0.33%
+    AMP+RIS                             ΔQTc=+11.6 ms  IKr_block=0.36%
+    MPH+RIS                             ΔQTc=+11.6 ms  IKr_block=0.36%
+    ARI+NOR                             ΔQTc=+11.5 ms  IKr_block=6.76%
+    MPH+ESC                             ΔQTc=+11.1 ms  IKr_block=0.03%
+    AMP+ESC                             ΔQTc=+11.1 ms  IKr_block=0.03%
+
+~ LOW-MOD (12 combinations):
+    MPH+CLO+ARI                         ΔQTc=+9.1 ms  IKr_block=4.22%
+    MPH+GUA+ARI                         ΔQTc=+9.1 ms  IKr_block=4.22%
+    QUE+ARI                             ΔQTc=+8.5 ms  IKr_block=5.11%
+    ARI+IMI                             ΔQTc=+8.0 ms  IKr_block=4.92%
+    ARI+SER                             ΔQTc=+7.5 ms  IKr_block=4.40%
+    ARI+FLU                             ΔQTc=+7.5 ms  IKr_block=4.53%
+    RIS+ARI                             ΔQTc=+7.5 ms  IKr_block=4.56%
+    ARI+ESC                             ΔQTc=+7.0 ms  IKr_block=4.25%
+    QUE+NOR                             ΔQTc=+6.0 ms  IKr_block=3.56%
+    IMI+NOR                             ΔQTc=+5.5 ms  IKr_block=3.37%
+    FLU+NOR                             ΔQTc=+5.0 ms  IKr_block=2.98%
+    RIS+NOR                             ΔQTc=+5.0 ms  IKr_block=3.00%
+
+✓ LOW (43 combinations):
+    SER+NOR                             ΔQTc=+4.5 ms  IKr_block=2.84%
+    ESC+NOR                             ΔQTc=+4.5 ms  IKr_block=2.69%
+    MPH+CLO+RIS                         ΔQTc=+2.7 ms  IKr_block=0.36%
+    MPH+GUA+SER                         ΔQTc=+2.7 ms  IKr_block=0.19%
+    AMP+GUA                             ΔQTc=+2.7 ms  IKr_block=0.00%
+    AMP+CLO                             ΔQTc=+2.7 ms  IKr_block=0.00%
+    MPH+GUA                             ΔQTc=+2.7 ms  IKr_block=0.00%
+    MPH+CLO                             ΔQTc=+2.7 ms  IKr_block=0.00%
+    QUE+IMI                             ΔQTc=+2.5 ms  IKr_block=1.65%
+    QUE+FLU                             ΔQTc=+2.0 ms  IKr_block=1.25%
+    RIS+QUE                             ΔQTc=+2.0 ms  IKr_block=1.28%
+    RIS+IMI                             ΔQTc=+1.5 ms  IKr_block=1.09%
+    QUE+SER                             ΔQTc=+1.5 ms  IKr_block=1.12%
+    SER+IMI                             ΔQTc=+1.5 ms  IKr_block=0.92%
+    QUE+ESC                             ΔQTc=+1.5 ms  IKr_block=0.96%
+    FLU+IMI                             ΔQTc=+1.5 ms  IKr_block=1.06%
+    ESC+IMI                             ΔQTc=+1.0 ms  IKr_block=0.76%
+    RIS+FLU                             ΔQTc=+1.0 ms  IKr_block=0.68%
+    RIS+ESC                             ΔQTc=+0.5 ms  IKr_block=0.39%
+    SER+FLU                             ΔQTc=+0.5 ms  IKr_block=0.52%
+    FLU+ESC                             ΔQTc=+0.5 ms  IKr_block=0.36%
+    RIS+SER                             ΔQTc=+0.5 ms  IKr_block=0.55%
+    SER+ESC                             ΔQTc=+0.0 ms  IKr_block=0.22%
+    ARI+FLU+CLO                         ΔQTc=-1.8 ms  IKr_block=4.53%
+    ARI+GUA                             ΔQTc=-2.3 ms  IKr_block=4.22%
+    ARI+CLO                             ΔQTc=-2.3 ms  IKr_block=4.22%
+    CLO+NOR                             ΔQTc=-5.0 ms  IKr_block=2.65%
+    GUA+NOR                             ΔQTc=-5.0 ms  IKr_block=2.65%
+    QUE+SER+CLO                         ΔQTc=-7.6 ms  IKr_block=1.12%
+    QUE+CLO                             ΔQTc=-7.6 ms  IKr_block=0.93%
+    QUE+GUA                             ΔQTc=-7.6 ms  IKr_block=0.93%
+    GUA+IMI                             ΔQTc=-8.1 ms  IKr_block=0.73%
+    CLO+IMI                             ΔQTc=-8.1 ms  IKr_block=0.73%
+    RIS+GUA                             ΔQTc=-8.6 ms  IKr_block=0.36%
+    FLU+CLO                             ΔQTc=-8.6 ms  IKr_block=0.33%
+    RIS+CLO                             ΔQTc=-8.6 ms  IKr_block=0.36%
+    FLU+GUA                             ΔQTc=-8.6 ms  IKr_block=0.33%
+    RIS+SER+CLO                         ΔQTc=-8.6 ms  IKr_block=0.55%
+    ESC+GUA                             ΔQTc=-9.2 ms  IKr_block=0.03%
+    ESC+CLO                             ΔQTc=-9.2 ms  IKr_block=0.03%
+    SER+CLO                             ΔQTc=-9.2 ms  IKr_block=0.19%
+    SER+GUA                             ΔQTc=-9.2 ms  IKr_block=0.19%
+    CLO+GUA                             ΔQTc=-14.4 ms  IKr_block=0.00%
+
+── PAIRWISE ΔQTc MATRIX ──
+      MPH   AMP   RIS   QUE   ARI   SER   FLU   ESC   CLO   GUA   IMI   NOR
+MPH   0.0  20.0  11.6  12.6  18.3  11.6  11.6  11.1   2.7   2.7  12.1  15.4
+AMP  20.0   0.0  11.6  12.6  18.3  11.6  11.6  11.1   2.7   2.7  12.1  15.4
+RIS  11.6  11.6   0.0   2.0   7.5   0.5   1.0   0.5  -8.6  -8.6   1.5   5.0
+QUE  12.6  12.6   2.0   0.0   8.5   1.5   2.0   1.5  -7.6  -7.6   2.5   6.0
+ARI  18.3  18.3   7.5   8.5   0.0   7.5   7.5   7.0  -2.3  -2.3   8.0  11.5
+SER  11.6  11.6   0.5   1.5   7.5   0.0   0.5   0.0  -9.2  -9.2   1.5   4.5
+FLU  11.6  11.6   1.0   2.0   7.5   0.5   0.0   0.5  -8.6  -8.6   1.5   5.0
+ESC  11.1  11.1   0.5   1.5   7.0   0.0   0.5   0.0  -9.2  -9.2   1.0   4.5
+CLO   2.7   2.7  -8.6  -7.6  -2.3  -9.2  -8.6  -9.2   0.0 -14.4  -8.1  -5.0
+GUA   2.7   2.7  -8.6  -7.6  -2.3  -9.2  -8.6  -9.2 -14.4   0.0  -8.1  -5.0
+IMI  12.1  12.1   1.5   2.5   8.0   1.5   1.5   1.0  -8.1  -8.1   0.0   5.5
+NOR  15.4  15.4   5.0   6.0  11.5   4.5   5.0   4.5  -5.0  -5.0   5.5   0.0
+
+======================================================================
+KEY MECHANISTIC INSIGHTS
+======================================================================
+
+1. ΔQTc>=10ms with low IKr block (<5%) -- prolongation NOT from hERG (ICaL / rate-mediated):
+   MPH+AMP                             ΔQTc=+20.0ms  IKr=0.00%
+   MPH+ARI+FLU                         ΔQTc=+18.7ms  IKr=4.53%
+   MPH+ARI+SER                         ΔQTc=+18.3ms  IKr=4.40%
+   AMP+ARI                             ΔQTc=+18.3ms  IKr=4.22%
+   MPH+ARI+ESC                         ΔQTc=+18.3ms  IKr=4.25%
+   AMP+ARI+SER                         ΔQTc=+18.3ms  IKr=4.40%
+   MPH+ARI                             ΔQTc=+18.3ms  IKr=4.22%
+   AMP+NOR                             ΔQTc=+15.4ms  IKr=2.65%
+   MPH+NOR                             ΔQTc=+15.4ms  IKr=2.65%
+   MPH+QUE+SER                         ΔQTc=+13.0ms  IKr=1.12%
+   IMI+MPH+RIS                         ΔQTc=+13.0ms  IKr=1.09%
+   AMP+QUE                             ΔQTc=+12.6ms  IKr=0.93%
+   MPH+QUE                             ΔQTc=+12.6ms  IKr=0.93%
+   IMI+MPH+SER                         ΔQTc=+12.6ms  IKr=0.92%
+   MPH+RIS+FLU                         ΔQTc=+12.1ms  IKr=0.68%
+   MPH+RIS+SER                         ΔQTc=+12.1ms  IKr=0.55%
+   MPH+IMI                             ΔQTc=+12.1ms  IKr=0.73%
+   AMP+IMI                             ΔQTc=+12.1ms  IKr=0.73%
+   AMP+RIS+SER                         ΔQTc=+12.1ms  IKr=0.55%
+   MPH+SER                             ΔQTc=+11.6ms  IKr=0.19%
+   AMP+SER                             ΔQTc=+11.6ms  IKr=0.19%
+   AMP+FLU                             ΔQTc=+11.6ms  IKr=0.33%
+   MPH+FLU                             ΔQTc=+11.6ms  IKr=0.33%
+   AMP+RIS                             ΔQTc=+11.6ms  IKr=0.36%
+   MPH+RIS                             ΔQTc=+11.6ms  IKr=0.36%
+   MPH+ESC                             ΔQTc=+11.1ms  IKr=0.03%
+   AMP+ESC                             ΔQTc=+11.1ms  IKr=0.03%
+
+2. Combinations with highest IKr block:
+   NOR+MPH+ARI                         IKr=6.76%  ΔQTc=+22.5ms
+   ARI+NOR                             IKr=6.76%  ΔQTc=+11.5ms
+   QUE+ARI                             IKr=5.11%  ΔQTc=+8.5ms
+   ARI+IMI                             IKr=4.92%  ΔQTc=+8.0ms
+   RIS+ARI                             IKr=4.56%  ΔQTc=+7.5ms
+
+3. Stimulant-free combinations with ΔQTc≥5ms:
+   ARI+NOR                             ΔQTc=+11.5ms
+   QUE+ARI                             ΔQTc=+8.5ms
+   ARI+IMI                             ΔQTc=+8.0ms
+   ARI+SER                             ΔQTc=+7.5ms
+   ARI+FLU                             ΔQTc=+7.5ms
+   RIS+ARI                             ΔQTc=+7.5ms
+   ARI+ESC                             ΔQTc=+7.0ms
+   QUE+NOR                             ΔQTc=+6.0ms
+   IMI+NOR                             ΔQTc=+5.5ms
+   FLU+NOR                             ΔQTc=+5.0ms
+   RIS+NOR                             ΔQTc=+5.0ms
+
+4. Adolescent-specific flags (all Cmax values adult-derived):
+   - All ΔQTc estimates carry ~20-30% uncertainty from Cmax extrapolation
+   - CYP2D6 developmental variation could shift Cmax 1.5-3x for:
+     risperidone, aripiprazole, fluoxetine, nortriptyline, imipramine
+   - Adolescent baseline QTc differs from adult (shorter by ~10-15ms)
+   - Sympathomimetic beta-adrenergic modulation (IKs/ICaL) is a provisional
+     parameterization (IKS_UPREG); magnitude not yet calibrated to pediatric data
+
+Saved:
+  /Users/aru/Desktop/cardiosafe/results/risk_grid_results.csv  — all combinations ranked by ΔQTc
+  /Users/aru/Desktop/cardiosafe/results/risk_matrix.csv        — pairwise ΔQTc heatmap data
+  /Users/aru/Desktop/cardiosafe/results/pairwise_results.csv   — pairs only
+  /Users/aru/Desktop/cardiosafe/results/triple_results.csv     — triples only
+
+Total runtime: 251.5 min
+Next: run visualize_risk.py to generate manuscript figures
