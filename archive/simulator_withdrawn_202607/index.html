@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioSafe Pediatric — Clinical Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F5F0; --bg2:#EDEAE2; --bg3:#E2DED5;
+  --ink:#1A1814; --ink2:#3D3A34; --ink3:#7A7468;
+  --rule:#CCC9BF; --navy:#1B3A6B; --teal:#0D5C6B;
+  --amber:#8B4A0A; --red:#8B1A1A; --green:#1A5C2A; --purple:#5B2D8E;
+  --red-bg:#FDF0EF; --amb-bg:#FDF5EC; --tel-bg:#EFF7F8;
+  --grn-bg:#EFF8F1; --pur-bg:#F5F0FD; --accent:#C0392B;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:grid;grid-template-columns:380px 1fr;grid-template-rows:auto 1fr;}
+
+/* ── HEADER ── */
+header{grid-column:1/-1;background:var(--navy);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #C0392B;}
+.header-left h1{font-family:'Libre Baskerville',serif;font-size:1.4rem;color:#fff;}
+.header-left h1 em{color:#F4A261;font-style:italic;}
+.header-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;font-weight:300;letter-spacing:0.04em;text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:0.75rem;}
+.header-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.15);padding:4px 10px;}
+.btn-mode{font-size:11px;padding:5px 12px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;border-radius:2px;font-family:'IBM Plex Sans',sans-serif;transition:all 0.15s;}
+.btn-mode:hover,.btn-mode.active{background:rgba(255,255,255,0.15);color:#fff;}
+.btn-mode.active{border-color:rgba(255,255,255,0.6);}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--bg2);border-right:1px solid var(--rule);padding:1.5rem;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;}
+.sidebar-section h2{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--rule);}
+.field{margin-bottom:0.75rem;}
+.field label{display:block;font-size:11px;color:var(--ink3);font-weight:500;margin-bottom:4px;letter-spacing:0.03em;}
+.field input,.field select{width:100%;padding:7px 10px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;border-radius:2px;transition:border-color 0.15s;}
+.field input:focus,.field select:focus{border-color:var(--navy);}
+.field input[type="number"]{font-family:'IBM Plex Mono',monospace;}
+
+/* QTc baseline */
+.qtc-baseline-row{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;}
+.qtc-normal{font-size:10px;color:var(--teal);margin-top:3px;font-family:'IBM Plex Mono',monospace;min-height:14px;}
+.qtc-warn{color:var(--amber);}
+.qtc-alert{color:var(--red);}
+
+/* diagnosis */
+.dx-grid{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.dx-tag{padding:4px 9px;border:1px solid var(--rule);background:var(--bg);cursor:pointer;font-size:11px;color:var(--ink3);border-radius:20px;transition:all 0.1s;user-select:none;}
+.dx-tag:hover{border-color:var(--navy);color:var(--navy);}
+.dx-tag.selected{background:var(--navy);border-color:var(--navy);color:#fff;}
+.dx-suggest{font-size:10px;color:var(--teal);margin-top:6px;line-height:1.5;min-height:14px;font-style:italic;}
+
+/* drug grid */
+.drug-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.drug-btn{padding:7px 6px;border:1px solid var(--rule);background:var(--bg);cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--ink3);text-align:center;border-radius:2px;transition:all 0.1s;user-select:none;position:relative;}
+.drug-btn:hover{border-color:var(--navy);color:var(--navy);}
+.drug-btn.selected{background:var(--navy);border-color:var(--navy);color:#fff;}
+.drug-btn.selected .drug-class{color:rgba(255,255,255,0.6);}
+.drug-btn.suggested{border-color:var(--teal);}
+.drug-btn.suggested:not(.selected){color:var(--teal);}
+.suggest-dot{position:absolute;top:3px;right:3px;width:5px;height:5px;background:var(--teal);border-radius:50%;display:none;}
+.drug-btn.suggested .suggest-dot{display:block;}
+.drug-btn.selected .suggest-dot{display:none;}
+.drug-name{font-size:11px;font-weight:500;display:block;}
+.drug-class{font-size:9px;color:var(--ink3);font-family:'IBM Plex Sans',sans-serif;font-weight:400;display:block;margin-top:1px;}
+.selected-list{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--navy);min-height:20px;padding:6px 8px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;margin-bottom:0.75rem;line-height:1.6;}
+.selected-list.empty{color:var(--ink3);font-family:'IBM Plex Sans',sans-serif;font-style:italic;font-size:11px;}
+.btn-run{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.02em;border-radius:2px;transition:background 0.15s;}
+.btn-run:hover{background:#9B2D22;}
+.btn-run:disabled{background:var(--rule);color:var(--ink3);cursor:default;}
+.btn-clear{width:100%;padding:7px;background:transparent;color:var(--ink3);border:1px solid var(--rule);cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:12px;border-radius:2px;margin-top:4px;transition:all 0.1s;}
+.btn-clear:hover{border-color:var(--ink3);color:var(--ink2);}
+
+/* advanced toggle */
+.advanced-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:6px 0;user-select:none;}
+.advanced-toggle:hover span{color:var(--ink2)!important;}
+
+/* dose panel */
+.dose-panel{background:var(--bg);border:1px solid var(--rule);border-radius:2px;padding:0;max-height:0;overflow:hidden;transition:max-height 0.25s ease,padding 0.25s ease;margin-top:4px;}
+.dose-panel.open{max-height:300px;padding:10px;}
+.dose-panel h4{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
+.dose-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;}
+.dose-input-wrap{display:flex;flex-direction:column;gap:3px;}
+.dose-input-wrap label{font-size:10px;color:var(--ink3);}
+.dose-input-wrap input{padding:5px 8px;border:1px solid var(--rule);background:var(--bg2);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);border-radius:2px;outline:none;width:100%;}
+.dose-input-wrap input:focus{border-color:var(--navy);}
+.dose-note{font-size:10px;color:var(--ink3);line-height:1.4;font-style:italic;}
+.dose-result{font-size:11px;color:var(--teal);margin-top:4px;font-family:'IBM Plex Mono',monospace;min-height:14px;}
+.cmax-scale-badge{font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid #B4D4DA;background:var(--tel-bg);color:var(--teal);font-family:'IBM Plex Mono',monospace;display:inline-block;}
+.peds-badge{font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid #B4D4DA;background:#E0F0F4;color:#0A4A58;font-family:'IBM Plex Mono',monospace;display:inline-block;}
+
+/* cyp */
+.cyp-section{padding:8px 10px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;margin-top:4px;}
+.cyp-radio-group{display:flex;flex-direction:column;gap:4px;}
+.cyp-radio{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--ink2);}
+.cyp-radio input[type=radio]{accent-color:var(--navy);}
+.cyp-desc{font-size:10px;color:var(--ink3);margin-left:20px;}
+
+/* ── MAIN ── */
+.main{padding:2rem;overflow-y:auto;display:flex;flex-direction:column;gap:1.5rem;}
+
+/* comparison layout */
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.comparison-label{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:0.5rem;}
+.comparison-drop{min-height:200px;border:2px dashed var(--rule);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink3);font-style:italic;transition:border-color 0.2s;}
+.comparison-drop.has-result{border:1px solid var(--rule);display:block;}
+
+/* result card */
+.result-card{border:1px solid var(--rule);background:var(--bg);border-radius:3px;overflow:hidden;}
+.result-header{padding:1rem 1.25rem;border-bottom:1px solid var(--rule);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}
+.patient-name{font-family:'Libre Baskerville',serif;font-size:1.2rem;color:var(--ink);}
+.patient-meta{font-size:12px;color:var(--ink3);margin-top:2px;}
+.result-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.risk-badge-large{padding:6px 16px;font-size:13px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border-radius:2px;white-space:nowrap;}
+.risk-HIGH{background:var(--red-bg);color:var(--red);border:1px solid #E8B4B4;}
+.risk-MODERATE{background:var(--amb-bg);color:var(--amber);border:1px solid #E8D0B4;}
+.risk-LOW-MOD{background:var(--tel-bg);color:var(--teal);border:1px solid #B4D4DA;}
+.risk-LOW{background:var(--grn-bg);color:var(--green);border:1px solid #B4D8BF;}
+.risk-PROTECTIVE{background:var(--grn-bg);color:var(--green);border:1px solid #B4D8BF;}
+.result-body{padding:1.25rem;}
+
+/* score strip */
+.score-strip{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:2px;margin-bottom:1.25rem;overflow:hidden;}
+.score-cell{background:var(--bg2);padding:0.75rem 1rem;text-align:center;}
+.score-num{font-family:'Libre Baskerville',serif;font-size:1.8rem;line-height:1;}
+.score-lbl{font-size:10px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:0.06em;}
+.score-bar-wrap{height:4px;background:var(--bg3);border-radius:2px;margin-top:6px;}
+.score-bar{height:100%;border-radius:2px;transition:width 0.8s ease;}
+
+/* combo rows */
+.combo-list{display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;}
+.combo-row{padding:10px 12px;background:var(--bg2);border-radius:2px;border-left:3px solid transparent;}
+.combo-row.HIGH{border-left-color:var(--red);}
+.combo-row.MODERATE{border-left-color:#E07000;}
+.combo-row.LOW-MOD{border-left-color:var(--teal);}
+.combo-row.LOW,.combo-row.PROTECTIVE{border-left-color:var(--green);}
+.combo-main{display:grid;grid-template-columns:1fr auto;align-items:start;gap:0.75rem;}
+.combo-left{display:flex;flex-direction:column;gap:4px;}
+.combo-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);}
+.combo-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.combo-score{font-family:'Libre Baskerville',serif;font-size:1.3rem;line-height:1;}
+.combo-dqtc{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink3);}
+.dqtc-bar-wrap{height:3px;background:var(--bg3);border-radius:2px;margin-top:3px;width:80px;}
+.dqtc-bar{height:100%;border-radius:2px;}
+.score-HIGH{color:var(--red);}
+.score-MODERATE{color:var(--amber);}
+.score-LOW-MOD{color:var(--teal);}
+.score-LOW,.score-PROTECTIVE{color:var(--green);}
+.faers-badge{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 7px;border-radius:2px;border:1px solid var(--rule);color:var(--ink3);display:inline-block;}
+.faers-badge.signal{background:#FDF5EC;color:var(--amber);border-color:#E8D0B4;}
+.adjusted-badge{font-size:10px;padding:2px 7px;background:var(--pur-bg);color:var(--purple);border:1px solid #D4B8F0;border-radius:2px;font-family:'IBM Plex Mono',monospace;}
+
+/* mechanism tooltip */
+.mech-toggle{font-size:10px;color:var(--navy);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;margin-left:6px;user-select:none;}
+.mech-expand{display:none;margin-top:6px;padding:6px 8px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;font-size:11px;color:var(--ink2);line-height:1.5;}
+.mech-expand.open{display:block;}
+
+/* bazett strip */
+.bazett-strip{display:flex;gap:8px;margin-top:5px;align-items:center;}
+.bazett-bar-bg{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;display:flex;}
+.bazett-artifact{height:100%;background:#D97706;opacity:0.7;}
+.bazett-genuine{height:100%;background:#1B3A6B;opacity:0.85;}
+.bazett-label{font-size:9px;color:var(--ink3);white-space:nowrap;}
+
+/* age stratified */
+.age-ror-strip{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;}
+.age-ror-badge{font-size:10px;padding:2px 8px;border-radius:2px;font-family:'IBM Plex Mono',monospace;}
+.age-ror-high{background:#FDF0EF;color:var(--red);border:1px solid #E8B4B4;}
+.age-ror-med{background:#FDF5EC;color:var(--amber);border:1px solid #E8D0B4;}
+.age-ror-low{background:var(--grn-bg);color:var(--green);border:1px solid #B4D8BF;}
+
+/* triple section */
+.triple-section{margin-top:0.75rem;}
+.triple-section h4{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.triple-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg2);border-radius:2px;border-left:3px solid transparent;margin-bottom:4px;}
+.triple-row.HIGH{border-left-color:var(--red);}
+.triple-row.MODERATE{border-left-color:#E07000;}
+.triple-row.LOW-MOD{border-left-color:var(--teal);}
+.triple-name{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink);}
+.triple-dqtc{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;}
+
+/* clinical notes */
+.clinical-note{padding:0.875rem 1rem;border:1px solid var(--rule);background:var(--bg2);border-radius:2px;border-left:3px solid var(--navy);font-size:13px;color:var(--ink2);line-height:1.6;margin-top:0.5rem;}
+.clinical-note strong{color:var(--navy);font-weight:500;}
+.note-amber{border-left-color:var(--amber);}
+.note-teal{border-left-color:var(--teal);}
+.note-red{border-left-color:var(--red);}
+.note-purple{border-left-color:var(--purple);}
+.age-warning{padding:0.75rem 1rem;border:1px solid #E8D0B4;background:#FDF5EC;border-radius:2px;font-size:12px;color:var(--amber);margin-top:0.5rem;line-height:1.5;}
+.age-warning strong{font-weight:500;}
+.disclaimer{font-size:11px;color:var(--ink3);padding:0.75rem 1rem;border:1px solid var(--rule);border-radius:2px;line-height:1.5;margin-top:0.75rem;}
+
+/* print button */
+.btn-print{font-size:11px;padding:4px 10px;background:transparent;color:var(--ink3);border:1px solid var(--rule);border-radius:2px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:all 0.1s;}
+.btn-print:hover{border-color:var(--navy);color:var(--navy);}
+
+/* history */
+.history-section h2{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--rule);}
+.history-list{display:flex;flex-direction:column;gap:4px;}
+.history-item{display:flex;align-items:center;gap:0.75rem;padding:8px 12px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;cursor:pointer;font-size:12px;color:var(--ink2);transition:border-color 0.1s;}
+.history-item:hover{border-color:var(--navy);}
+.history-name{font-weight:500;flex:1;}
+.history-drugs{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink3);}
+.history-badge{font-size:10px;font-weight:600;letter-spacing:0.04em;}
+
+/* empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:0.75rem;}
+.empty-icon{font-size:3rem;opacity:0.15;}
+.empty-title{font-family:'Libre Baskerville',serif;font-size:1.1rem;color:var(--ink3);}
+.empty-sub{font-size:12px;color:var(--ink3);max-width:300px;line-height:1.5;}
+
+@media(max-width:900px){body{grid-template-columns:1fr;}.sidebar{border-right:none;border-bottom:1px solid var(--rule);}  .comparison-grid{grid-template-columns:1fr;}}
+
+/* ── PRINT STYLES ── */
+@media print {
+  body{display:block;background:#fff;}
+  .sidebar,.header-sub,.header-right,.btn-print,.btn-clear,.btn-run,.advanced-toggle,#advancedPanel,.history-section{display:none!important;}
+  header{padding:0.5rem 1rem;border-bottom:2px solid #1B3A6B;}
+  header h1{font-size:1rem;}
+  .main{padding:0.5rem;}
+  .result-card{border:1px solid #ccc;page-break-inside:avoid;margin-bottom:1rem;}
+  .combo-row{break-inside:avoid;}
+  .mech-expand{display:block!important;}
+}
+</style>
+</head>
+<body>
+<div style="background:#7f1d1d;color:#fff;padding:12px 16px;font:14px system-ui">
+  Under revision. The parameter set behind these predictions was withdrawn in June 2026 following an internal audit and is being rebuilt. Do not use these values.
+</div>
+
+<header>
+  <div class="header-left">
+    <h1>CardioSafe <em>Pediatric</em> — Clinical Simulator</h1>
+    <div class="header-sub">Mechanistic cardiac risk · Adolescent psychiatric polypharmacy</div>
+  </div>
+  <div class="header-right">
+    <button class="btn-mode active" id="btnSingle" onclick="setMode('single')">Single patient</button>
+    <button class="btn-mode" id="btnCompare" onclick="setMode('compare')">Compare regimens</button>
+    <span style="width:1px;height:20px;background:rgba(255,255,255,0.2)"></span>
+    <button class="btn-mode active" id="btnGenuine" onclick="setMetric('genuine')">Genuine ΔAPD₉₀</button>
+    <button class="btn-mode" id="btnBazett" onclick="setMetric('bazett')">Bazett ΔQTc</button>
+    <div class="header-badge">ORd 2011 · v4 · Research/curiosity</div>
+  </div>
+</header>
+
+<aside class="sidebar">
+
+  <div class="sidebar-section">
+    <h2>Patient</h2>
+    <div class="field">
+      <label>Name / ID</label>
+      <input type="text" id="patientName" placeholder="e.g. Patient A or MRN-001">
+    </div>
+    <div class="field">
+      <label>Age (years)</label>
+      <input type="number" id="patientAge" min="4" max="18" placeholder="e.g. 10">
+    </div>
+    <div class="field">
+      <label>Sex</label>
+      <select id="patientSex">
+        <option value="">Not specified</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Diagnoses <span style="color:var(--ink3);font-weight:400">(select all that apply)</span></label>
+      <div class="dx-grid" id="dxGrid"></div>
+      <div class="dx-suggest" id="dxSuggest"></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h2 id="medLabel">Medications</h2>
+    <div class="selected-list empty" id="selectedList">No medications selected</div>
+    <div class="drug-grid" id="drugGrid"></div>
+    <div id="dosePanel"></div>
+    <button class="btn-clear" onclick="clearDrugs()">Clear all</button>
+  </div>
+
+  <!-- Compare regimen B -->
+  <div class="sidebar-section" id="compareSection" style="display:none;">
+    <h2>Proposed regimen</h2>
+    <div class="selected-list empty" id="selectedListB">No medications selected</div>
+    <div class="drug-grid" id="drugGridB"></div>
+    <div id="dosePanelB"></div>
+    <button class="btn-clear" onclick="clearDrugsB()">Clear all</button>
+  </div>
+
+  <div class="sidebar-section">
+    <button class="btn-run" id="runBtn" onclick="runAnalysis()" disabled>
+      Assess Cardiac Risk
+    </button>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="advanced-toggle" onclick="toggleAdvanced()" id="advancedToggle">
+      <span style="font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);">Advanced options</span>
+      <span id="advancedChevron" style="font-size:11px;color:var(--ink3);transition:transform 0.2s;">▸</span>
+    </div>
+    <div id="advancedPanel" style="display:none;">
+      <div style="font-size:11px;color:var(--ink3);line-height:1.5;margin-bottom:1rem;padding:8px 10px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;">
+        These inputs improve accuracy for specific patients but require clinical or genetic data.
+      </div>
+
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Cmax reference</div>
+      <div style="display:flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+        <button id="btnAdultCmax" onclick="setCmaxMode('adult')" style="flex:1;padding:6px;border:none;cursor:pointer;font-size:11px;font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:#fff;transition:all 0.1s;">Adult reference</button>
+        <button id="btnPedsCmax" onclick="setCmaxMode('pediatric')" style="flex:1;padding:6px;border:none;cursor:pointer;font-size:11px;font-family:'IBM Plex Sans',sans-serif;background:transparent;color:var(--ink3);transition:all 0.1s;">Pediatric Cmax</button>
+      </div>
+      <div id="cmaxModeNote" style="font-size:10px;color:var(--ink3);margin-bottom:1rem;line-height:1.4;">Population-average adult free plasma Cmax from published literature.</div>
+
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Dose scaling</div>
+      <div class="field">
+        <label>Weight</label>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;">
+          <input type="number" id="patientWeight" min="20" max="300" placeholder="e.g. 32" step="0.5">
+          <div style="display:flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--bg);height:34px;">
+            <button id="unitKg" onclick="setWeightUnit('kg')" style="padding:0 10px;border:none;cursor:pointer;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;background:var(--navy);color:#fff;transition:all 0.1s;">kg</button>
+            <button id="unitLbs" onclick="setWeightUnit('lbs')" style="padding:0 10px;border:none;cursor:pointer;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;background:transparent;color:var(--ink3);transition:all 0.1s;">lbs</button>
+          </div>
+        </div>
+        <div id="weightConvert" style="font-size:10px;color:var(--teal);margin-top:3px;min-height:14px;font-family:'IBM Plex Mono',monospace;"></div>
+      </div>
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:1rem;line-height:1.4;">Enter weight, then click ⚖ on a selected drug to enter that drug's dose.</div>
+
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">CYP2D6 genotype</div>
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:8px;line-height:1.4;">About 7–10% of people are CYP2D6 poor metabolizers — drug levels for ARI, RIS, NOR, IMI run 1.75–2× higher. Only relevant if genotyped.</div>
+      <div class="cyp-section">
+        <div class="cyp-radio-group">
+          <label class="cyp-radio"><input type="radio" name="cyp2d6" value="unknown" checked> Unknown (default)</label>
+          <label class="cyp-radio"><input type="radio" name="cyp2d6" value="extensive"> Extensive metabolizer<span class="cyp-desc">Standard Cmax</span></label>
+          <label class="cyp-radio"><input type="radio" name="cyp2d6" value="poor"> Poor metabolizer<span class="cyp-desc">ARI ×2, RIS ×1.75, NOR ×2, IMI ×1.5</span></label>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Baseline QTc</div>
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:8px;line-height:1.4;">If a recent ECG is available, enter the baseline QTc. The tool will predict the absolute QTc on the current regimen and flag pre-existing prolongation.</div>
+      <div class="qtc-baseline-row" style="display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin-bottom:4px;">
+        <input type="number" id="baselineQTc" min="300" max="600" placeholder="e.g. 420 ms" step="1" style="width:100%;padding:7px 10px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:13px;outline:none;border-radius:2px;">
+        <span style="font-size:11px;color:var(--ink3);white-space:nowrap">ms</span>
+      </div>
+      <div class="qtc-normal" id="qtcStatus" style="font-size:10px;min-height:14px;margin-bottom:1rem;font-family:'IBM Plex Mono',monospace;"></div>
+
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Additional notes</div>
+      <input type="text" id="patientNotes" placeholder="e.g. prior ECG, cardiac history" style="width:100%;padding:7px 10px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;border-radius:2px;">
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <p style="font-size:11px;color:var(--ink3);line-height:1.5;">
+      Toggle <strong>Genuine ΔAPD₉₀</strong> vs <strong>Bazett ΔQTc</strong> in the header: stimulant pairs show large Bazett QTc but near-zero genuine change (a rate-correction artifact), while hERG blockers show small but real prolongation. Composite score is a rough personal heuristic (active Δ + IKr + FAERS), not a validated index. O'Hara-Rudy 2011, 500-beat steady state.<br><br>
+      <strong style="color:var(--red);">Research/curiosity only.</strong> Not for clinical decisions.
+    </p>
+  </div>
+
+</aside>
+
+<main class="main" id="main">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">♥</div>
+    <div class="empty-title">No patient loaded</div>
+    <div class="empty-sub">Select diagnoses to see drug suggestions, add medications, and click Assess Cardiac Risk. Baseline QTc and other advanced inputs are optional.</div>
+  </div>
+</main>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const DRUGS = [
+  {code:"MPH",name:"Methylphenidate",cls:"Stimulant"},
+  {code:"AMP",name:"Amphetamine",cls:"Stimulant"},
+  {code:"RIS",name:"Risperidone",cls:"Antipsychotic"},
+  {code:"QUE",name:"Quetiapine",cls:"Antipsychotic"},
+  {code:"ARI",name:"Aripiprazole",cls:"Antipsychotic"},
+  {code:"SER",name:"Sertraline",cls:"SSRI"},
+  {code:"FLU",name:"Fluoxetine",cls:"SSRI"},
+  {code:"ESC",name:"Escitalopram",cls:"SSRI"},
+  {code:"CLO",name:"Clonidine",cls:"Alpha-2"},
+  {code:"GUA",name:"Guanfacine",cls:"Alpha-2"},
+  {code:"IMI",name:"Imipramine",cls:"TCA"},
+  {code:"NOR",name:"Nortriptyline",cls:"TCA"},
+];
+
+const DQTC={
+  "AMP+ARI":18.3,
+  "AMP+CLO":2.7,
+  "AMP+ESC":11.1,
+  "AMP+FLU":11.6,
+  "AMP+GUA":2.7,
+  "AMP+IMI":12.1,
+  "AMP+MPH":20.0,
+  "AMP+NOR":15.4,
+  "AMP+QUE":12.6,
+  "AMP+RIS":11.6,
+  "AMP+SER":11.6,
+  "ARI+CLO":-2.3,
+  "ARI+ESC":7.0,
+  "ARI+FLU":7.5,
+  "ARI+GUA":-2.3,
+  "ARI+IMI":8.0,
+  "ARI+MPH":18.3,
+  "ARI+NOR":11.5,
+  "ARI+QUE":8.5,
+  "ARI+RIS":7.5,
+  "ARI+SER":7.5,
+  "CLO+ESC":-9.2,
+  "CLO+FLU":-8.6,
+  "CLO+GUA":-14.4,
+  "CLO+IMI":-8.1,
+  "CLO+MPH":2.7,
+  "CLO+NOR":-5.0,
+  "CLO+QUE":-7.6,
+  "CLO+RIS":-8.6,
+  "CLO+SER":-9.2,
+  "ESC+FLU":0.5,
+  "ESC+GUA":-9.2,
+  "ESC+IMI":1.0,
+  "ESC+MPH":11.1,
+  "ESC+NOR":4.5,
+  "ESC+QUE":1.5,
+  "ESC+RIS":0.5,
+  "ESC+SER":0.0,
+  "FLU+GUA":-8.6,
+  "FLU+IMI":1.5,
+  "FLU+MPH":11.6,
+  "FLU+NOR":5.0,
+  "FLU+QUE":2.0,
+  "FLU+RIS":1.0,
+  "FLU+SER":0.5,
+  "GUA+IMI":-8.1,
+  "GUA+MPH":2.7,
+  "GUA+NOR":-5.0,
+  "GUA+QUE":-7.6,
+  "GUA+RIS":-8.6,
+  "GUA+SER":-9.2,
+  "IMI+MPH":12.1,
+  "IMI+NOR":5.5,
+  "IMI+QUE":2.5,
+  "IMI+RIS":1.5,
+  "IMI+SER":1.5,
+  "MPH+NOR":15.4,
+  "MPH+QUE":12.6,
+  "MPH+RIS":11.6,
+  "MPH+SER":11.6,
+  "NOR+QUE":6.0,
+  "NOR+RIS":5.0,
+  "NOR+SER":4.5,
+  "QUE+RIS":2.0,
+  "QUE+SER":1.5,
+  "RIS+SER":0.5
+};
+
+const DAPD={
+  "AMP+ARI":3.8,
+  "AMP+CLO":1.3,
+  "AMP+ESC":-3.0,
+  "AMP+FLU":-2.5,
+  "AMP+GUA":1.3,
+  "AMP+IMI":-2.1,
+  "AMP+MPH":-8.4,
+  "AMP+NOR":1.1,
+  "AMP+QUE":-1.6,
+  "AMP+RIS":-2.5,
+  "AMP+SER":-2.5,
+  "ARI+CLO":10.4,
+  "ARI+ESC":7.0,
+  "ARI+FLU":7.5,
+  "ARI+GUA":10.4,
+  "ARI+IMI":8.0,
+  "ARI+MPH":3.8,
+  "ARI+NOR":11.5,
+  "ARI+QUE":8.5,
+  "ARI+RIS":7.5,
+  "ARI+SER":7.5,
+  "CLO+ESC":3.3,
+  "CLO+FLU":3.8,
+  "CLO+GUA":10.6,
+  "CLO+IMI":4.4,
+  "CLO+MPH":1.3,
+  "CLO+NOR":7.7,
+  "CLO+QUE":4.9,
+  "CLO+RIS":3.8,
+  "CLO+SER":3.3,
+  "ESC+FLU":0.5,
+  "ESC+GUA":3.3,
+  "ESC+IMI":1.0,
+  "ESC+MPH":-3.0,
+  "ESC+NOR":4.5,
+  "ESC+QUE":1.5,
+  "ESC+RIS":0.5,
+  "ESC+SER":0.0,
+  "FLU+GUA":3.8,
+  "FLU+IMI":1.5,
+  "FLU+MPH":-2.5,
+  "FLU+NOR":5.0,
+  "FLU+QUE":2.0,
+  "FLU+RIS":1.0,
+  "FLU+SER":0.5,
+  "GUA+IMI":4.4,
+  "GUA+MPH":1.3,
+  "GUA+NOR":7.7,
+  "GUA+QUE":4.9,
+  "GUA+RIS":3.8,
+  "GUA+SER":3.3,
+  "IMI+MPH":-2.1,
+  "IMI+NOR":5.5,
+  "IMI+QUE":2.5,
+  "IMI+RIS":1.5,
+  "IMI+SER":1.5,
+  "MPH+NOR":1.1,
+  "MPH+QUE":-1.6,
+  "MPH+RIS":-2.5,
+  "MPH+SER":-2.5,
+  "NOR+QUE":6.0,
+  "NOR+RIS":5.0,
+  "NOR+SER":4.5,
+  "QUE+RIS":2.0,
+  "QUE+SER":1.5,
+  "RIS+SER":0.5
+};
+const IKR={
+  "AMP+ARI":4.22,
+  "AMP+CLO":0.0,
+  "AMP+ESC":0.03,
+  "AMP+FLU":0.33,
+  "AMP+GUA":0.0,
+  "AMP+IMI":0.73,
+  "AMP+MPH":0.0,
+  "AMP+NOR":2.65,
+  "AMP+QUE":0.93,
+  "AMP+RIS":0.36,
+  "AMP+SER":0.19,
+  "ARI+CLO":4.22,
+  "ARI+ESC":4.25,
+  "ARI+FLU":4.53,
+  "ARI+GUA":4.22,
+  "ARI+IMI":4.92,
+  "ARI+MPH":4.22,
+  "ARI+NOR":6.76,
+  "ARI+QUE":5.11,
+  "ARI+RIS":4.56,
+  "ARI+SER":4.4,
+  "CLO+ESC":0.03,
+  "CLO+FLU":0.33,
+  "CLO+GUA":0.0,
+  "CLO+IMI":0.73,
+  "CLO+MPH":0.0,
+  "CLO+NOR":2.65,
+  "CLO+QUE":0.93,
+  "CLO+RIS":0.36,
+  "CLO+SER":0.19,
+  "ESC+FLU":0.36,
+  "ESC+GUA":0.03,
+  "ESC+IMI":0.76,
+  "ESC+MPH":0.03,
+  "ESC+NOR":2.69,
+  "ESC+QUE":0.96,
+  "ESC+RIS":0.39,
+  "ESC+SER":0.22,
+  "FLU+GUA":0.33,
+  "FLU+IMI":1.06,
+  "FLU+MPH":0.33,
+  "FLU+NOR":2.98,
+  "FLU+QUE":1.25,
+  "FLU+RIS":0.68,
+  "FLU+SER":0.52,
+  "GUA+IMI":0.73,
+  "GUA+MPH":0.0,
+  "GUA+NOR":2.65,
+  "GUA+QUE":0.93,
+  "GUA+RIS":0.36,
+  "GUA+SER":0.19,
+  "IMI+MPH":0.73,
+  "IMI+NOR":3.37,
+  "IMI+QUE":1.65,
+  "IMI+RIS":1.09,
+  "IMI+SER":0.92,
+  "MPH+NOR":2.65,
+  "MPH+QUE":0.93,
+  "MPH+RIS":0.36,
+  "MPH+SER":0.19,
+  "NOR+QUE":3.56,
+  "NOR+RIS":3.0,
+  "NOR+SER":2.84,
+  "QUE+RIS":1.28,
+  "QUE+SER":1.12,
+  "RIS+SER":0.55
+};
+const FAERS_ROR={
+  "AMP+SER":2.81,"ARI+ESC":2.31,"ARI+GUA":10.25,"ARI+IMI":14.67,"ARI+MPH":8.15,
+  "ARI+RIS":1.71,"ARI+SER":6.78,"ESC+IMI":28.01,"FLU+QUE":9.18,"FLU+RIS":3.69,
+  "GUA+MPH":3.4,"GUA+QUE":13.15,"GUA+SER":2.58,"IMI+SER":16.22,"MPH+QUE":5.25,
+  "MPH+SER":12.79,"QUE+SER":5.84
+};
+const FAERS_SIGNAL=new Set([
+  "AMP+SER","ARI+ESC","ARI+GUA","ARI+IMI","ARI+MPH","ARI+RIS","ARI+SER",
+  "ESC+IMI","FLU+QUE","FLU+RIS","GUA+MPH","GUA+QUE","GUA+SER","IMI+SER",
+  "MPH+QUE","MPH+SER","QUE+SER"
+]);
+
+// Age-stratified FAERS ROR (children 6-12 vs adolescents 13-17)
+const AGE_ROR={
+  "MPH+SER": {child:43.71, adol:1.86},
+  "MPH+ARI": {child:23.71, adol:0.47},
+  "MPH+QUE": {child:16.45, adol:1.84},
+  "ARI+GUA": {child:21.72, adol:1.69},
+  "QUE+GUA": {child:32.15, adol:3.91},
+  "QUE+FLU": {child:3.75,  adol:10.88},
+};
+
+// Mechanism explanations
+const MECH_TEXT={
+  "minimal":"At modeled therapeutic exposure this combination does not meaningfully change ventricular repolarization (genuine ΔAPD90 within a few ms of baseline).",
+  "small":"A small genuine change in repolarization, below the ~5 ms threshold used here for concern.",
+  "genuine prolongation":"Genuine APD90 prolongation driven mainly by the autonomic/alpha-2 component rather than hERG block. Part of this can reflect bradycardia-driven restitution rather than a pure channel effect.",
+  "genuine, hERG-mediated":"Genuine APD90 prolongation from hERG (IKr) block: the co-administered drug reduces the repolarizing IKr current, directly lengthening the action potential. This is the mechanism CiPA/CredibleMeds screening targets.",
+  "shortening (faster repolarization)":"Net APD90 shortening relative to baseline. In stimulant-containing pairs this is the genuine picture once the rate effect is removed: the apparent QTc rise is a Bazett rate-correction artifact, not true prolongation.",
+  "rate artifact (sympathomimetic)":"The apparent Bazett ΔQTc is largely a rate-correction artifact: stimulants raise heart rate, which inflates Bazett-corrected QTc even though the genuine action-potential duration barely changes or shortens.",
+  "rate artifact + mild hERG":"Apparent Bazett ΔQTc combines a stimulant-driven rate artifact with weak hERG block from the partner drug; the genuine repolarization change is much smaller than the Bazett number suggests.",
+  "hERG-driven":"Apparent ΔQTc is primarily hERG (IKr) block, which genuinely prolongs the action potential.",
+  "autonomic (bradycardic)":"Alpha-2 agonists (clonidine, guanfacine) lower heart rate, driving Bazett ΔQTc negative even when the genuine action-potential duration is unchanged or slightly prolonged.",
+  "mixed":"Both hERG block and rate effects contribute to the apparent ΔQTc.",
+};
+
+// Triples
+const TRIPLES=[{"combo": "NOR+MPH+ARI", "genuine": 7.9, "bazett": 22.5, "tier": "LOW-MOD"}, {"combo": "MPH+ARI+FLU", "genuine": 4.3, "bazett": 18.7, "tier": "LOW"}, {"combo": "MPH+ARI+SER", "genuine": 3.8, "bazett": 18.3, "tier": "LOW"}, {"combo": "MPH+ARI+ESC", "genuine": 3.8, "bazett": 18.3, "tier": "LOW"}, {"combo": "AMP+ARI+SER", "genuine": 3.8, "bazett": 18.3, "tier": "LOW"}, {"combo": "MPH+QUE+SER", "genuine": -1.2, "bazett": 13.0, "tier": "PROTECTIVE"}, {"combo": "IMI+MPH+RIS", "genuine": -1.2, "bazett": 13.0, "tier": "PROTECTIVE"}, {"combo": "IMI+MPH+SER", "genuine": -1.6, "bazett": 12.6, "tier": "PROTECTIVE"}, {"combo": "MPH+RIS+FLU", "genuine": -2.1, "bazett": 12.1, "tier": "PROTECTIVE"}, {"combo": "MPH+RIS+SER", "genuine": -2.1, "bazett": 12.1, "tier": "PROTECTIVE"}, {"combo": "AMP+RIS+SER", "genuine": -2.1, "bazett": 12.1, "tier": "PROTECTIVE"}, {"combo": "MPH+CLO+ARI", "genuine": 7.8, "bazett": 9.1, "tier": "LOW-MOD"}, {"combo": "MPH+GUA+ARI", "genuine": 7.8, "bazett": 9.1, "tier": "LOW-MOD"}, {"combo": "MPH+CLO+RIS", "genuine": 1.3, "bazett": 2.7, "tier": "LOW"}, {"combo": "MPH+GUA+SER", "genuine": 1.3, "bazett": 2.7, "tier": "LOW"}, {"combo": "ARI+FLU+CLO", "genuine": 11.0, "bazett": -1.8, "tier": "MODERATE"}, {"combo": "QUE+SER+CLO", "genuine": 4.9, "bazett": -7.6, "tier": "LOW"}, {"combo": "RIS+SER+CLO", "genuine": 3.8, "bazett": -8.6, "tier": "LOW"}];
+
+const CYP2D6_SUBSTRATES={ARI:2.0,RIS:1.75,NOR:2.0,IMI:1.5};
+
+// Pediatric free Cmax (nM) — from published pediatric PK studies
+const PEDIATRIC_CMAX={
+  MPH:21.9,  // IR 0.5mg/kg/day; AGNP TDM 2024 + OROS literature
+  AMP:148.0, // d-AMP, McGough 2003/FDA Adderall XR scaled to 10mg/day
+  RIS:3.87,  // Boellner/Aman Clin Ther 2007
+  QUE:86.6,  // Winter 2008 at 150mg/day
+  ARI:11.9,  // Adult benchmark; FDA: pediatric PK comparable dose-normalized
+  SER:10.8,  // Alderman 1998 JAACAP / FDA Zoloft label
+  FLU:30.4,  // Wilens 2002 / FDA Prozac label avg SS
+  ESC:13.2,  // FDA Lexapro label adolescent single dose
+  CLO:0.5,   // No pediatric data — adult ref retained
+  GUA:12.2,  // FDA Intuniv label children 6-12
+  IMI:53.5,  // Sallee 1986 estimated parent
+  NOR:30.4,  // Therapeutic window midpoint
+};
+
+const ADULT_REF_PK={
+  MPH:{adult_dose:1.0,adult_weight:70,free_cmax_nm:2.6,max_dose_per_kg:2.0,note:'Typical 0.3–1.0 mg/kg/day (max 60 mg/day)'},
+  AMP:{adult_dose:0.5,adult_weight:70,free_cmax_nm:4.1,max_dose_per_kg:1.5,note:'Mixed amphetamine salts 0.1–0.5 mg/kg/dose BID'},
+  RIS:{adult_dose:0.07,adult_weight:70,free_cmax_nm:0.9,max_dose_per_kg:0.15,note:'Pediatric 0.01–0.07 mg/kg/day'},
+  QUE:{adult_dose:4.0,adult_weight:70,free_cmax_nm:2.1,max_dose_per_kg:8.0,note:'Pediatric 50–800 mg/day; weight-adjust by age'},
+  ARI:{adult_dose:0.2,adult_weight:70,free_cmax_nm:21.0,max_dose_per_kg:0.5,note:'Pediatric 2–30 mg/day'},
+  SER:{adult_dose:1.4,adult_weight:70,free_cmax_nm:3.0,max_dose_per_kg:3.0,note:'Pediatric 25–200 mg/day'},
+  FLU:{adult_dose:0.29,adult_weight:70,free_cmax_nm:3.5,max_dose_per_kg:0.6,note:'Pediatric 10–60 mg/day'},
+  ESC:{adult_dose:0.14,adult_weight:70,free_cmax_nm:2.5,max_dose_per_kg:0.3,note:'Pediatric 5–20 mg/day'},
+  CLO:{adult_dose:0.004,adult_weight:70,free_cmax_nm:0.5,max_dose_per_kg:0.01,note:'Pediatric 0.05–0.4 mg/day'},
+  GUA:{adult_dose:0.06,adult_weight:70,free_cmax_nm:1.8,max_dose_per_kg:0.12,note:'Intuniv 1–7 mg/day'},
+  IMI:{adult_dose:1.5,adult_weight:70,free_cmax_nm:18.0,max_dose_per_kg:2.5,note:'Pediatric 1–5 mg/kg/day; narrow TI'},
+  NOR:{adult_dose:1.0,adult_weight:70,free_cmax_nm:28.0,max_dose_per_kg:2.0,note:'Pediatric 0.5–2 mg/kg/day; narrow TI'},
+};
+
+const DIAGNOSES=[
+  {id:"ADHD",label:"ADHD",suggest:["MPH","AMP","CLO","GUA"]},
+  {id:"ANXIETY",label:"Anxiety",suggest:["SER","FLU","ESC"]},
+  {id:"DEPRESSION",label:"Depression",suggest:["SER","FLU","ESC"]},
+  {id:"ODD",label:"ODD",suggest:["RIS","ARI"]},
+  {id:"BIPOLAR",label:"Bipolar",suggest:["QUE","ARI","RIS"]},
+  {id:"AUTISM",label:"Autism",suggest:["RIS","ARI","MPH"]},
+  {id:"PSYCHOSIS",label:"Psychosis",suggest:["RIS","QUE","ARI"]},
+  {id:"TICS",label:"Tics / TS",suggest:["CLO","GUA","ARI"]},
+  {id:"ENURESIS",label:"Enuresis",suggest:["IMI"]},
+  {id:"SLEEP",label:"Sleep issues",suggest:["CLO","GUA"]},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let selected=new Set(), selectedB=new Set(), selectedDx=new Set(), history=[];
+let activeDosePanel=null;
+const doseState={};
+let appMode='single'; // 'single' | 'compare'
+let riskMetric='genuine'; // 'genuine' (ΔAPD90) | 'bazett' (ΔQTc)
+let cmaxMode='adult'; // 'adult' | 'pediatric'
+let weightUnit='kg';
+const doseStateB={};
+let activeDosePanelB=null;
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function canonicalKey(a,b){return [a,b].sort().join('+');}
+function getDQTc(a,b){return DQTC[canonicalKey(a,b)]??null;}
+function getIKR(a,b){return IKR[canonicalKey(a,b)]??0;}
+function isFaers(a,b){return FAERS_SIGNAL.has(canonicalKey(a,b));}
+function getFaersROR(a,b){return FAERS_ROR[canonicalKey(a,b)]??null;}
+function getGenuine(a,b){return DAPD[canonicalKey(a,b)]??null;}
+function getBazettDelta(a,b){return DQTC[canonicalKey(a,b)]??null;}
+function getActiveDelta(a,b){return riskMetric==='genuine'?(getGenuine(a,b)??0):(getBazettDelta(a,b)??0);}
+function getAgeROR(a,b){return AGE_ROR[canonicalKey(a,b)]??null;}
+function riskTier(dq){
+  if(dq===null||dq===undefined)return'LOW';
+  if(dq>=20)return'HIGH';if(dq>=10)return'MODERATE';
+  if(dq>=5)return'LOW-MOD';if(dq>=0)return'LOW';return'PROTECTIVE';
+}
+function mechLabel(ikr,dq){
+  if(riskMetric==='bazett'){
+    if(dq===null||Math.abs(dq)<2)return'minimal';
+    if(dq<0)return'autonomic (bradycardic)';
+    if(ikr<1&&dq>5)return'rate artifact (sympathomimetic)';
+    if(ikr<3&&dq>5)return'rate artifact + mild hERG';
+    if(ikr>=5)return'hERG-driven';return'mixed';
+  }
+  if(dq===null)return'minimal';
+  if(dq<=-3)return'shortening (faster repolarization)';
+  if(dq>=5&&ikr>=3)return'genuine, hERG-mediated';
+  if(dq>=5)return'genuine prolongation';
+  if(Math.abs(dq)<2)return'minimal';
+  return'small';
+}
+function tierBarColor(tier){return{HIGH:'#8B1A1A',MODERATE:'#8B4A0A','LOW-MOD':'#0D5C6B',LOW:'#1A5C2A',PROTECTIVE:'#0D5C6B'}[tier]||'#7A7468';}
+function tierColor(tier){return{HIGH:'#8B1A1A',MODERATE:'#8B4A0A','LOW-MOD':'#0D5C6B',LOW:'#1A5C2A',PROTECTIVE:'#1A5C2A'}[tier]||'#7A7468';}
+function compositeScore(dq,ikr,ror,hasFaers,hasCyp,hasCond){
+  const c_dqtc=Math.min(100,Math.max(0,(dq/20)*100));
+  const c_ikr=Math.min(100,(ikr/10)*100);
+  const c_faers=hasFaers&&ror>1?Math.min(100,(Math.log(ror)/Math.log(30))*100):0;
+  let score=0.50*c_dqtc+0.20*c_ikr+0.30*c_faers;
+  if(hasCyp)score+=15;if(hasCond)score+=10;
+  return Math.min(100,Math.round(score));
+}
+function scoreLabel(s){if(s>=75)return'HIGH';if(s>=50)return'MODERATE';if(s>=25)return'LOW-MOD';return'LOW';}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function getBaseCmax(code){
+  if(cmaxMode==='pediatric') return PEDIATRIC_CMAX[code]??ADULT_REF_PK[code].free_cmax_nm;
+  return ADULT_REF_PK[code].free_cmax_nm;
+}
+
+function getCypMultiplier(code){
+  const status=document.querySelector('input[name=cyp2d6]:checked')?.value||'unknown';
+  if(status!=='poor')return 1.0;
+  return CYP2D6_SUBSTRATES[code]??1.0;
+}
+
+function adjustedDQTc(a,b,baseDQ){
+  const ma=getCypMultiplier(a),mb=getCypMultiplier(b);
+  if(ma===1.0&&mb===1.0)return{dq:baseDQ,adjusted:false};
+  const ikr=getIKR(a,b);
+  const stimulants=new Set(['MPH','AMP']);
+  let dqAdj=baseDQ;
+  if(ikr>0.5){
+    const ikrScale=stimulants.has(a)?mb:(stimulants.has(b)?ma:Math.max(ma,mb));
+    dqAdj=baseDQ*(0.5+0.5*ikrScale);
+  }
+  return{dq:Math.round(dqAdj*10)/10,adjusted:true};
+}
+
+function toggleDosePanelB(code){
+  const panel=document.getElementById('dosePanelB');
+  if(activeDosePanelB===code){panel.innerHTML='';activeDosePanelB=null;return;}
+  activeDosePanelB=code;
+  const ref=ADULT_REF_PK[code];
+  const existing=doseStateB[code]||{};
+  const patientWeightKg=getWeightKg();
+  if(existing.weight_kg&&patientWeightKg&&existing.weight_kg!==patientWeightKg)existing.weight_kg=patientWeightKg;
+  panel.innerHTML=`
+    <div class="dose-panel open" id="dpB-${code}">
+      <h4>${code} — Proposed dose</h4>
+      <div class="dose-row">
+        <div class="dose-input-wrap"><label>Dose (mg/kg/day)</label>
+          <input type="number" id="dpB-dose-${code}" placeholder="${ref.adult_dose.toFixed(3)}" step="0.01" min="0" max="${ref.max_dose_per_kg}" value="${existing.dose_mg_per_kg||''}" oninput="updateDosePreviewB('${code}')">
+        </div>
+        <div class="dose-input-wrap"><label>Weight (kg)</label>
+          <input type="number" id="dpB-weight-${code}" placeholder="${patientWeightKg||'e.g. 32'}" step="0.5" min="10" max="120" value="${patientWeightKg||existing.weight_kg||''}" oninput="updateDosePreviewB('${code}')">
+        </div>
+      </div>
+      <div class="dose-note">${ref.note}</div>
+      <div class="dose-result" id="dpB-result-${code}"></div>
+      <button style="margin-top:8px;font-size:11px;padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:2px;cursor:pointer" onclick="saveDoseB('${code}')">Apply</button>
+      <button style="margin-top:8px;margin-left:6px;font-size:11px;padding:5px 12px;background:transparent;color:var(--ink3);border:1px solid var(--rule);border-radius:2px;cursor:pointer" onclick="clearDoseB('${code}')">Use reference Cmax</button>
+    </div>`;
+  updateDosePreviewB(code);
+}
+
+function updateDosePreviewB(code){
+  const ref=ADULT_REF_PK[code];
+  const doseEl=document.getElementById(`dpB-dose-${code}`);
+  const weightEl=document.getElementById(`dpB-weight-${code}`);
+  const resEl=document.getElementById(`dpB-result-${code}`);
+  if(!doseEl||!resEl)return;
+  const dose=parseFloat(doseEl.value),weight=parseFloat(weightEl.value);
+  if(!dose||!weight){resEl.textContent='Enter dose and weight to see Cmax estimate';return;}
+  const scale=(dose*weight)/(ref.adult_dose*ref.adult_weight);
+  const base=getBaseCmax(code);
+  resEl.innerHTML=`Scaled Cmax ≈ <strong>${(base*scale).toFixed(1)} nM</strong> (${scale.toFixed(2)}× reference ${base.toFixed(1)} nM)`;
+}
+
+function saveDoseB(code){
+  const doseEl=document.getElementById(`dpB-dose-${code}`);
+  const weightEl=document.getElementById(`dpB-weight-${code}`);
+  if(!doseEl)return;
+  const dose=parseFloat(doseEl.value);
+  const weight=parseFloat(weightEl.value)||getWeightKg()||null;
+  if(dose&&weight&&!isNaN(dose)&&!isNaN(weight)){
+    doseStateB[code]={dose_mg_per_kg:dose,weight_kg:weight};
+    const ref=ADULT_REF_PK[code];
+    const scale=(dose*weight)/(ref.adult_dose*ref.adult_weight);
+    const clsEl=document.querySelector(`#drugB-${code} .drug-class`);
+    if(clsEl){clsEl.textContent=scale.toFixed(2)+'× Cmax';clsEl.style.color='rgba(255,255,255,0.8)';}
+    const doseBtn=document.getElementById(`dosebtnB-${code}`);
+    if(doseBtn)doseBtn.style.display='block';
+  } else if(dose&&!weight){
+    const resEl=document.getElementById(`dpB-result-${code}`);
+    if(resEl)resEl.innerHTML='<span style="color:var(--red)">Enter patient weight to apply dose scaling</span>';
+    return;
+  }
+  activeDosePanelB=null;document.getElementById('dosePanelB').innerHTML='';
+}
+
+function clearDoseB(code){
+  delete doseStateB[code];
+  const drug=DRUGS.find(d=>d.code===code);
+  const clsEl=document.querySelector(`#drugB-${code} .drug-class`);
+  if(clsEl&&drug){clsEl.textContent=drug.cls;clsEl.style.color='';}
+  activeDosePanelB=null;document.getElementById('dosePanelB').innerHTML='';
+}
+
+function getDoseScaleB(code){
+  const state=doseStateB[code];
+  if(!state||!state.dose_mg_per_kg||!state.weight_kg)return 1.0;
+  const ref=ADULT_REF_PK[code];
+  const scale=(state.dose_mg_per_kg*state.weight_kg)/(ref.adult_dose*ref.adult_weight);
+  return isNaN(scale)||scale<=0?1.0:scale;
+}
+
+function getDoseScale(code){
+  const state=doseState[code];
+  if(!state||!state.dose_mg_per_kg||!state.weight_kg)return 1.0;
+  const ref=ADULT_REF_PK[code];
+  const scale=(state.dose_mg_per_kg*state.weight_kg)/(ref.adult_dose*ref.adult_weight);
+  return isNaN(scale)||scale<=0?1.0:scale;
+}
+
+function getScaledDQTcWith(a,b,baseDQ,scaleFn){
+  const scaleA=scaleFn(a),scaleB=scaleFn(b);
+  if(scaleA===1.0&&scaleB===1.0)return{dq:baseDQ,scaled:false,scaleA:1.0,scaleB:1.0};
+  const ikr=getIKR(a,b);
+  const stimulants=new Set(['MPH','AMP']);
+  let dqAdj=baseDQ||0;
+  if(stimulants.has(a)||stimulants.has(b)){
+    const stimScale=stimulants.has(a)?scaleA:scaleB;
+    const nonStimScale=stimulants.has(a)?scaleB:scaleA;
+    const sympFrac=ikr<1?1.0:Math.max(0,1-ikr/20);
+    dqAdj=dqAdj*(sympFrac*stimScale+(1-sympFrac)*nonStimScale);
+  } else {
+    dqAdj=dqAdj*Math.max(scaleA,scaleB);
+  }
+  return{dq:isNaN(dqAdj)?baseDQ:Math.round(dqAdj*10)/10,scaled:true,scaleA,scaleB};
+}
+
+function getScaledDQTc(a,b,baseDQ){
+  const scaleA=getDoseScale(a),scaleB=getDoseScale(b);
+  if(scaleA===1.0&&scaleB===1.0)return{dq:baseDQ,scaled:false,scaleA:1.0,scaleB:1.0};
+  const ikr=getIKR(a,b);
+  const stimulants=new Set(['MPH','AMP']);
+  let dqAdj=baseDQ||0;
+  if(stimulants.has(a)||stimulants.has(b)){
+    const stimScale=stimulants.has(a)?scaleA:scaleB;
+    const nonStimScale=stimulants.has(a)?scaleB:scaleA;
+    const sympFrac=ikr<1?1.0:Math.max(0,1-ikr/20);
+    dqAdj=dqAdj*(sympFrac*stimScale+(1-sympFrac)*nonStimScale);
+  } else {
+    dqAdj=dqAdj*Math.max(scaleA,scaleB);
+  }
+  return{dq:isNaN(dqAdj)?baseDQ:Math.round(dqAdj*10)/10,scaled:true,scaleA,scaleB};
+}
+
+// ── WEIGHT UNIT ───────────────────────────────────────────────────────────────
+function getWeightKg(){
+  const raw=parseFloat(document.getElementById('patientWeight')?.value);
+  if(isNaN(raw))return null;
+  return weightUnit==='lbs'?Math.round(raw*0.4536*10)/10:raw;
+}
+function setWeightUnit(unit){
+  weightUnit=unit;
+  const kg=document.getElementById('unitKg'),lbs=document.getElementById('unitLbs');
+  if(kg){kg.style.background=unit==='kg'?'var(--navy)':'transparent';kg.style.color=unit==='kg'?'#fff':'var(--ink3)';}
+  if(lbs){lbs.style.background=unit==='lbs'?'var(--navy)':'transparent';lbs.style.color=unit==='lbs'?'#fff':'var(--ink3)';}
+  const wEl=document.getElementById('patientWeight');
+  if(unit==='lbs'){if(wEl){wEl.placeholder='e.g. 70';wEl.max=265;}}
+  else{if(wEl){wEl.placeholder='e.g. 32';wEl.max=120;}}
+  updateWeightConvert();
+}
+function updateWeightConvert(){
+  const raw=parseFloat(document.getElementById('patientWeight')?.value);
+  const el=document.getElementById('weightConvert');
+  if(!el)return;
+  if(isNaN(raw)){el.textContent='';return;}
+  el.textContent=weightUnit==='lbs'?`= ${Math.round(raw*0.4536*10)/10} kg`:`= ${Math.round(raw/0.4536*10)/10} lbs`;
+}
+
+// ── CMAX MODE ─────────────────────────────────────────────────────────────────
+function setCmaxMode(mode){
+  cmaxMode=mode;
+  document.getElementById('btnAdultCmax').style.background=mode==='adult'?'var(--navy)':'transparent';
+  document.getElementById('btnAdultCmax').style.color=mode==='adult'?'#fff':'var(--ink3)';
+  document.getElementById('btnPedsCmax').style.background=mode==='pediatric'?'var(--navy)':'transparent';
+  document.getElementById('btnPedsCmax').style.color=mode==='pediatric'?'#fff':'var(--ink3)';
+  document.getElementById('cmaxModeNote').textContent=mode==='pediatric'
+    ?'Pediatric-specific free Cmax from published studies (9/12 drugs). QUE 86.6 nM, AMP 148 nM, MPH 21.9 nM. Note: ARI uses adult benchmark (FDA: comparable dose-normalized).'
+    :'Population-average adult free plasma Cmax from published literature.';
+}
+
+// ── MODE (single / compare) ───────────────────────────────────────────────────
+function setMode(mode){
+  appMode=mode;
+  document.getElementById('btnSingle').classList.toggle('active',mode==='single');
+  document.getElementById('btnCompare').classList.toggle('active',mode==='compare');
+  document.getElementById('compareSection').style.display=mode==='compare'?'block':'none';
+  document.getElementById('medLabel').textContent=mode==='compare'?'Current regimen':'Medications';
+  const main=document.getElementById('main');
+  // reset main area
+  main.innerHTML=`<div class="empty-state" id="emptyState"><div class="empty-icon">♥</div><div class="empty-title">No patient loaded</div><div class="empty-sub">${mode==='compare'?'Enter current and proposed regimens to compare cardiac risk.':'Select diagnoses to see drug suggestions, then add medications and click Assess Cardiac Risk.'}</div></div>`;
+}
+
+function setMetric(m){
+  riskMetric=m;
+  document.getElementById('btnGenuine').classList.toggle('active',m==='genuine');
+  document.getElementById('btnBazett').classList.toggle('active',m==='bazett');
+}
+
+// ── QTc BASELINE ──────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('baselineQTc')?.addEventListener('input',updateQtcStatus);
+  document.getElementById('patientWeight')?.addEventListener('input',()=>{
+    updateWeightConvert();
+    if(activeDosePanel){
+      const dpW=document.getElementById(`dp-weight-${activeDosePanel}`);
+      const kg=getWeightKg();
+      if(dpW&&kg){dpW.value=kg;updateDosePreview(activeDosePanel);}
+    }
+  });
+});
+
+function updateQtcStatus(){
+  const val=parseFloat(document.getElementById('baselineQTc')?.value);
+  const el=document.getElementById('qtcStatus');
+  if(!el)return;
+  if(isNaN(val)){el.textContent='';el.className='qtc-normal';return;}
+  if(val<440){el.textContent=`Normal baseline (${val} ms)`;el.className='qtc-normal';}
+  else if(val<470){el.textContent=`⚠ Borderline prolonged (${val} ms) — use caution with any QT-active drugs`;el.className='qtc-normal qtc-warn';}
+  else{el.textContent=`⚠ Prolonged baseline QTc (${val} ms) — high-risk starting point`;el.className='qtc-normal qtc-alert';}
+}
+
+function predictedAbsQTc(baselineQTc, dq){
+  if(!baselineQTc||isNaN(baselineQTc))return null;
+  return Math.round(baselineQTc + dq);
+}
+
+// ── BUILD UI ──────────────────────────────────────────────────────────────────
+function buildDxGrid(){
+  const grid=document.getElementById('dxGrid');
+  DIAGNOSES.forEach(dx=>{
+    const tag=document.createElement('button');
+    tag.className='dx-tag';tag.id=`dx-${dx.id}`;tag.textContent=dx.label;
+    tag.onclick=()=>toggleDx(dx.id);grid.appendChild(tag);
+  });
+}
+
+function toggleDx(id){
+  if(selectedDx.has(id)){selectedDx.delete(id);document.getElementById(`dx-${id}`)?.classList.remove('selected');}
+  else{selectedDx.add(id);document.getElementById(`dx-${id}`)?.classList.add('selected');}
+  updateSuggestions();
+}
+
+function updateSuggestions(){
+  const suggested=new Set();
+  selectedDx.forEach(id=>{DIAGNOSES.find(d=>d.id===id)?.suggest.forEach(c=>suggested.add(c));});
+  DRUGS.forEach(d=>{
+    const btn=document.getElementById(`drug-${d.code}`);
+    if(!btn)return;
+    suggested.has(d.code)?btn.classList.add('suggested'):btn.classList.remove('suggested');
+  });
+  const el=document.getElementById('dxSuggest');
+  if(el){el.textContent=suggested.size>0?`Typical for selected diagnoses: ${[...suggested].map(c=>DRUGS.find(d=>d.code===c)?.name||c).join(', ')}`:''}
+}
+
+function buildDrugGrid(gridId='drugGrid', selSet=selected){
+  const grid=document.getElementById(gridId);
+  if(!grid)return;
+  grid.innerHTML='';
+  DRUGS.forEach(d=>{
+    const btn=document.createElement('button');
+    btn.className='drug-btn';
+    btn.id=gridId==='drugGrid'?`drug-${d.code}`:`drugB-${d.code}`;
+    btn.innerHTML=`<div class="suggest-dot"></div><span class="drug-name">${d.code}</span><span class="drug-class">${d.cls}</span>`;
+    if(gridId==='drugGrid'){
+      const doseBtn=document.createElement('div');
+      doseBtn.id=`dosebtn-${d.code}`;
+      doseBtn.style.cssText='display:none;position:absolute;top:2px;right:2px;font-size:9px;background:rgba(255,255,255,0.2);padding:1px 4px;border-radius:2px;cursor:pointer;color:rgba(255,255,255,0.8);';
+      doseBtn.textContent='⚖ dose';
+      doseBtn.onclick=(e)=>{e.stopPropagation();toggleDosePanel(d.code);};
+      btn.appendChild(doseBtn);
+      btn.onclick=()=>toggleDrug(d.code,selSet,'drugGrid','selectedList');
+    } else {
+      const doseBtnB=document.createElement('div');
+      doseBtnB.id=`dosebtnB-${d.code}`;
+      doseBtnB.style.cssText='display:none;position:absolute;top:2px;right:2px;font-size:9px;background:rgba(255,255,255,0.2);padding:1px 4px;border-radius:2px;cursor:pointer;color:rgba(255,255,255,0.8);';
+      doseBtnB.textContent='⚖ dose';
+      doseBtnB.onclick=(e)=>{e.stopPropagation();toggleDosePanelB(d.code);};
+      btn.appendChild(doseBtnB);
+      btn.onclick=()=>toggleDrug(d.code,selSet,'drugGridB','selectedListB');
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function toggleDrug(code,selSet,gridId,listId){
+  const isA=(gridId==='drugGrid');
+  const btnId=isA?`drug-${code}`:`drugB-${code}`;
+  const btn=document.getElementById(btnId);
+  const doseBtn=isA?document.getElementById(`dosebtn-${code}`):null;
+  if(selSet.has(code)){
+    selSet.delete(code);btn?.classList.remove('selected');
+    if(doseBtn){doseBtn.style.display='none';}
+    if(isA&&activeDosePanel===code){activeDosePanel=null;document.getElementById('dosePanel').innerHTML='';}
+    if(isA)clearDose(code);
+  } else {
+    selSet.add(code);btn?.classList.add('selected');
+    if(doseBtn){doseBtn.style.display='block';}
+    const doseBtnB=!isA?document.getElementById(`dosebtnB-${code}`):null;
+    if(doseBtnB){doseBtnB.style.display='block';}
+    if(isA&&doseState[code]){
+      const scale=(doseState[code].dose_mg_per_kg*doseState[code].weight_kg)/(ADULT_REF_PK[code].adult_dose*ADULT_REF_PK[code].adult_weight);
+      const clsEl=btn?.querySelector('.drug-class');
+      if(clsEl){clsEl.textContent=scale.toFixed(2)+'× Cmax';clsEl.style.color='rgba(255,255,255,0.8)';}
+    } else if(!isA&&doseStateB[code]){
+      const scale=(doseStateB[code].dose_mg_per_kg*doseStateB[code].weight_kg)/(ADULT_REF_PK[code].adult_dose*ADULT_REF_PK[code].adult_weight);
+      const clsEl=btn?.querySelector('.drug-class');
+      if(clsEl){clsEl.textContent=scale.toFixed(2)+'× Cmax';clsEl.style.color='rgba(255,255,255,0.8)';}
+    }
+  }
+  updateSelectedList(selSet,listId);
+  const totalSelected=(appMode==='compare')?(selected.size>=2||selectedB.size>=2):(selected.size>=2);
+  document.getElementById('runBtn').disabled=!totalSelected;
+}
+
+function clearDrugs(){
+  selected.forEach(c=>{
+    document.getElementById(`drug-${c}`)?.classList.remove('selected');
+    const db=document.getElementById(`dosebtn-${c}`);if(db)db.style.display='none';
+    delete doseState[c];
+  });
+  selected.clear();activeDosePanel=null;
+  document.getElementById('dosePanel').innerHTML='';
+  updateSelectedList(selected,'selectedList');
+  document.getElementById('runBtn').disabled=true;
+}
+function clearDrugsB(){
+  selectedB.forEach(c=>{
+    document.getElementById(`drugB-${c}`)?.classList.remove('selected');
+    const db=document.getElementById(`dosebtnB-${c}`);if(db)db.style.display='none';
+    delete doseStateB[c];
+  });
+  selectedB.clear();
+  activeDosePanelB=null;
+  const pb=document.getElementById('dosePanelB');if(pb)pb.innerHTML='';
+  updateSelectedList(selectedB,'selectedListB');
+  if(selected.size<2&&selectedB.size<2)document.getElementById('runBtn').disabled=true;
+}
+
+function updateSelectedList(selSet,listId){
+  const el=document.getElementById(listId);if(!el)return;
+  if(selSet.size===0){el.textContent='No medications selected';el.className='selected-list empty';}
+  else{
+    const drugs=DRUGS.filter(d=>selSet.has(d.code));
+    el.innerHTML=drugs.map(d=>`<span style="color:var(--navy);font-weight:500">${d.code}</span> ${d.name}`).join('<br>');
+    el.className='selected-list';
+  }
+}
+
+// ── DOSE PANEL ────────────────────────────────────────────────────────────────
+function toggleDosePanel(code){
+  const panel=document.getElementById('dosePanel');
+  if(activeDosePanel===code){panel.innerHTML='';activeDosePanel=null;return;}
+  activeDosePanel=code;
+  const ref=ADULT_REF_PK[code];
+  const existing=doseState[code]||{};
+  const patientWeightKg=getWeightKg();
+  if(existing.weight_kg&&patientWeightKg&&existing.weight_kg!==patientWeightKg)existing.weight_kg=patientWeightKg;
+  panel.innerHTML=`
+    <div class="dose-panel open" id="dp-${code}">
+      <h4>${code} — Patient dose</h4>
+      <div class="dose-row">
+        <div class="dose-input-wrap"><label>Dose (mg/kg/day)</label>
+          <input type="number" id="dp-dose-${code}" placeholder="${ref.adult_dose.toFixed(3)}" step="0.01" min="0" max="${ref.max_dose_per_kg}" value="${existing.dose_mg_per_kg||''}" oninput="updateDosePreview('${code}')">
+        </div>
+        <div class="dose-input-wrap"><label>Weight (kg)</label>
+          <input type="number" id="dp-weight-${code}" placeholder="${patientWeightKg||'e.g. 32'}" step="0.5" min="10" max="120" value="${patientWeightKg||existing.weight_kg||''}" oninput="updateDosePreview('${code}')">
+        </div>
+      </div>
+      <div class="dose-note">${ref.note}</div>
+      <div class="dose-result" id="dp-result-${code}"></div>
+      <button style="margin-top:8px;font-size:11px;padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:2px;cursor:pointer" onclick="saveDose('${code}')">Apply</button>
+      <button style="margin-top:8px;margin-left:6px;font-size:11px;padding:5px 12px;background:transparent;color:var(--ink3);border:1px solid var(--rule);border-radius:2px;cursor:pointer" onclick="clearDose('${code}')">Use reference Cmax</button>
+    </div>`;
+  updateDosePreview(code);
+}
+
+function updateDosePreview(code){
+  const ref=ADULT_REF_PK[code];
+  const doseEl=document.getElementById(`dp-dose-${code}`);
+  const weightEl=document.getElementById(`dp-weight-${code}`);
+  const resEl=document.getElementById(`dp-result-${code}`);
+  if(!doseEl||!resEl)return;
+  const dose=parseFloat(doseEl.value),weight=parseFloat(weightEl.value);
+  if(!dose||!weight){resEl.textContent='Enter dose and weight to see Cmax estimate';return;}
+  const scale=(dose*weight)/(ref.adult_dose*ref.adult_weight);
+  const base=getBaseCmax(code);
+  resEl.innerHTML=`Scaled Cmax ≈ <strong>${(base*scale).toFixed(1)} nM</strong> (${scale.toFixed(2)}× reference ${base.toFixed(1)} nM)`;
+}
+
+function saveDose(code){
+  const doseEl=document.getElementById(`dp-dose-${code}`);
+  const weightEl=document.getElementById(`dp-weight-${code}`);
+  if(!doseEl)return;
+  const dose=parseFloat(doseEl.value);
+  const weight=parseFloat(weightEl.value)||getWeightKg()||null;
+  if(dose&&weight&&!isNaN(dose)&&!isNaN(weight)){
+    doseState[code]={dose_mg_per_kg:dose,weight_kg:weight};
+    const ref=ADULT_REF_PK[code];
+    const scale=(dose*weight)/(ref.adult_dose*ref.adult_weight);
+    const clsEl=document.querySelector(`#drug-${code} .drug-class`);
+    if(clsEl){clsEl.textContent=scale.toFixed(2)+'× Cmax';clsEl.style.color='rgba(255,255,255,0.8)';}
+    const doseBtn=document.getElementById(`dosebtn-${code}`);
+    if(doseBtn)doseBtn.style.display='block';
+  } else if(dose&&!weight){
+    const resEl=document.getElementById(`dp-result-${code}`);
+    if(resEl)resEl.innerHTML='<span style="color:var(--red)">Enter patient weight to apply dose scaling</span>';
+    return;
+  }
+  activeDosePanel=null;document.getElementById('dosePanel').innerHTML='';
+}
+
+function clearDose(code){
+  delete doseState[code];
+  const drug=DRUGS.find(d=>d.code===code);
+  const clsEl=document.querySelector(`#drug-${code} .drug-class`);
+  if(clsEl&&drug){clsEl.textContent=drug.cls;clsEl.style.color='';}
+  activeDosePanel=null;document.getElementById('dosePanel').innerHTML='';
+}
+
+// ── ANALYSIS ──────────────────────────────────────────────────────────────────
+function buildCombos(codes, doseScaleFn=null){
+  const combos=[];
+  for(let i=0;i<codes.length;i++){
+    for(let j=i+1;j<codes.length;j++){
+      const a=codes[i],b=codes[j];
+      const baseDQ=getActiveDelta(a,b);
+      const genuineV=getGenuine(a,b),bazettV=getBazettDelta(a,b);
+      // Apply Cmax mode scaling to baseDQ
+      // If pediatric mode, scale the delta proportionally (hERG-driven combos scale with Cmax ratio)
+      let pkDQ=baseDQ;
+      if(cmaxMode==='pediatric'){
+        const stimulants=new Set(['MPH','AMP']);
+        const ikr=getIKR(a,b);
+        const adultA=ADULT_REF_PK[a]?.free_cmax_nm||1;
+        const adultB=ADULT_REF_PK[b]?.free_cmax_nm||1;
+        const pedsA=PEDIATRIC_CMAX[a]||adultA;
+        const pedsB=PEDIATRIC_CMAX[b]||adultB;
+        // Ratio capped at 10x to prevent extreme values from sparse peds data
+        const ratioA=Math.min(pedsA/adultA, 10.0);
+        const ratioB=Math.min(pedsB/adultB, 10.0);
+        if(stimulants.has(a)||stimulants.has(b)){
+          const stimRatio=stimulants.has(a)?ratioA:ratioB;
+          const nonStimRatio=stimulants.has(a)?ratioB:ratioA;
+          const sympFrac=ikr<1?1.0:Math.max(0,1-ikr/20);
+          pkDQ=baseDQ*(sympFrac*stimRatio+(1-sympFrac)*nonStimRatio);
+        } else {
+          pkDQ=baseDQ*Math.max(ratioA,ratioB);
+        }
+        pkDQ=Math.round(pkDQ*10)/10;
+        // Cap delta-QTc at mechanism-appropriate maximum
+        // Sympathomimetic combinations: max ~30ms (upper bound from 500-beat sweep)
+        // hERG-driven combinations: max ~50ms (theoretical)
+        const stimulants_cap=new Set(['MPH','AMP']);
+        const isSympathomimetic=(stimulants_cap.has(a)||stimulants_cap.has(b))&&getIKR(a,b)<3;
+        pkDQ=Math.min(pkDQ, isSympathomimetic?28.0:45.0);
+      }
+      const{dq:cypDQ,adjusted:cypAdj}=adjustedDQTc(a,b,pkDQ);
+      // Dose scaling overrides pediatric Cmax scaling when both are present
+      // (user-entered dose data is more specific than population-level peds reference)
+      const dsObj=doseScaleFn===getDoseScaleB?doseStateB:doseState;
+      const hasDoseA=dsObj[a]&&dsObj[a].dose_mg_per_kg&&dsObj[a].weight_kg;
+      const hasDoseB=dsObj[b]&&dsObj[b].dose_mg_per_kg&&dsObj[b].weight_kg;
+      const baseForDose=(hasDoseA||hasDoseB)?baseDQ:cypDQ;
+      const{dq:scaledDQ,scaled:doseScaled,scaleA,scaleB}=getScaledDQTcWith(a,b,hasDoseA||hasDoseB?adjustedDQTc(a,b,baseDQ).dq:cypDQ, doseScaleFn||getDoseScale);
+      const dq=scaledDQ;
+      const ikr=getIKR(a,b);
+      const tier=riskTier(dq);
+      const faers=isFaers(a,b);
+      const ror=getFaersROR(a,b);
+      const hasCyp=(codes.includes('FLU')&&(['RIS','ARI','QUE'].includes(a)||['RIS','ARI','QUE'].includes(b)));
+      const hasCond=codes.includes('GUA')&&['RIS','QUE','ARI'].some(c=>codes.includes(c));
+      const score=compositeScore(dq,ikr,ror,faers,hasCyp,hasCond);
+      combos.push({a,b,dq,baseDQ,pkDQ,ikr,tier,faers,ror,genuineV,bazettV,adjusted:cypAdj||doseScaled,doseScaled,scaleA,scaleB,score,scoreLabel:scoreLabel(score)});
+    }
+  }
+  return combos.sort((x,y)=>y.score-x.score);
+}
+
+function runAnalysis(){
+  const name=document.getElementById('patientName').value.trim()||'Patient';
+  const age=parseInt(document.getElementById('patientAge').value)||null;
+  const sex=document.getElementById('patientSex').value;
+  const notes=document.getElementById('patientNotes').value.trim();
+  const baselineQTc=parseFloat(document.getElementById('baselineQTc')?.value)||null;
+  const cypStatus=document.querySelector('input[name=cyp2d6]:checked')?.value||'unknown';
+  const dxLabels=[...selectedDx].map(id=>DIAGNOSES.find(d=>d.id===id)?.label||id);
+
+  const main=document.getElementById('main');
+  document.getElementById('emptyState')?.remove();
+
+  if(appMode==='compare'){
+    runComparison(name,age,sex,baselineQTc,dxLabels,cypStatus);
+  } else {
+    const codes=Array.from(selected);
+    const combos=buildCombos(codes);
+    const tierOrder=["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
+    let worstTier="LOW";
+    combos.forEach(c=>{if(tierOrder.indexOf(c.tier)<tierOrder.indexOf(worstTier))worstTier=c.tier;});
+    const topScore=combos.length>0?combos[0].score:0;
+    const relevantTriples=TRIPLES.filter(t=>t.combo.split('+').every(p=>codes.includes(p)));
+    const weight=getWeightKg();
+    const metaParts=[age?`Age ${age}`:'',weight?`${weight} kg`:''];
+    if(sex)metaParts.push({M:'Male',F:'Female'}[sex]||sex);
+    if(dxLabels.length)metaParts.push(dxLabels.join(', '));
+    const drugNames=DRUGS.filter(d=>codes.includes(d.code)).map(d=>d.name).join(', ');
+    const card=buildResultCard({name,metaParts,drugNames,codes,combos,worstTier,topScore,relevantTriples,age,sex,baselineQTc,cypStatus,notes});
+    main.insertBefore(card,main.firstChild);
+    history.unshift({name,drugs:codes,tier:worstTier,score:topScore});
+    renderHistory();
+  }
+  resetForm();
+}
+
+function runComparison(name,age,sex,baselineQTc,dxLabels,cypStatus){
+  const main=document.getElementById('main');
+  const codesA=Array.from(selected),codesB=Array.from(selectedB);
+  const combosA=buildCombos(codesA,getDoseScale),combosB=buildCombos(codesB,getDoseScaleB);
+  const tierOrder=["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
+  const worstA=combosA.reduce((w,c)=>tierOrder.indexOf(c.tier)<tierOrder.indexOf(w)?c.tier:w,"LOW");
+  const worstB=combosB.reduce((w,c)=>tierOrder.indexOf(c.tier)<tierOrder.indexOf(w)?c.tier:w,"LOW");
+  const topScoreA=combosA[0]?.score||0,topScoreB=combosB[0]?.score||0;
+  const improvement=topScoreA-topScoreB;
+
+  const wrapper=document.createElement('div');
+  wrapper.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+      <div style="font-family:'Libre Baskerville',serif;font-size:1.1rem;color:var(--ink)">${escHtml(name)} — Regimen Comparison</div>
+      <button class="btn-print" onclick="window.print()">🖨 Print</button>
+    </div>
+    <div style="padding:0.75rem 1rem;border:1px solid var(--rule);border-radius:2px;background:var(--bg2);font-size:12px;color:var(--ink2);margin-bottom:1rem;">
+      ${(()=>{
+        const tierOrder=["HIGH","MODERATE","LOW-MOD","LOW","PROTECTIVE"];
+        const tierA=tierOrder.indexOf(worstA), tierB=tierOrder.indexOf(worstB);
+        const tierImproved=tierB>tierA, tierWorsened=tierB<tierA;
+        if(tierImproved) return `<span style="color:var(--green);font-weight:500">↓ Proposed regimen reduces risk tier: ${worstA} → ${worstB} (score ${topScoreA} → ${topScoreB}).</span>`;
+        if(tierWorsened) return `<span style="color:var(--red);font-weight:500">↑ Proposed regimen increases risk tier: ${worstA} → ${worstB} (score ${topScoreA} → ${topScoreB}).</span>`;
+        if(improvement>5) return `<span style="color:var(--green);font-weight:500">↓ Same tier — proposed regimen reduces composite score by ${improvement} points (${topScoreA} → ${topScoreB}).</span>`;
+        if(improvement<-5) return `<span style="color:var(--red);font-weight:500">↑ Same tier — proposed regimen increases composite score by ${Math.abs(improvement)} points (${topScoreA} → ${topScoreB}).</span>`;
+        return `<span style="color:var(--ink3)">Comparable risk profiles — same tier (${worstA}), score difference ${Math.abs(improvement)} points.</span>`;
+      })()}
+    </div>
+    <div class="comparison-grid">
+      <div>
+        <div class="comparison-label">Current regimen</div>
+        <div id="compareCardA"></div>
+      </div>
+      <div>
+        <div class="comparison-label">Proposed regimen</div>
+        <div id="compareCardB"></div>
+      </div>
+    </div>`;
+  main.insertBefore(wrapper,main.firstChild);
+
+  const metaParts=[age?`Age ${age}`:''];if(sex)metaParts.push({M:'Male',F:'Female'}[sex]||sex);
+  const cardA=buildResultCard({name:'Current',metaParts,drugNames:DRUGS.filter(d=>codesA.includes(d.code)).map(d=>d.name).join(', '),codes:codesA,combos:combosA,worstTier:worstA,topScore:topScoreA,relevantTriples:[],age,sex,baselineQTc,cypStatus,notes:'',compact:true});
+  const cardB=buildResultCard({name:'Proposed',metaParts,drugNames:DRUGS.filter(d=>codesB.includes(d.code)).map(d=>d.name).join(', '),codes:codesB,combos:combosB,worstTier:worstB,topScore:topScoreB,relevantTriples:[],age,sex,baselineQTc,cypStatus,notes:'',compact:true});
+  document.getElementById('compareCardA')?.appendChild(cardA);
+  document.getElementById('compareCardB')?.appendChild(cardB);
+  history.unshift({name,drugs:[...codesA,...codesB],tier:worstA,score:topScoreA});
+  renderHistory();
+}
+
+function buildResultCard({name,metaParts,drugNames,codes,combos,worstTier,topScore,relevantTriples,age,sex,baselineQTc,cypStatus,notes,compact=false}){
+  // Age warnings
+  const ageWarnings=[];
+  if(age!==null){
+    combos.forEach(c=>{
+      const w=getAgeROR(c.a,c.b);if(!w)return;
+      if(age<=12&&w.child>w.adol){ageWarnings.push({combo:`${c.a}+${c.b}`,childROR:w.child,adolROR:w.adol});}
+      else if(age>=13&&w.adol>w.child){ageWarnings.push({combo:`${c.a}+${c.b}`,childROR:w.child,adolROR:w.adol,adolHigher:true});}
+    });
+  }
+
+  // Flags
+  const hasFluoxetine=codes.includes('FLU');
+  const cyp2d6Substrates=['RIS','ARI','QUE'].filter(c=>codes.includes(c));
+  const cypWarning=hasFluoxetine&&cyp2d6Substrates.length>0?`Fluoxetine inhibits CYP2D6. ${cyp2d6Substrates.join(', ')} plasma concentrations may be 1.5–1.7× higher than modeled.`:null;
+  const guaWarning=codes.includes('GUA')&&['RIS','QUE','ARI'].some(c=>codes.includes(c))?`Guanfacine + antipsychotic: PR interval prolongation and AV conduction slowing — not captured by QTc modeling. FAERS ROR 10–13 in pediatric patients.`:null;
+  const poorMetabWarning=cypStatus==='poor'?`CYP2D6 poor metabolizer: Cmax scaled 2.0× for ARI/NOR, 1.75× for RIS, 1.5× for IMI.`:null;
+  const sexWarning=sex==='F'?`Female sex: longer baseline QTc (mean 410 vs 400 ms) due to lower IKs from estrogen. Risk may be underestimated.`:null;
+  const pedsWarning=cmaxMode==='pediatric'?`Pediatric Cmax mode active — predictions use published pediatric-specific free plasma concentrations.`:null;
+
+  let recText='';
+  if(worstTier==='HIGH')recText='HIGH cardiac risk. Consider alternative combinations. If proceeding, baseline ECG required; cardiology consultation recommended.';
+  else if(worstTier==='MODERATE')recText='MODERATE cardiac risk. Baseline ECG recommended. Repeat ECG at 4–6 weeks or after dose changes.';
+  else if(worstTier==='LOW-MOD')recText='LOW-MODERATE cardiac risk. Baseline ECG reasonable. Monitor for palpitations, presyncope, or HR elevation.';
+  else recText='LOW cardiac risk. Standard clinical monitoring applies.';
+
+  const card=document.createElement('div');
+  card.className='result-card';
+
+  // Absolute QTc prediction
+  const absQTcNote=baselineQTc&&combos[0]?
+    `Predicted QTc: ~${predictedAbsQTc(baselineQTc,combos[0].dq)} ms (baseline ${baselineQTc} ms + Δ${combos[0].dq>=0?'+':''}${combos[0].dq?.toFixed(1)} ms)`:
+    '';
+
+  card.innerHTML=`
+    <div class="result-header">
+      <div>
+        <div class="patient-name">${escHtml(name)}</div>
+        <div class="patient-meta">${metaParts.filter(Boolean).join(' · ')} | ${escHtml(drugNames)}</div>
+        ${cypStatus==='poor'?'<div style="margin-top:4px"><span class="adjusted-badge">CYP2D6 poor metabolizer</span></div>':''}
+        ${cmaxMode==='pediatric'?'<div style="margin-top:4px"><span class="peds-badge">Pediatric Cmax</span></div>':''}
+      </div>
+      <div class="result-header-right">
+        <div class="risk-badge-large risk-${worstTier}">${worstTier.replace('-',' ')}</div>
+        ${!compact?`<button class="btn-print" onclick="window.print()">🖨 Print</button>`:''}
+      </div>
+    </div>
+    <div class="result-body">
+      ${absQTcNote?`<div style="padding:8px 10px;background:${worstTier==='HIGH'?'var(--red-bg)':worstTier==='MODERATE'?'var(--amb-bg)':'var(--tel-bg)'};border-radius:2px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--ink2);margin-bottom:0.75rem;">${absQTcNote}</div>`:''}
+      ${renderScoreStrip(topScore,combos)}
+      ${renderCombos(combos,age,baselineQTc)}
+      ${relevantTriples.length?renderTriples(relevantTriples):''}
+      ${ageWarnings.map(w=>`
+        <div class="age-warning" style="margin-top:0.5rem">
+          <strong>Age note — ${w.combo}:</strong>
+          ${w.adolHigher
+            ?`FAERS cardiac signal higher in adolescents (ROR ${w.adolROR}) than children (ROR ${w.childROR}), consistent with CYP2D6 maturation increasing fluoxetine-driven Cmax at age ${age}.`
+            :`FAERS cardiac signal markedly higher in children 6–12 (ROR ${w.childROR}) vs adolescents 13–17 (ROR ${w.adolROR}). Children have higher baseline HR (~90 bpm) and higher weight-adjusted doses, amplifying sympathomimetic ΔQTc effects at age ${age}.`}
+        </div>`).join('')}
+      <div class="clinical-note" style="margin-top:0.75rem"><strong>Clinical note:</strong> ${recText}</div>
+      ${cypWarning?`<div class="clinical-note note-amber" style="margin-top:0.5rem"><strong>CYP2D6 interaction:</strong> ${cypWarning}</div>`:''}
+      ${guaWarning?`<div class="clinical-note note-amber" style="margin-top:0.5rem"><strong>Conduction note:</strong> ${guaWarning}</div>`:''}
+      ${poorMetabWarning?`<div class="clinical-note note-purple" style="margin-top:0.5rem"><strong>Poor metabolizer:</strong> ${poorMetabWarning}</div>`:''}
+      ${sexWarning?`<div class="clinical-note note-teal" style="margin-top:0.5rem"><strong>Sex note:</strong> ${sexWarning}</div>`:''}
+      ${pedsWarning?`<div class="clinical-note note-teal" style="margin-top:0.5rem"><strong>Pediatric Cmax:</strong> ${pedsWarning}</div>`:''}
+      ${notes?`<div class="clinical-note" style="margin-top:0.5rem;border-left-color:var(--ink3)"><strong>Notes:</strong> ${escHtml(notes)}</div>`:''}
+      <div class="disclaimer" style="margin-top:0.75rem">
+        Risk tier uses ${riskMetric==='genuine'?'genuine ΔAPD₉₀':'Bazett ΔQTc'}; composite score is a rough personal heuristic (active Δ + IKr + FAERS), not validated.
+        ORd 2011 at 500-beat steady state. ${cmaxMode==='pediatric'?'Pediatric-specific Cmax (9/12 drugs).':'Adult reference Cmax.'}
+        <strong style="color:var(--red)"> Research/curiosity only.</strong>
+      </div>
+    </div>`;
+  return card;
+}
+
+function renderScoreStrip(topScore,combos){
+  const overallTier=scoreLabel(topScore);
+  const barColor=tierBarColor(overallTier);
+  const avgDQ=combos.length?(combos.reduce((s,c)=>s+(c.dq||0),0)/combos.length).toFixed(1):'—';
+  const topCombo=combos[0];
+  return `
+    <div class="score-strip">
+      <div class="score-cell">
+        <div class="score-num score-${overallTier}" style="color:${barColor}">${topScore}</div>
+        <div class="score-lbl">Composite Score</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${topScore}%;background:${barColor}"></div></div>
+      </div>
+      <div class="score-cell">
+        <div class="score-num" style="font-size:1.3rem;color:var(--ink2)">${topCombo?((topCombo.dq>=0?'+':'')+topCombo.dq.toFixed(1)+' ms'):'—'}</div>
+        <div class="score-lbl">Highest Δ (${riskMetric==='genuine'?'APD₉₀':'Bazett QTc'})</div>
+        ${topCombo?`<div style="font-size:10px;color:var(--ink3);margin-top:3px">${topCombo.a}+${topCombo.b}</div>`:''}
+      </div>
+      <div class="score-cell">
+        <div class="score-num" style="font-size:1.3rem;color:var(--ink2)">${combos.length}</div>
+        <div class="score-lbl">Pair${combos.length!==1?'s':''} Assessed</div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:3px">avg ΔQTc ${avgDQ} ms</div>
+      </div>
+      <div class="score-cell">
+        <div class="score-num" style="font-size:1.3rem;color:var(--ink2)">${combos.filter(c=>FAERS_SIGNAL.has(canonicalKey(c.a,c.b))).length}</div>
+        <div class="score-lbl">FAERS Signals</div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:3px">of ${combos.length} pairs</div>
+      </div>
+    </div>`;
+}
+
+let mechOpenId=null;
+function toggleMech(id){
+  if(mechOpenId&&mechOpenId!==id){
+    const prev=document.getElementById(`mech-${mechOpenId}`);
+    if(prev)prev.classList.remove('open');
+  }
+  const el=document.getElementById(`mech-${id}`);
+  if(el){el.classList.toggle('open');mechOpenId=el.classList.contains('open')?id:null;}
+}
+
+function renderCombos(combos,age,baselineQTc){
+  const idBase=Date.now();
+  return `<div class="combo-list">${combos.map((c,idx)=>{
+    const sign=c.dq>=0?'+':'';
+    const bw=Math.min(100,Math.abs(c.dq||0)/22*100);
+    const mech=mechLabel(c.ikr,c.dq);
+    const rorStr=c.ror?` · ROR ${c.ror.toFixed(2)}`:'';
+    const fTag=c.faers?`<span class="faers-badge signal">⚠ FAERS${rorStr}</span>`:`<span class="faers-badge">no FAERS signal</span>`;
+
+    // Badge
+    let adjTag='';
+    if(c.doseScaled&&c.scaleA!==1.0&&c.scaleB!==1.0)adjTag=`<span class="cmax-scale-badge" style="margin-left:4px">${c.a} ${c.scaleA.toFixed(2)}× · ${c.b} ${c.scaleB.toFixed(2)}×</span>`;
+    else if(c.doseScaled&&c.scaleA!==1.0)adjTag=`<span class="cmax-scale-badge" style="margin-left:4px">${c.a} ${c.scaleA.toFixed(2)}× Cmax</span>`;
+    else if(c.doseScaled&&c.scaleB!==1.0)adjTag=`<span class="cmax-scale-badge" style="margin-left:4px">${c.b} ${c.scaleB.toFixed(2)}× Cmax</span>`;
+    else if(c.adjusted)adjTag=`<span class="adjusted-badge" style="margin-left:4px">CYP2D6 adj</span>`;
+    if(cmaxMode==='pediatric')adjTag+=`<span class="peds-badge" style="margin-left:4px">peds Cmax</span>`;
+
+    // Age-stratified FAERS
+    const ageROR=getAgeROR(c.a,c.b);
+    const ageRORHtml=ageROR&&age?`
+      <div class="age-ror-strip">
+        <span style="font-size:10px;color:var(--ink3)">FAERS ROR by age:</span>
+        <span class="age-ror-badge ${ageROR.child>10?'age-ror-high':ageROR.child>3?'age-ror-med':'age-ror-low'}">6–12 yr: ${ageROR.child}</span>
+        <span class="age-ror-badge ${ageROR.adol>10?'age-ror-high':ageROR.adol>3?'age-ror-med':'age-ror-low'}">13–17 yr: ${ageROR.adol}</span>
+      </div>`:'' ;
+
+    // Genuine (APD90) vs Bazett (QTc) — the core insight
+    const gv=c.genuineV, bv=c.bazettV;
+    let divergeFlag='';
+    if(gv!==null&&bv!==null){
+      if(bv-gv>=5&&gv<5)divergeFlag=`<span class="bazett-label" style="color:var(--amber)">← Bazett rate artifact</span>`;
+      else if(gv-bv>=5)divergeFlag=`<span class="bazett-label" style="color:var(--teal)">← Bazett masks prolongation</span>`;
+    }
+    const bazHtml=(gv!==null&&bv!==null)?`
+      <div class="bazett-strip">
+        <span class="bazett-label" style="color:#1B3A6B;font-weight:500">genuine ΔAPD₉₀ ${gv>=0?'+':''}${gv.toFixed(1)}ms</span>
+        <span class="bazett-label" style="color:#D97706">Bazett ΔQTc ${bv>=0?'+':''}${bv.toFixed(1)}ms</span>
+        ${divergeFlag}
+      </div>`:'' ;
+
+    // Absolute QTc
+    const absQtc=baselineQTc?`<span style="font-size:10px;color:var(--ink3);font-family:'IBM Plex Mono',monospace"> → ~${predictedAbsQTc(baselineQTc,c.dq)} ms QTc</span>`:'';
+
+    // Mechanism expand
+    const mechId=`${idBase}_${idx}`;
+    const mechExplanation=MECH_TEXT[mech]||'';
+
+    return `
+      <div class="combo-row ${c.tier}">
+        <div class="combo-main">
+          <div class="combo-left">
+            <div class="combo-name">${c.a} + ${c.b}
+              <span style="font-size:10px;color:var(--ink3);font-family:'IBM Plex Sans',sans-serif;font-weight:400;margin-left:4px">${mech}</span>
+              ${mechExplanation?`<span class="mech-toggle" onclick="toggleMech('${mechId}')">why?</span>`:''}
+            </div>
+            <div style="margin-top:3px">${fTag}${adjTag}</div>
+            ${ageRORHtml}
+            <div class="dqtc-bar-wrap" style="margin-top:5px"><div class="dqtc-bar" style="width:${bw}%;background:${tierBarColor(c.tier)}"></div></div>
+            ${bazHtml}
+            ${mechExplanation?`<div class="mech-expand" id="mech-${mechId}">${mechExplanation}</div>`:''}
+          </div>
+          <div class="combo-right">
+            <div class="combo-score score-${c.scoreLabel}" style="color:${tierBarColor(c.scoreLabel)}">${c.score}</div>
+            <div class="combo-dqtc">${sign}${c.dq?.toFixed(1)||'n/a'} ms <span style="opacity:0.7">${riskMetric==='genuine'?'APD₉₀':'QTc'}</span>${absQtc}</div>
+            <div style="font-size:10px;color:var(--ink3)">IKr ${c.ikr.toFixed(2)}%</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('')}</div>`;
+}
+
+function renderTriples(triples){
+  return `<div class="triple-section"><h4>Triple combination analysis</h4>${triples.map(t=>`
+    <div class="triple-row ${t.tier}">
+      <span class="triple-name">${t.combo}</span>
+      <span class="triple-dqtc score-${t.tier}" style="color:${tierBarColor(t.tier)}">gen ${t.genuine>=0?'+':''}${t.genuine.toFixed(1)} · Baz ${t.bazett>=0?'+':''}${t.bazett.toFixed(1)} ms</span>
+    </div>`).join('')}</div>`;
+}
+
+function renderHistory(){
+  document.getElementById('historySection')?.remove();
+  if(history.length===0)return;
+  const main=document.getElementById('main');
+  const section=document.createElement('div');
+  section.id='historySection';section.className='history-section';section.style.marginTop='0.5rem';
+  section.innerHTML=`<h2>Previous assessments</h2><div class="history-list">${
+    history.slice(0,6).map(h=>`
+      <div class="history-item">
+        <span class="history-name">${escHtml(h.name)}</span>
+        <span class="history-drugs">${h.drugs.join(' + ')}</span>
+        <span class="history-badge" style="color:${tierColor(h.tier)}">${h.tier} · ${h.score}</span>
+      </div>`).join('')
+  }</div>`;
+  main.appendChild(section);
+}
+
+// ── RESET ─────────────────────────────────────────────────────────────────────
+function resetForm(){
+  document.getElementById('patientName').value='';
+  document.getElementById('patientAge').value='';
+  document.getElementById('patientSex').value='';
+  document.getElementById('patientWeight').value='';
+  document.getElementById('patientNotes').value='';
+  document.getElementById('baselineQTc').value='';
+  document.getElementById('weightConvert').textContent='';
+  document.getElementById('qtcStatus').textContent='';
+  selectedDx.clear();
+  document.querySelectorAll('.dx-tag').forEach(t=>t.classList.remove('selected'));
+  document.getElementById('dxSuggest').textContent='';
+  DRUGS.forEach(d=>document.getElementById(`drug-${d.code}`)?.classList.remove('suggested'));
+  clearDrugs();clearDrugsB();
+  Object.keys(doseState).forEach(k=>delete doseState[k]);
+  Object.keys(doseStateB).forEach(k=>delete doseStateB[k]);
+  activeDosePanelB=null;
+  const pbr=document.getElementById('dosePanelB');if(pbr)pbr.innerHTML='';
+  document.querySelector('input[name=cyp2d6][value=unknown]').checked=true;
+  setWeightUnit('kg');setCmaxMode('adult');
+  const advPanel=document.getElementById('advancedPanel');
+  const chevron=document.getElementById('advancedChevron');
+  if(advPanel)advPanel.style.display='none';
+  if(chevron){chevron.style.transform='';chevron.textContent='▸';}
+}
+
+function toggleAdvanced(){
+  const panel=document.getElementById('advancedPanel');
+  const chevron=document.getElementById('advancedChevron');
+  const isOpen=panel.style.display!=='none';
+  panel.style.display=isOpen?'none':'block';
+  chevron.style.transform=isOpen?'':'rotate(90deg)';
+  chevron.textContent=isOpen?'▸':'▾';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildDxGrid();
+buildDrugGrid('drugGrid',selected);
+buildDrugGrid('drugGridB',selectedB);
+</script>
+</body>
+</html>

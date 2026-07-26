@@ -67,13 +67,15 @@ Estimated proportion of the IM/PM subpopulation is 0.346.
 
 ## 3. What the old table got wrong, and how
 
-Three distinct error modes. They need to be described separately because they are not the same failure.
+Four distinct error modes. They need to be described separately because they are not the same failure.
 
 **Fabricated attribution.** Aripiprazole was cited to Kramer 2013 and Perrin 2008. Neither paper contains an aripiprazole hERG measurement. The citation points at real papers that do not contain the drug.
 
 **Citation slippage within a correct neighbourhood.** Imipramine was listed at 3388 nM and attributed to Witchel 2002. The value is essentially correct: Teschemacher et al. 1999 measured 3.4 micromolar. But Witchel 2002 is a citalopram and fluoxetine paper. Harry Witchel is the fourth author on Teschemacher 1999. Right number, right research group, wrong paper. This is the most insidious of the three because the number checks out.
 
 **Wrong value and wrong citation.** Nortriptyline was listed at 1100 nM attributed to Witchel 2002. The real value is 2200 nM from Jeon et al. 2011, and Witchel 2002 contains no tricyclics.
+
+**Value duplicated across rows.** The web simulator's `PEDIATRIC_CMAX` block listed NOR at 30.4 and FLU at 30.4, identical. In the rebuilt table fluoxetine free Cmax is 22.0 nM and nortriptyline is 45.6 nM. Two drugs with different molecular weights, protein binding and pediatric concentrations cannot share a free Cmax. This is the only one of the four modes detectable by eye without leaving the file.
 
 Separately, quetiapine was listed at 1070 nM against its own cited source, Kongsamut 2002, which reports 5765 nM. And the entire free Cmax column was hand typed rather than computed, so the free fraction was never applied.
 
@@ -135,6 +137,36 @@ The inconsistency, not the error, is the argument for a standardized sourced par
 **Total concentration ceiling.** Where protein binding is unknown, check whether the total concentration alone can reach the required free concentration. Norfluoxetine at the measured pediatric mean has a total of 490 nM against a 625 nM free requirement for 20 percent block. Unreachable at zero binding, therefore unreachable. Excluded without ever finding its binding fraction.
 
 Both belong in the Methods. Absent data is a recurring condition in pediatric psychopharmacology, not an accident.
+
+### 4.6 There was no single source of truth, and that is why the June fix did not propagate
+
+The parameter values existed in at least three independent places, none of which read from the others:
+
+1. `data/herg_master_params.csv` — the nominal table.
+2. `src/cyp2d6_ito.py` — five free Cmax values hardcoded in source, annotated `# from herg_master_params.csv`, a comment asserting a dependency the code does not have.
+3. `docs/clinical_sim.html` and `docs/index.html` — roughly 270 lines of JavaScript constants (`DQTC`, `DAPD`, `IKR`, `TRIPLES`, `PEDIATRIC_CMAX`, `ADULT_REF_PK`), with no external data load anywhere in the page.
+
+The June 2026 audit corrected the table. It did not and could not touch the other two, so the withdrawn values kept running: in the CYP2D6 analysis, and on a live public page serving a clinical tier badge for a further month. **Single source of truth was not a nice-to-have here. Its absence is the reason the fix did not propagate**, and it is why `build_params.py` now computes free Cmax from the table rather than accepting a typed column.
+
+The fourth error mode in § 3 — the NOR/FLU duplicate at 30.4 — was only ever visible in copy 3. It could not have been caught by auditing the CSV.
+
+**Detecting copies.** The obvious grep does not work:
+
+```
+grep -rn --include="*.py" --include="*.js" --include="*.html" \
+  -E "cmax|ic50|free_conc|fraction_bound" . \
+  | grep -viE "^\./archive/" | grep -E "=\s*[0-9]"
+```
+
+This is case-sensitive on the value filter and requires `=` immediately before the digits, so it cannot match colon-delimited JavaScript object literals (`RIS:3.87`), quoted Python dict keys (`"Cmax_free_nM": 2.1`), or lowercase `free_cmax_nm:2.6`. Run against the repo it returned six cosmetic CSS-class hits and one function default, and missed every one of the ~270 inlined constants. Use instead:
+
+```
+grep -rniE "cmax|ic50|free_conc|fraction_bound" \
+  --include=*.py --include=*.js --include=*.html . \
+  | grep -viE '^\./archive/' | grep -E '[:=]\s*[0-9]'
+```
+
+Case-insensitive throughout, and `[:=]` catches both assignment and object-literal forms.
 
 ---
 

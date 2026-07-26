@@ -6,6 +6,12 @@ Scores BOTH genuine repolarization (ΔAPD90) and rate-confounded Bazett (ΔQTc)
 against the FAERS signal, by subset. Tells you whether the real-world signal
 tracks true APD prolongation or the heart-rate artifact.
 
+NOT A COMPOSITE (verified July 2026). This computes three separate
+Mann-Whitney AUCs against the FAERS signal — genuine ΔAPD90, Bazett ΔQTc, and
+IKr block — reported side by side and never combined into a single number. It
+is a discriminator, not a composite. Retained on that basis when the composite
+score and its concordance variants were archived; see archive/src/.
+
 Usage:
     python3 src/concordance_metrics.py \
         --grid results/risk_grid_results.csv \
