@@ -11,6 +11,14 @@ Also removes the obsolete BAZETT decomposition block.
 FAERS_ROR / FAERS_SIGNAL / AGE_ROR are model-independent and left untouched.
 
 Usage:  python3 src/generate_sim_data.py [--dry-run]
+
+DO NOT RUN until the risk grid is regenerated (July 2026). This script writes
+its output directly into docs/clinical_sim.html, which is the live page at
+arnava25.github.io and is currently carrying an "under revision" banner because
+the parameter set behind it was withdrawn in the June 2026 audit. Running it
+against the existing results/risk_grid_results.csv would refresh the live
+calculator with the same invalidated numbers. See results/README.md and
+params/rebuild_record.md.
 """
 import sys, re, csv, json, argparse
 from pathlib import Path

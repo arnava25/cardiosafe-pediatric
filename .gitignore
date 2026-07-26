@@ -1,20 +1,28 @@
+# Python
 __pycache__/
 *.pyc
 
 # FAERS raw data — too large for git (2GB+)
-data/faers_cache/*.zip
-data/faers_cache/*.parquet
+# Whole cache directory is excluded: zips, the three parquet files
+# (demo, drug, reac), and any intermediate artifacts.
+data/faers_cache/*
+# ...except the provenance note, which is small and worth versioning.
+# (Pattern above must end in /* — git will not descend into a directory
+# excluded as `dir/`, so a negation inside it would never be reached.)
+!data/faers_cache/PROVENANCE.md
 
 # macOS metadata
 .DS_Store
-docs/.DS_Store
 
 # Large log files
 results/risk_grid_500beat.log
 
 # Figures generated at root level by mistake
 figure5_sympathomimetic_sensitivity.png
-__pycache__/
-*.pyc
-.DS_Store
+
+# PDFs
 *.pdf
+# ...except the withdrawn JEC submission package. The point of that folder is
+# to preserve exactly what was almost submitted; a cover letter and highlights
+# that exist only on one machine are not archived.
+!archive/jec_withdrawn_202606/*.pdf

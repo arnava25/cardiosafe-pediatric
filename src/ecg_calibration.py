@@ -89,7 +89,10 @@ def run_calibration(fast=False):
     compare to published adolescent QTc reference values.
     """
     n_beats = N_BEATS_FAST if fast else N_BEATS_CALIBRATION
-    params_path = str(_ROOT_DIR / "data" / "herg_master_params.csv")
+    # Repointed July 2026 at the rebuilt table. The previous target,
+    # data/herg_master_params.csv, was withdrawn in the June 2026 audit and now
+    # lives in archive/params_invalidated_202606/. Calibration must be rerun.
+    params_path = str(_ROOT_DIR / "params" / "herg_params_v2.csv")
 
     print(f"[{ts()}] ECG Calibration — CardioSafe Pediatric")
     print(f"[{ts()}] Beats per simulation: {n_beats}")

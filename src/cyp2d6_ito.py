@@ -24,6 +24,12 @@ Usage:
     python3 src/cyp2d6_ito.py
 """
 
+raise NotImplementedError(
+    "Hardcoded free Cmax values from the withdrawn parameter table. "
+    "Rewrite to read params/herg_params_v2.csv via build_params.py "
+    "before running. See params/rebuild_record.md section 3."
+)
+
 import sys
 import csv
 from pathlib import Path
