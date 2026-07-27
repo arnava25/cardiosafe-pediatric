@@ -1,0 +1,109 @@
+Model ready drugs: ['ESC', 'FLU', 'NOR', 'QUE', 'RIS', 'SER']
+35 combinations: 15 pairs, 20 triples
+Single drug projections, ms dAPD90: ESC 20.7, FLU 4.4, NOR 2.9, QUE 8.5, RIS 6.7, SER 2.2
+
+PASS 1, ARITHMETIC TRIAGE. Projected, not simulated. Raw dAPD90.
+combination           block %  bnd pp  proj ms  % base  sum solo   excess  excess %
+ESC+QUE+RIS             21.12   1.195     38.8   14.72      35.9    +2.90     +8.1%
+ESC+FLU+QUE             19.93   0.981     36.1   13.69      33.6    +2.45     +7.3%
+ESC+NOR+QUE             19.09   0.851     34.2   12.99      32.1    +2.12     +6.6%
+ESC+FLU+RIS             18.98   0.890     34.0   12.90      31.8    +2.16     +6.8%
+ESC+QUE+SER             18.66   0.784     33.3   12.64      31.4    +1.95     +6.2%
+ESC+NOR+RIS             18.13   0.765     32.2   12.20      30.3    +1.84     +6.1%
+ESC+RIS+SER             17.70   0.701     31.2   11.85      29.6    +1.67     +5.7%
+ESC+QUE                 17.41   0.584     30.6   11.62      29.2    +1.43     +4.9%
+ESC+FLU+NOR             16.89   0.570     29.5   11.20      28.1    +1.45     +5.2%
+ESC+FLU+SER             16.45   0.508     28.6   10.85      27.3    +1.29     +4.7%
+ESC+RIS                 16.43   0.508     28.6   10.84      27.4    +1.17     +4.3%
+ESC+NOR+SER             15.57   0.395     26.8   10.17      25.8    +1.01     +3.9%
+ESC+FLU                 15.16   0.324     26.0    9.85      25.2    +0.81     +3.2%
+ESC+NOR                 14.28   0.218     24.2    9.17      23.6    +0.55     +2.3%
+ESC+SER                 13.83   0.164     23.3    8.83      22.9    +0.42     +1.8%
+FLU+QUE+RIS             12.60   0.518     20.9    7.93      19.6    +1.27     +6.5%
+NOR+QUE+RIS             11.68   0.437     19.2    7.27      18.1    +1.05     +5.8%
+QUE+RIS+SER             11.22   0.395     18.3    6.94      17.3    +0.94     +5.4%
+FLU+NOR+QUE             10.34   0.306     16.7    6.32      15.9    +0.82     +5.2%
+FLU+QUE+SER              9.88   0.269     15.8    6.00      15.1    +0.72     +4.8%
+QUE+RIS                  9.86   0.270     15.8    5.99      15.2    +0.60     +3.9%
+FLU+NOR+RIS              9.28   0.301     14.8    5.60      14.1    +0.70     +4.9%
+NOR+QUE+SER              8.93   0.207     14.1    5.36      13.6    +0.55     +4.1%
+FLU+RIS+SER              8.81   0.268     13.9    5.28      13.3    +0.61     +4.6%
+FLU+QUE                  8.49   0.157     13.3    5.06      12.9    +0.41     +3.2%
+NOR+RIS+SER              7.85   0.216     12.2    4.64      11.8    +0.47     +4.0%
+NOR+QUE                  7.53   0.105     11.7    4.43      11.4    +0.28     +2.5%
+FLU+RIS                  7.40   0.171     11.5    4.35      11.1    +0.34     +3.0%
+QUE+SER                  7.04   0.079     10.9    4.12      10.7    +0.21     +2.0%
+FLU+NOR+SER              6.45   0.128      9.9    3.75       9.5    +0.35     +3.7%
+NOR+RIS                  6.43   0.130      9.8    3.73       9.6    +0.23     +2.4%
+RIS+SER                  5.94   0.109      9.0    3.43       8.9    +0.17     +1.9%
+FLU+NOR                  5.01   0.059      7.5    2.85       7.4    +0.16     +2.2%
+FLU+SER                  4.52   0.044      6.7    2.55       6.6    +0.12     +1.8%
+NOR+SER                  3.51   0.030      5.2    1.96       5.1    +0.08     +1.6%
+
+Excess over additive: +0.08 to +2.90 ms, mean +0.95, against a 0.5 ms measurement grid.
+Correlation between total block and excess: r = 0.9141
+If that correlation is high and the excess is small, the deviation from
+additivity is a property of the response curve, not a drug interaction:
+independent sites combine block sub-additively while the block to APD90
+curve is supralinear, and the curvature slightly outweighs it.
+
+Widest binding site bound: 1.195 percentage points.
+Margulis 2008 found no synergy experimentally, so the independent value is an
+upper bound. No clinical threshold is applied; see the module docstring.
+
+Wrote /Users/aru/Desktop/cardiosafe/results/combination_grid.csv
+
+PASS 2, SIMULATION.
+Simulating 6 singles first, then 35 combinations, at 500 beats.
+run                   block %   sim ms  proj ms    err  elapsed
+ESC                     12.50     22.0     20.7   +1.3     180s
+FLU                      3.05      5.0      4.4   +0.6     357s
+NOR                      2.03      3.0      2.9   +0.1     537s
+QUE                      5.61      9.5      8.5   +1.0     718s
+RIS                      4.49      7.5      6.7   +0.8     908s
+SER                      1.52      2.5      2.2   +0.4    1090s
+ESC+QUE+RIS             21.12     39.6     38.8   +0.8    1270s
+ESC+FLU+QUE             19.93     37.1     36.1   +1.0    1451s
+ESC+NOR+QUE             19.09     35.0     34.2   +0.8    1626s
+ESC+FLU+RIS             18.98     35.0     34.0   +1.0    1805s
+ESC+QUE+SER             18.66     34.5     33.3   +1.2    1987s
+ESC+NOR+RIS             18.13     33.0     32.2   +0.8    2165s
+ESC+RIS+SER             17.70     32.5     31.2   +1.3    2347s
+ESC+QUE                 17.41     32.0     30.6   +1.4    2525s
+ESC+FLU+NOR             16.89     30.5     29.5   +1.0    2706s
+ESC+FLU+SER             16.45     30.0     28.6   +1.4    2890s
+ESC+RIS                 16.43     30.0     28.6   +1.4    3065s
+ESC+NOR+SER             15.58     28.0     26.8   +1.2    3238s
+ESC+FLU                 15.17     27.5     26.0   +1.5    3414s
+ESC+NOR                 14.28     25.5     24.2   +1.3    3588s
+ESC+SER                 13.83     24.5     23.3   +1.2    3764s
+FLU+QUE+RIS             12.60     22.5     20.9   +1.6    3938s
+NOR+QUE+RIS             11.68     20.5     19.2   +1.3    4113s
+QUE+RIS+SER             11.22     19.5     18.3   +1.2    4287s
+FLU+NOR+QUE             10.34     18.0     16.7   +1.3    4461s
+FLU+QUE+SER              9.87     17.0     15.8   +1.2    4632s
+QUE+RIS                  9.86     17.0     15.8   +1.2    4802s
+FLU+NOR+RIS              9.28     16.0     14.8   +1.2    4975s
+NOR+QUE+SER              8.93     15.5     14.1   +1.4    5149s
+FLU+RIS+SER              8.81     15.0     13.9   +1.1    5321s
+FLU+QUE                  8.49     14.5     13.3   +1.2    5494s
+NOR+RIS+SER              7.85     13.5     12.2   +1.3    5666s
+NOR+QUE                  7.53     13.0     11.7   +1.3    5848s
+FLU+RIS                  7.40     12.5     11.5   +1.0    6023s
+QUE+SER                  7.04     12.0     10.9   +1.1    6197s
+FLU+NOR+SER              6.45     11.0      9.9   +1.1    6372s
+NOR+RIS                  6.43     11.0      9.8   +1.2    6542s
+RIS+SER                  5.94     10.0      9.0   +1.0    6714s
+FLU+NOR                  5.01      8.5      7.5   +1.0    6887s
+FLU+SER                  4.52      7.5      6.7   +0.8    7059s
+NOR+SER                  3.51      5.5      5.2   +0.3    7228s
+
+Wrote /Users/aru/Desktop/cardiosafe/results/combination_grid.csv
+
+SIMULATED excess over additive: -0.06 to +0.47 ms, mean +0.30
+PROJECTED excess was: +0.08 to +2.90 ms, mean +0.95
+If those agree, additivity is measured rather than inferred from the curve.
+
+Quadratic projection error across combinations: mean 1.18 ms, max 1.64 ms.
+The curve was fitted on single drug runs only. This is its first test on
+multi drug combinations.

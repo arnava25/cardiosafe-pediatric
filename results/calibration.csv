@@ -1,0 +1,5 @@
+drug,dose_mg_day,cmax_total_ngml,free_cmax_nM,block_pct,model_dAPD90_ms,fda_predicted_ddQTcF_ms,ratio_model_over_fda,difference_ms
+quetiapine,400.0,520.9,230.91,2.707,4.53,5.4,0.84,-0.87
+quetiapine,600.0,1023.6,453.75,5.183,8.54,6.8,1.255,1.74
+quetiapine,800.0,1113.4,493.55,5.613,9.54,6.9,1.382,2.64
+risperidone,,,4.65,4.495,7.54,,,

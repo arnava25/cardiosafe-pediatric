@@ -5,7 +5,7 @@ parameter rebuild and must be regenerated before use.**
 
 These outputs were computed against `data/herg_master_params.csv`, the hERG
 parameter table withdrawn in the June 2026 citation audit. That table has been
-moved to `archive/params_invalidated_202606/`; see the README there for the three
+moved to `archive/params_invalidated_202606/`; see the README there for the four
 error modes found. Nothing here has been deleted, because the files are needed
 for provenance and for before/after comparison once the rerun is done — but no
 number in them should be quoted, plotted, or carried into a manuscript.

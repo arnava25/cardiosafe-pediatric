@@ -1,0 +1,11 @@
+assumed_CL_L_per_h,phenotype,cmax_scale,block_pct,APD90_ms,dAPD90_ms,above_ICH_10ms,source
+14.2,normal,1.0,12.5,285.64,22.04,True,"Poweleit 2023 measured, CYP2C19 normal metabolizers"
+14.2,poor,2.5227,26.492,315.16,51.56,True,"Poweleit 2023 measured, CYP2C19 normal metabolizers, CYP2C19 poor metabolizer"
+16.3,normal,0.8712,11.068,283.14,19.54,True,second low estimate cited by Poweleit
+16.3,poor,2.1977,23.895,309.15,45.55,True,"second low estimate cited by Poweleit, CYP2C19 poor metabolizer"
+20.0,normal,0.71,9.209,279.64,16.04,True,bottom of the published adult and adolescent range
+20.0,poor,1.7911,20.375,301.65,38.05,True,"bottom of the published adult and adolescent range, CYP2C19 poor metabolizer"
+33.0,normal,0.4303,5.791,273.14,9.54,False,implied by Fekete 2020 dose to concentration factor
+33.0,poor,1.0855,13.426,287.64,24.04,True,"implied by Fekete 2020 dose to concentration factor, CYP2C19 poor metabolizer"
+40.0,normal,0.355,4.827,271.64,8.04,False,top of the published adult and adolescent range
+40.0,poor,0.8956,11.343,283.64,20.04,True,"top of the published adult and adolescent range, CYP2C19 poor metabolizer"
